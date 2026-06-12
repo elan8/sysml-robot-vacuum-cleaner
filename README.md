@@ -8,7 +8,7 @@ Used as the Babel42 bootstrap demo, Spec42 validation corpus, and teaching examp
 
 Model a residential robot vacuum with:
 
-- stakeholder and system requirements (profile-typed usages from `RequirementManagement`)
+- stakeholder and system requirements (implicit usages with `@RequirementRole` and `@StatusInfo` metadata)
 - requirement derivation from user needs to system requirements
 - subsystem decomposition with power, mass, and BOM roll-ups
 - operating behavior state machine
@@ -19,7 +19,9 @@ Model a residential robot vacuum with:
 
 Requires packages from [sysml-domain-libraries](https://github.com/elan8/sysml-domain-libraries), especially:
 
-- `RequirementManagement` (`UserRequirement`, `SystemRequirement`)
+- `RequirementMetadata` (`RequirementRole`, `RequirementRoleKind`)
+- `ModelingMetadata` (`StatusInfo`, OMG `StatusKind`)
+- `RequirementManagement` (evidence, baseline, traceability scaffolding — not requirement defs)
 - `MonetaryUnits` (`MonetaryAmount`)
 - `ISQ` / `SI` quantity types
 

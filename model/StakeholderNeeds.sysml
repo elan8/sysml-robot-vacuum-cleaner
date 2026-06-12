@@ -1,36 +1,45 @@
 package StakeholderNeeds {
-  private import RequirementManagement::*;
+  private import RequirementMetadata::*;
+  private import ModelingMetadata::*;
 
-  requirement cleanLargeAreas : UserRequirement {
+  requirement cleanLargeAreas {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* Stakeholders need the robot to clean large floor areas efficiently in one mission. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement operateSafely : UserRequirement {
+  requirement operateSafely {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* The robot shall operate safely around people, pets, and household obstacles. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement quietCleaning : UserRequirement {
+  requirement quietCleaning {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* Cleaning noise shall remain acceptable for residential and office use. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement reliableDocking : UserRequirement {
+  requirement reliableDocking {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* The robot shall dock and charge reliably without user intervention. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement easyToEmpty : UserRequirement {
+  requirement easyToEmpty {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = open; }
     doc /* The robot shall be easy to empty and maintain without tools or specialist skills. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement missionFeedback : UserRequirement {
+  requirement missionFeedback {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* Users need visibility into cleaning progress and status from the mobile app during a mission. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement affordableProduct : UserRequirement {
+  requirement affordableProduct {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* The product shall remain affordable at target production volume. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement portableDesign : UserRequirement {
+  requirement portableDesign {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
     doc /* The robot shall be easy to lift and ship for home use. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
 }

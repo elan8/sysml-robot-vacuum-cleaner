@@ -1,42 +1,52 @@
 package SystemRequirements {
-  private import RequirementManagement::*;
+  private import RequirementMetadata::*;
+  private import ModelingMetadata::*;
   private import StakeholderNeeds::*;
 
-  requirement cleanAtLeastEighty : SystemRequirement {
+  requirement cleanAtLeastEighty {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall clean at least 80 m² on a single charge. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement returnToDock : SystemRequirement {
+  requirement returnToDock {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall return to the docking station when battery state of charge drops below 15%. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement avoidObstacles : SystemRequirement {
+  requirement avoidObstacles {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall avoid obstacles higher than 30 mm. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement detectDustBin : SystemRequirement {
+  requirement detectDustBin {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall detect when the dust bin is full. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement keepNoise : SystemRequirement {
+  requirement keepNoise {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall keep acoustic noise below 65 dBA in standard mode. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement coverFloor : SystemRequirement {
+  requirement coverFloor {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall cover at least 90% of reachable floor area in a rectangular room. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement reportCleaningStatus : SystemRequirement {
+  requirement reportCleaningStatus {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The robot shall report cleaning progress and status to the mobile app during a mission. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement limitBomCost : SystemRequirement {
+  requirement limitBomCost {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The bill of materials at target production volume shall not exceed 400 EUR. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
-  requirement limitTotalMass : SystemRequirement {
+  requirement limitTotalMass {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
     doc /* The total robot mass shall not exceed 5.0 kg. */
-    attribute :>> status = RequirementStatusKind::approved;
   }
 
   #derivation connection {
