@@ -18,8 +18,7 @@ package AnalysisCases {
         robot.power.powerDrawW,
         robot.docking.powerDrawW,
         robot.control.powerDrawW,
-        robot.userInterface.powerDrawW,
-        robot.safety.powerDrawW
+        robot.userInterface.powerDrawW
       ) <= powerBudgetW;
     }
     objective estimatePower {
@@ -41,8 +40,7 @@ package AnalysisCases {
         robot.power.bomCost,
         robot.docking.bomCost,
         robot.control.bomCost,
-        robot.userInterface.bomCost,
-        robot.safety.bomCost
+        robot.userInterface.bomCost
       ) <= bomCostBudget;
     }
     objective estimateCost {
@@ -63,8 +61,7 @@ package AnalysisCases {
         robot.power.massKg,
         robot.docking.massKg,
         robot.control.massKg,
-        robot.userInterface.massKg,
-        robot.safety.massKg
+        robot.userInterface.massKg
       ) <= massBudget;
     }
     objective estimateMass {
