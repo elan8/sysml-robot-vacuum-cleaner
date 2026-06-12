@@ -9,7 +9,7 @@ package Verification {
     doc /* Confirm at least 90% reachable floor coverage in the standard rectangular test room. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::coverFloor;
+      verify requirement coverFloor;
     }
     then action runCoverageTest : RunPhysicalTest;
     
@@ -20,7 +20,7 @@ package Verification {
     doc /* Confirm cleaning area per charge meets cleanAtLeastEighty under the reference mission profile. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::cleanAtLeastEighty;
+      verify requirement cleanAtLeastEighty;
     }
     then action runRuntimeTest : RunPhysicalTest;
     
@@ -31,7 +31,7 @@ package Verification {
     doc /* Confirm the robot avoids obstacles taller than 30 mm without contact. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::avoidObstacles;
+      verify requirement avoidObstacles;
     }
     then action runObstacleScenario : RunPhysicalTest;
     
@@ -42,7 +42,7 @@ package Verification {
     doc /* Confirm autonomous return and docking when battery state of charge is low. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::returnToDock;
+      verify requirement returnToDock;
     }
     then action runDockingTest : RunPhysicalTest;
     
@@ -53,7 +53,7 @@ package Verification {
     doc /* Confirm dust-bin-full detection and user notification. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::detectDustBin;
+      verify requirement detectDustBin;
     }
     then action runBinFullTest : RunPhysicalTest;
     
@@ -64,7 +64,7 @@ package Verification {
     doc /* Confirm acoustic noise in standard cleaning mode stays below 65 dBA. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::keepNoise;
+      verify requirement keepNoise;
     }
     then action runNoiseTest : RunPhysicalTest;
     
@@ -78,7 +78,7 @@ package Verification {
     */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::limitBomCost;
+      verify requirement limitBomCost;
     }
     then action recordBomAnalysis : RecordModelAnalysisEvidence;
     
@@ -94,7 +94,7 @@ package Verification {
     */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::limitTotalMass;
+      verify requirement limitTotalMass;
     }
     then action recordMassAnalysis : RecordModelAnalysisEvidence;
     
@@ -107,8 +107,8 @@ package Verification {
     doc /* Confirm the robot detects 50 mm floor drop-offs and commands a safe stop before crossing the edge. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::detectCliffs;
-      verify requirement SystemRequirements::superviseHazards;
+      verify requirement detectCliffs;
+      verify requirement superviseHazards;
     }
     then action runCliffEdgeTest : RunPhysicalTest;
     
@@ -121,7 +121,7 @@ package Verification {
     doc /* Confirm localization error remains below 150 mm across the reference home layout. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::localizeReliably;
+      verify requirement localizeReliably;
     }
     then action recordLocalizationAnalysis : RecordModelAnalysisEvidence;
     
@@ -134,7 +134,7 @@ package Verification {
     doc /* Confirm cleaned, unknown, and unreachable areas are represented in the mission coverage map. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::updateCoverageMap;
+      verify requirement updateCoverageMap;
     }
     then action recordCoverageMapAnalysis : RecordModelAnalysisEvidence;
     
@@ -147,8 +147,8 @@ package Verification {
     doc /* Confirm wheel-stall detection enters bounded recovery and escalates to safe stop when recovery fails. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::recoverFromStall;
-      verify requirement SystemRequirements::superviseHazards;
+      verify requirement recoverFromStall;
+      verify requirement superviseHazards;
     }
     then action runStallRecoveryScenario : RunPhysicalTest;
     
@@ -159,7 +159,7 @@ package Verification {
     doc /* Confirm local-only map handling and user consent behavior for cloud backup. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::protectMapPrivacy;
+      verify requirement protectMapPrivacy;
     }
     then action runPrivacyConfigurationReview : RunPhysicalTest;
     
@@ -170,7 +170,7 @@ package Verification {
     doc /* Confirm charge current and temperature remain within the battery safe operating area. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement SystemRequirements::chargeSafely;
+      verify requirement chargeSafely;
     }
     then action runChargingSafetyTest : RunPhysicalTest;
     
