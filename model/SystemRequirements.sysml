@@ -48,6 +48,41 @@ package SystemRequirements {
     @StatusInfo { status = done; }
     doc /* The total robot mass shall not exceed 5.0 kg. */
   }
+  requirement detectCliffs {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall detect floor drop-offs of at least 50 mm before any wheel crosses the edge. */
+  }
+  requirement localizeReliably {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall maintain localization error below 150 mm during a standard cleaning mission. */
+  }
+  requirement updateCoverageMap {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall maintain a coverage map with cleaned, unreachable, and unknown cells during the mission. */
+  }
+  requirement recoverFromStall {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall detect a wheel stall within 2 s and enter a bounded recovery maneuver. */
+  }
+  requirement protectMapPrivacy {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall keep raw home map data local unless the user explicitly enables cloud backup. */
+  }
+  requirement chargeSafely {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall limit charge current and temperature within the battery manufacturer's safe operating area. */
+  }
+  requirement superviseHazards {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall command a safe stop when cliff, bumper, lift, overcurrent, or thermal hazards are detected. */
+  }
 
   #derivation connection {
     end #original ::> cleanLargeAreas;
@@ -84,5 +119,33 @@ package SystemRequirements {
   #derivation connection {
     end #original ::> portableDesign;
     end #derive ::> limitTotalMass;
+  }
+  #derivation connection {
+    end #original ::> protectHomes;
+    end #derive ::> detectCliffs;
+  }
+  #derivation connection {
+    end #original ::> adaptToHomes;
+    end #derive ::> localizeReliably;
+  }
+  #derivation connection {
+    end #original ::> adaptToHomes;
+    end #derive ::> updateCoverageMap;
+  }
+  #derivation connection {
+    end #original ::> tolerateFaults;
+    end #derive ::> recoverFromStall;
+  }
+  #derivation connection {
+    end #original ::> respectPrivacy;
+    end #derive ::> protectMapPrivacy;
+  }
+  #derivation connection {
+    end #original ::> maintainBatteryHealth;
+    end #derive ::> chargeSafely;
+  }
+  #derivation connection {
+    end #original ::> protectHomes;
+    end #derive ::> superviseHazards;
   }
 }

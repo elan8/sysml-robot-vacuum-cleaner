@@ -42,4 +42,29 @@ package StakeholderNeeds {
     @StatusInfo { status = done; }
     doc /* The robot shall be easy to lift and ship for home use. */
   }
+  requirement protectHomes {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall protect household occupants, furniture, stairs, and fragile objects while cleaning autonomously. */
+  }
+  requirement adaptToHomes {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall adapt to typical homes with mixed flooring, thresholds, low furniture, narrow passages, and changing clutter. */
+  }
+  requirement respectPrivacy {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall preserve user privacy when sensing, mapping, storing, and communicating home data. */
+  }
+  requirement tolerateFaults {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall detect and recover from common operational faults without creating unsafe behavior. */
+  }
+  requirement maintainBatteryHealth {
+    @RequirementRole { role = user; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall charge safely and protect battery lifetime across repeated missions. */
+  }
 }

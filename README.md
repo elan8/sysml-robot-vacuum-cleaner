@@ -10,10 +10,12 @@ Model a residential robot vacuum with:
 
 - stakeholder and system requirements (implicit usages with `@RequirementRole` and `@StatusInfo` metadata)
 - requirement derivation from user needs to system requirements
-- subsystem decomposition with power, mass, and BOM roll-ups
-- operating behavior state machine
+- subsystem decomposition with power, mass, BOM, sensing, localization, control, safety, and privacy responsibilities
+- cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
+- operating behavior state machine with self-test, cleaning, pause, recovery, safe-stop, fault, docking, and charging states
+- operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
 - verification cases with physical and model-based evidence
-- analysis cases for power, cost, mass, and mission energy
+- analysis cases for power, cost, mass, mission energy, localization, coverage resolution, and safety reaction timing
 
 ## Library dependencies
 
@@ -54,6 +56,9 @@ Override the model directory with `BABEL42_ROBOT_VACUUM_MODEL_PATH` when develop
 |-----------|-------|
 | BOM budget | 400 EUR |
 | Mass budget | 5.0 kg |
+| Battery energy budget | 648 kJ |
+| Localization error limit | 150 mm |
+| Safe-stop reaction limit | 100 ms |
 
 Defined in `DesignLimits.sysml` and referenced by system requirements and analysis cases.
 
@@ -67,6 +72,7 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 | [DesignLimits.sysml](model/DesignLimits.sysml) | `DesignLimits` | BOM and mass budgets |
 | [Architecture.sysml](model/Architecture.sysml) | `Architecture` | Subsystems, connections, `satisfy` |
 | [BehaviorStates.sysml](model/BehaviorStates.sysml) | `BehaviorStates` | Operating state machine |
+| [OperationalScenarios.sysml](model/OperationalScenarios.sysml) | `OperationalScenarios` | Use-case context and mission action flows |
 | [Verification.sysml](model/Verification.sysml) | `Verification` | Verification cases |
 | [AnalysisCases.sysml](model/AnalysisCases.sysml) | `AnalysisCases` | Power, cost, mass, energy roll-ups |
 
@@ -76,8 +82,9 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 2. `SystemRequirements.sysml` — derived system requirements
 3. `Architecture.sysml` — physical/logical decomposition and traceability
 4. `BehaviorStates.sysml` — mission lifecycle states
-5. `Verification.sysml` and `AnalysisCases.sysml` — V&V and parametric evidence
-6. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
+5. `OperationalScenarios.sysml` — nominal and recovery mission flows
+6. `Verification.sysml` and `AnalysisCases.sysml` — V&V and parametric evidence
+7. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
 
 ## Parser notes
 
