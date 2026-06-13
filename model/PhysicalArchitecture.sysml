@@ -6,9 +6,9 @@ package PhysicalArchitecture {
   private import SI::*;
   private import ScalarValues::*;
 
-  part def RobotSubsystem {
+  part def PhysicalAssembly {
     doc /*
-      Shared roll-up attributes for physical robot subsystems (power, mass, BOM).
+      Shared roll-up attributes for monteerbare robot-assemblies (power, mass, BOM).
     */
     attribute powerDrawW : PowerValue;
     attribute massKg : MassValue;
@@ -40,19 +40,20 @@ package PhysicalArchitecture {
     port hazardOut : HazardPort;
   }
 
-  part def MobilitySubsystem :> RobotSubsystem {
+  part def DriveModule :> PhysicalAssembly {
     doc /*
-      Wheel actuation and proprioception. Motor drivers live on the main control PCB;
-      phase commands are routed at robot level from control.mainControlPcb.
+      Mechanical drive LRU: wheel motors, gearboxes, encoders, and bumper switches.
+      Motor drivers are mounted on the main control PCB in mainElectronics.
     */
     attribute drivePowerW : PowerValue = 28 [W];
     attribute :>> powerDrawW = 28 [W];
     attribute :>> massKg = 1.2 [kg];
-    attribute :>> bomCost = 120 [EUR];
+    attribute :>> bomCost = 100 [EUR];
     port powerIn : PowerLoadPort;
-    port commandIn : MissionCommandPort;
-    port odometryOut : OdometryPort;
-    port faultOut : HazardPort;
+    port phaseLeftIn : MissionCommandPort;
+    port phaseRightIn : MissionCommandPort;
+    port encoderOut : OdometryPort;
+    port bumperHazardOut : HazardPort;
     part leftMotor : BrushlessDriveMotor;
     part rightMotor : BrushlessDriveMotor;
     part leftGearbox : WheelGearbox;
@@ -60,13 +61,13 @@ package PhysicalArchitecture {
     part leftEncoder : WheelEncoder;
     part rightEncoder : WheelEncoder;
     part bumperSwitches : BumperSwitchArray;
-    item wheelOdometry : PoseEstimate;
-    item driveFault : HazardEvent;
     connect powerIn to leftMotor.powerIn;
     connect powerIn to rightMotor.powerIn;
-    connect leftEncoder.odometryOut to odometryOut;
-    connect rightEncoder.odometryOut to odometryOut;
-    connect bumperSwitches.hazardOut to faultOut;
+    connect leftMotor.phaseCommandIn to phaseLeftIn;
+    connect rightMotor.phaseCommandIn to phaseRightIn;
+    connect leftEncoder.odometryOut to encoderOut;
+    connect rightEncoder.odometryOut to encoderOut;
+    connect bumperSwitches.hazardOut to bumperHazardOut;
   }
 
   part def BrushMotor {
@@ -88,7 +89,7 @@ package PhysicalArchitecture {
     port statusOut : MissionStatusPort;
   }
 
-  part def CleaningSubsystem :> RobotSubsystem {
+  part def CleaningHeadModule :> PhysicalAssembly {
     attribute brushPowerW : PowerValue = 12 [W];
     attribute vacuumPowerW : PowerValue = 6 [W];
     attribute dustBinCapacityMl : Integer = 450;
@@ -104,8 +105,6 @@ package PhysicalArchitecture {
     part vacuumFan : VacuumFan;
     part dustBin : DustBin;
     part dustLevelSensor : DustLevelSensor;
-    item dustBinStatus : MissionStatus;
-    item brushFault : HazardEvent;
     connect powerIn to mainBrushMotor.powerIn;
     connect powerIn to sideBrushMotor.powerIn;
     connect powerIn to vacuumFan.powerIn;
@@ -132,18 +131,24 @@ package PhysicalArchitecture {
   part def MapProcessingSoftware {
     attribute gridCellSizeMm : LengthValue = 100 [mm];
   }
+  part def CoveragePlannerSoftware {
+    attribute plannerType : String = "boustrophedon with obstacle replanning";
+  }
+  part def LocalizationEstimatorSoftware {
+    attribute estimatorType : String = "wheel odometry plus IMU plus range observations";
+    attribute localizationErrorMm : LengthValue = 120 [mm];
+  }
 
-  part def PerceptionSubsystem :> RobotSubsystem {
+  part def SensorAssembly :> PhysicalAssembly {
+    doc /* Sensor hardware LRU: range, cliff, and inertial sensing (no application firmware). */
     attribute obstacleDetectionRangeMm : LengthValue = 1200 [mm];
     attribute cliffDetectionHeightMm : LengthValue = 50 [mm];
-    attribute :>> powerDrawW = 6 [W];
-    attribute :>> massKg = 0.32 [kg];
-    attribute :>> bomCost = 58 [EUR];
+    attribute :>> powerDrawW = 5 [W];
+    attribute :>> massKg = 0.28 [kg];
+    attribute :>> bomCost = 38 [EUR];
     port powerIn : PowerLoadPort;
-    port mapOut;
-    port obstacleOut;
-    port cliffOut;
-    port hazardOut : HazardPort;
+    port sensorBusOut;
+    port cliffHazardOut : HazardPort;
     part frontTofSensor : TimeOfFlightRangeSensor;
     part leftWallTofSensor : TimeOfFlightRangeSensor;
     part rightWallTofSensor : TimeOfFlightRangeSensor;
@@ -152,41 +157,10 @@ package PhysicalArchitecture {
     part cliffSensorRearLeft : InfraredCliffSensor;
     part cliffSensorRearRight : InfraredCliffSensor;
     part imu : InertialMeasurementUnit;
-    part mapProcessor : MapProcessingSoftware;
-    item occupancyGrid : OccupancyGrid;
-    item obstacleObservation : ObstacleObservation;
-    item cliffObservation : CliffObservation;
-    connect cliffSensorFrontLeft.cliffOut to hazardOut;
-    connect cliffSensorFrontRight.cliffOut to hazardOut;
-    connect cliffSensorRearLeft.cliffOut to hazardOut;
-    connect cliffSensorRearRight.cliffOut to hazardOut;
-  }
-
-  part def CoveragePlannerSoftware {
-    attribute plannerType : String = "boustrophedon with obstacle replanning";
-  }
-  part def LocalizationEstimatorSoftware {
-    attribute estimatorType : String = "wheel odometry plus IMU plus range observations";
-  }
-
-  part def NavigationSubsystem :> RobotSubsystem {
-    attribute localizationErrorMm : LengthValue = 120 [mm];
-    attribute coverageCellSizeMm : LengthValue = 100 [mm];
-    attribute :>> powerDrawW = 5 [W];
-    attribute :>> massKg = 0.18 [kg];
-    attribute :>> bomCost = 20 [EUR];
-    port powerIn : PowerLoadPort;
-    port mapIn;
-    port obstacleIn;
-    port odometryIn;
-    port commandOut;
-    part localizationEstimator : LocalizationEstimatorSoftware;
-    part coveragePlanner : CoveragePlannerSoftware;
-    item map : OccupancyGrid;
-    item obstacles : ObstacleObservation;
-    item odometry : PoseEstimate;
-    item plannedDriveCommand : DriveCommand;
-    item coverageMap : OccupancyGrid;
+    connect cliffSensorFrontLeft.cliffOut to cliffHazardOut;
+    connect cliffSensorFrontRight.cliffOut to cliffHazardOut;
+    connect cliffSensorRearLeft.cliffOut to cliffHazardOut;
+    connect cliffSensorRearRight.cliffOut to cliffHazardOut;
   }
 
   part def LithiumIonBatteryPack {
@@ -207,24 +181,21 @@ package PhysicalArchitecture {
     port powerOut;
   }
 
-  part def PowerSubsystem :> RobotSubsystem {
-    attribute electronicsPowerW : PowerValue = 8 [W];
+  part def PowerModule :> PhysicalAssembly {
     attribute batteryCapacity : EnergyValue = 648 [kJ];
     attribute lowBatteryThresholdPercent : Real = 15.0;
     attribute reserveEnergy : EnergyValue = 97 [kJ];
     attribute :>> powerDrawW = 8 [W];
     attribute :>> massKg = 0.72 [kg];
     attribute :>> bomCost = 68 [EUR];
-    port powerOut;
+    port mainPowerOut;
     port telemetryOut : TelemetryPort;
     port hazardOut : HazardPort;
     part batteryPack : LithiumIonBatteryPack;
     part bms : BatteryManagementSystem;
     part logicRegulator : BuckRegulator;
     part motorRegulator : BuckRegulator;
-    item batteryStatus : MissionStatus;
-    item powerHazard : HazardEvent;
-    connect batteryPack.powerOut to powerOut;
+    connect batteryPack.powerOut to mainPowerOut;
     connect bms.batteryTelemetryOut to telemetryOut;
     connect bms.hazardOut to hazardOut;
   }
@@ -238,7 +209,7 @@ package PhysicalArchitecture {
     port statusOut : MissionStatusPort;
   }
 
-  part def DockingSubsystem :> RobotSubsystem {
+  part def DockInterfaceModule :> PhysicalAssembly {
     attribute dockingBeaconRangeMm : LengthValue = 2500 [mm];
     attribute :>> powerDrawW = 2 [W];
     attribute :>> massKg = 0.38 [kg];
@@ -247,7 +218,6 @@ package PhysicalArchitecture {
     port dockStatusOut;
     part chargingContacts : ChargingContactPair;
     part beaconReceiver : DockBeaconReceiver;
-    item dockStatus : MissionStatus;
     connect powerIn to chargingContacts.powerIn;
     connect beaconReceiver.statusOut to dockStatusOut;
   }
@@ -272,44 +242,52 @@ package PhysicalArchitecture {
     part leftMotorDriver : MotorDriverIC;
     part rightMotorDriver : MotorDriverIC;
   }
-  part def ControlSoftware {
+  part def ApplicationFirmware {
     doc /*
-      Application firmware running on the MCU. It owns mission orchestration,
-      state management, command arbitration, and app-facing status.
+      Mission orchestration, command arbitration, and app-facing status on the main MCU.
     */
     attribute controlLoopPeriodMs : Integer = 50;
     exhibit state behavior : RobotOperatingBehavior;
   }
-  part def SafetySupervisor {
+  part def SafetySupervisorFirmware {
     doc /*
-      Safety-monitoring firmware task running on the main MCU, with direct inputs
-      from cliff sensors, bumper switches, motor drivers, and the BMS. It can
-      override mission commands by issuing a safe-stop drive command.
+      Safety-monitoring firmware task with inputs from sensors, motor drivers, and BMS.
     */
     attribute safeStopReactionTimeMs : Integer = 100;
   }
-  part def ControlElectronicsSubsystem :> RobotSubsystem {
+
+  part def MainElectronicsAssembly :> PhysicalAssembly {
+    doc /*
+      Compute LRU: main PCB, motor drivers, and all deployed navigation/perception/control firmware.
+    */
     attribute controlLoopPeriodMs : Integer = 50;
     attribute hazardReactionTimeMs : Integer = 100;
-    attribute :>> powerDrawW = 3 [W];
-    attribute :>> massKg = 0.10 [kg];
-    attribute :>> bomCost = 8 [EUR];
+    attribute coverageCellSizeMm : LengthValue = 100 [mm];
+    attribute :>> powerDrawW = 9 [W];
+    attribute :>> massKg = 0.28 [kg];
+    attribute :>> bomCost = 48 [EUR];
     port powerIn : PowerLoadPort;
-    port commandOut;
-    port statusOut;
-    port hazardIn;
-    port odometryIn : OdometryPort;
+    port leftMotorDriveOut : MissionCommandPort;
+    port rightMotorDriveOut : MissionCommandPort;
+    port sensorBusIn;
+    port encoderIn : OdometryPort;
+    port cleaningCommandOut : MissionCommandPort;
     port telemetryIn : TelemetryPort;
+    port dockStatusIn;
+    port hazardIn : HazardPort;
+    port statusOut;
+    port userCommandIn;
     part mainControlPcb : MainControlPcb;
-    part applicationSoftware : ControlSoftware;
-    part safetySupervisor : SafetySupervisor;
-    item userCommand : UserCommand;
-    item hazard : HazardEvent;
-    item safeCommand : DriveCommand;
-    item driveCommand : DriveCommand;
-    item cleaningCommand : CleaningCommand;
-    item missionStatus : MissionStatus;
+    part applicationFirmware : ApplicationFirmware;
+    part safetySupervisor : SafetySupervisorFirmware;
+    part mapProcessing : MapProcessingSoftware;
+    part localizationEstimator : LocalizationEstimatorSoftware;
+    part coveragePlanner : CoveragePlannerSoftware;
     exhibit state behavior : RobotOperatingBehavior;
+    connect mainControlPcb.leftMotorDriver.commandIn to leftMotorDriveOut;
+    connect mainControlPcb.rightMotorDriver.commandIn to rightMotorDriveOut;
+    connect mainControlPcb.leftMotorDriver.faultOut to hazardIn;
+    connect mainControlPcb.rightMotorDriver.faultOut to hazardIn;
   }
 
   part def PushButton {
@@ -324,19 +302,18 @@ package PhysicalArchitecture {
     port statusIn;
   }
 
-  part def UserInterface :> RobotSubsystem {
+  part def HumanMachineInterface :> PhysicalAssembly {
     attribute supportsLocalOnlyMode : Boolean = true;
     attribute :>> powerDrawW = 1 [W];
     attribute :>> massKg = 0.65 [kg];
     attribute :>> bomCost = 4 [EUR];
+    port powerIn : PowerLoadPort;
     port statusIn;
     port userCommandOut;
     part cleanButton : PushButton;
     part homeButton : PushButton;
     part statusLedRing : StatusLedRing;
     part mobileApp : MobileAppInterface;
-    item missionStatus : MissionStatus;
-    item appCommand : UserCommand;
     connect cleanButton.commandOut to userCommandOut;
     connect homeButton.commandOut to userCommandOut;
     connect mobileApp.commandOut to userCommandOut;
@@ -344,41 +321,42 @@ package PhysicalArchitecture {
     connect statusIn to mobileApp.statusIn;
   }
 
+  part def ChassisAssembly :> PhysicalAssembly {
+    doc /* Structural shell, wheel mounts, and assembly hardware. */
+    attribute :>> powerDrawW = 0 [W];
+    attribute :>> massKg = 0.55 [kg];
+    attribute :>> bomCost = 20 [EUR];
+  }
+
   part def AutonomousFloorCleaningRobot {
-    part mobility : MobilitySubsystem;
-    part cleaning : CleaningSubsystem;
-    part perception : PerceptionSubsystem;
-    part navigation : NavigationSubsystem;
-    part power : PowerSubsystem;
-    part docking : DockingSubsystem;
-    part control : ControlElectronicsSubsystem;
-    part userInterface : UserInterface;
-    connect power.powerOut to mobility.powerIn;
-    connect power.powerOut to cleaning.powerIn;
-    connect power.powerOut to perception.powerIn;
-    connect power.powerOut to navigation.powerIn;
-    connect power.powerOut to docking.powerIn;
-    connect power.powerOut to control.powerIn;
-    connect power.powerOut to control.mainControlPcb.leftMotorDriver.powerIn;
-    connect power.powerOut to control.mainControlPcb.rightMotorDriver.powerIn;
-    connect perception.mapOut to navigation.mapIn;
-    connect perception.obstacleOut to navigation.obstacleIn;
-    connect mobility.odometryOut to navigation.odometryIn;
-    connect mobility.odometryOut to control.odometryIn;
-    connect navigation.commandOut to control.commandOut;
-    connect control.commandOut to mobility.commandIn;
-    connect control.commandOut to cleaning.commandIn;
-    connect control.mainControlPcb.leftMotorDriver.commandIn to mobility.leftMotor.phaseCommandIn;
-    connect control.mainControlPcb.rightMotorDriver.commandIn to mobility.rightMotor.phaseCommandIn;
-    connect control.mainControlPcb.leftMotorDriver.faultOut to control.hazardIn;
-    connect control.mainControlPcb.rightMotorDriver.faultOut to control.hazardIn;
-    connect control.statusOut to userInterface.statusIn;
-    connect userInterface.userCommandOut to control.commandOut;
-    connect docking.dockStatusOut to control.statusOut;
-    connect perception.hazardOut to control.hazardIn;
-    connect mobility.faultOut to control.hazardIn;
-    connect cleaning.faultOut to control.hazardIn;
-    connect power.hazardOut to control.hazardIn;
-    connect power.telemetryOut to control.telemetryIn;
+    part chassis : ChassisAssembly;
+    part driveModule : DriveModule;
+    part cleaningHead : CleaningHeadModule;
+    part sensorAssembly : SensorAssembly;
+    part mainElectronics : MainElectronicsAssembly;
+    part powerModule : PowerModule;
+    part dockInterface : DockInterfaceModule;
+    part hmi : HumanMachineInterface;
+    connect powerModule.mainPowerOut to driveModule.powerIn;
+    connect powerModule.mainPowerOut to cleaningHead.powerIn;
+    connect powerModule.mainPowerOut to sensorAssembly.powerIn;
+    connect powerModule.mainPowerOut to mainElectronics.powerIn;
+    connect powerModule.mainPowerOut to dockInterface.powerIn;
+    connect powerModule.mainPowerOut to hmi.powerIn;
+    connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.leftMotorDriver.powerIn;
+    connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.rightMotorDriver.powerIn;
+    connect mainElectronics.leftMotorDriveOut to driveModule.phaseLeftIn;
+    connect mainElectronics.rightMotorDriveOut to driveModule.phaseRightIn;
+    connect driveModule.encoderOut to mainElectronics.encoderIn;
+    connect sensorAssembly.sensorBusOut to mainElectronics.sensorBusIn;
+    connect mainElectronics.cleaningCommandOut to cleaningHead.commandIn;
+    connect mainElectronics.statusOut to hmi.statusIn;
+    connect hmi.userCommandOut to mainElectronics.userCommandIn;
+    connect dockInterface.dockStatusOut to mainElectronics.dockStatusIn;
+    connect sensorAssembly.cliffHazardOut to mainElectronics.hazardIn;
+    connect driveModule.bumperHazardOut to mainElectronics.hazardIn;
+    connect cleaningHead.faultOut to mainElectronics.hazardIn;
+    connect powerModule.hazardOut to mainElectronics.hazardIn;
+    connect powerModule.telemetryOut to mainElectronics.telemetryIn;
   }
 }

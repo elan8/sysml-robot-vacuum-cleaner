@@ -18,15 +18,18 @@ package ArchitectureAllocations {
     perform action returnToDock : ReturnToDock;
     perform action chargeBattery : ChargeBattery;
 
-    allocate operate.locomotion to physical.mobility;
-    allocate operate.cleaning to physical.cleaning;
-    allocate operate.perception to physical.perception;
-    allocate operate.navigation to physical.navigation;
-    allocate operate.powerManagement to physical.power;
-    allocate operate.docking to physical.docking;
-    allocate operate.missionControl to physical.control;
-    allocate operate.safetySupervision to physical.control;
-    allocate operate.userInteraction to physical.userInterface;
+    allocate operate.locomotion to physical.driveModule;
+    allocate operate.cleaning to physical.cleaningHead;
+    allocate operate.perception to physical.sensorAssembly;
+    allocate operate.perception to physical.mainElectronics.mapProcessing;
+    allocate operate.navigation to physical.mainElectronics.localizationEstimator;
+    allocate operate.navigation to physical.mainElectronics.coveragePlanner;
+    allocate operate.powerManagement to physical.powerModule;
+    allocate operate.docking to physical.dockInterface;
+    allocate operate.missionControl to physical.mainElectronics.applicationFirmware;
+    allocate operate.safetySupervision to physical.mainElectronics.safetySupervisor;
+    allocate operate.userInteraction to physical.hmi;
+    allocate operate.userInteraction to physical.mainElectronics.applicationFirmware;
 
     allocate startMission to operate.missionControl;
     allocate buildMap to operate.perception;

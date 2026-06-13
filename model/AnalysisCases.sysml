@@ -11,19 +11,19 @@ package AnalysisCases {
     subject robot : AutonomousFloorCleaningRobot;
     return ref powerWithinBudget {
       return sum(
-        robot.mobility.powerDrawW,
-        robot.cleaning.powerDrawW,
-        robot.perception.powerDrawW,
-        robot.navigation.powerDrawW,
-        robot.power.powerDrawW,
-        robot.docking.powerDrawW,
-        robot.control.powerDrawW,
-        robot.userInterface.powerDrawW
+        robot.driveModule.powerDrawW,
+        robot.cleaningHead.powerDrawW,
+        robot.sensorAssembly.powerDrawW,
+        robot.mainElectronics.powerDrawW,
+        robot.powerModule.powerDrawW,
+        robot.dockInterface.powerDrawW,
+        robot.hmi.powerDrawW,
+        robot.chassis.powerDrawW
       ) <= powerBudgetW;
     }
     objective estimatePower {
       doc /*
-        Supporting engineering roll-up: subsystem powerDrawW summed vs local 75 W budget
+        Supporting engineering roll-up: assembly powerDrawW summed vs local 75 W budget
         (no dedicated system requirement; informs runtime and thermal design).
       */
     }
@@ -33,14 +33,14 @@ package AnalysisCases {
     subject robot : AutonomousFloorCleaningRobot;
     return ref costWithinTarget {
       return sum(
-        robot.mobility.bomCost,
-        robot.cleaning.bomCost,
-        robot.perception.bomCost,
-        robot.navigation.bomCost,
-        robot.power.bomCost,
-        robot.docking.bomCost,
-        robot.control.bomCost,
-        robot.userInterface.bomCost
+        robot.driveModule.bomCost,
+        robot.cleaningHead.bomCost,
+        robot.sensorAssembly.bomCost,
+        robot.mainElectronics.bomCost,
+        robot.powerModule.bomCost,
+        robot.dockInterface.bomCost,
+        robot.hmi.bomCost,
+        robot.chassis.bomCost
       ) <= bomCostBudget;
     }
     objective estimateCost {
@@ -54,14 +54,14 @@ package AnalysisCases {
     subject robot : AutonomousFloorCleaningRobot;
     return ref massWithinLimit {
       return sum(
-        robot.mobility.massKg,
-        robot.cleaning.massKg,
-        robot.perception.massKg,
-        robot.navigation.massKg,
-        robot.power.massKg,
-        robot.docking.massKg,
-        robot.control.massKg,
-        robot.userInterface.massKg
+        robot.driveModule.massKg,
+        robot.cleaningHead.massKg,
+        robot.sensorAssembly.massKg,
+        robot.mainElectronics.massKg,
+        robot.powerModule.massKg,
+        robot.dockInterface.massKg,
+        robot.hmi.massKg,
+        robot.chassis.massKg
       ) <= massBudget;
     }
     objective estimateMass {
@@ -92,7 +92,8 @@ package AnalysisCases {
     }
     objective estimateLocalization {
       doc /*
-        Model-based evidence for localizeReliably: fused odometry and perception estimate stays below the 150 mm limit.
+        Model-based evidence for localizeReliably: localization firmware on mainElectronics
+        keeps fused odometry and perception estimate below the 150 mm limit.
       */
     }
   }
@@ -105,7 +106,8 @@ package AnalysisCases {
     }
     objective estimateSafeStopTiming {
       doc /*
-        Model-based evidence for superviseHazards: hazard detection to safe stop command within the 100 ms budget.
+        Model-based evidence for superviseHazards: safetySupervisor firmware on mainElectronics
+        reacts within the 100 ms budget.
       */
     }
   }
@@ -118,7 +120,8 @@ package AnalysisCases {
     }
     objective estimateCoverageMapResolution {
       doc /*
-        Model-based evidence for updateCoverageMap: grid resolution is fine enough for room-scale coverage decisions.
+        Model-based evidence for updateCoverageMap: mapProcessing and coveragePlanner firmware
+        on mainElectronics use a grid resolution fine enough for room-scale coverage decisions.
       */
     }
   }

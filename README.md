@@ -10,8 +10,9 @@ Model a residential robot vacuum with:
 
 - stakeholder and system requirements (implicit usages with `@RequirementRole` and `@StatusInfo` metadata)
 - requirement derivation from user needs to system requirements
-- functional decomposition as **`action def` capabilities** (`ProvideLocomotion`, `SenseEnvironment`, …) composed in `OperateCleaningRobot`, with mission scenarios and requirement `satisfy`; physical decomposition as **`part def` subsystems** linked by explicit `allocate` relations
-- physical mapping to motors, gearboxes, encoders, motor drivers on the main control PCB, brush/vacuum hardware, cliff/range sensors, IMU, battery pack, BMS, regulators, charging contacts, MCU, wireless module, flash memory, buttons, LEDs, and mobile-app interface
+- functional decomposition as **`action def` capabilities** (`ProvideLocomotion`, `SenseEnvironment`, …) composed in `OperateCleaningRobot`, with mission scenarios and requirement `satisfy`
+- physical decomposition as **monteerbare assemblies** (`DriveModule`, `SensorAssembly`, `MainElectronicsAssembly`, …) with firmware on the main compute LRU, linked by explicit `allocate` relations
+- physical mapping to drive module, cleaning head, sensor kit, main electronics (PCB, motor drivers, all firmware), power module, dock interface, HMI, and chassis
 - cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
 - operating behavior state machine with self-test, cleaning, pause, recovery, safe-stop, fault, docking, and charging states
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
@@ -73,7 +74,7 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 | [DesignLimits.sysml](model/DesignLimits.sysml) | `DesignLimits` | BOM and mass budgets |
 | [ArchitectureCommon.sysml](model/ArchitectureCommon.sysml) | `ArchitectureCommon` | Shared items, ports, and interfaces |
 | [FunctionalArchitecture.sysml](model/FunctionalArchitecture.sysml) | `FunctionalArchitecture` | Capability `action def`s, `OperateCleaningRobot` composition, mission actions, requirement `satisfy` |
-| [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Hardware/software parts, connections, mass/BOM/power roll-ups |
+| [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Product assemblies, physical harness connections, mass/BOM/power roll-ups |
 | [ArchitectureAllocations.sysml](model/ArchitectureAllocations.sysml) | `ArchitectureAllocations` | `perform`/`allocate` from capability actions to physical parts |
 | [Architecture.sysml](model/Architecture.sysml) | `Architecture` | Import hub, `part robot`, system-level `satisfy` |
 | [BehaviorStates.sysml](model/BehaviorStates.sysml) | `BehaviorStates` | Operating state machine |
@@ -86,7 +87,7 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 1. `StakeholderNeeds.sysml` — user needs
 2. `SystemRequirements.sysml` — derived system requirements
 3. `FunctionalArchitecture.sysml` — capability actions, functional composition, requirement traceability
-4. `PhysicalArchitecture.sysml` — physical decomposition and CPS connections
+4. `PhysicalArchitecture.sysml` — product assemblies (drive, sensors, compute, power, …) and physical connections
 5. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
 6. `Architecture.sysml` — hub package and system-level constraints
 7. `BehaviorStates.sysml` — mission lifecycle states
