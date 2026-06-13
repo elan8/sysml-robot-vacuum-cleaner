@@ -1,6 +1,6 @@
 # Spec42 fixes needed
 
-Date: 2026-06-13 (updated after robot showcase context / safety / trade-study additions)
+Date: 2026-06-13 (updated after robot showcase interface-control / firmware-behavior additions)
 
 This document tracks **Spec42 tool gaps and false positives** discovered while extending `sysml-domain-libraries` (electronics interconnection / wireless) and validating the robot-vacuum showcase. It complements [`SPEC42_VALIDATION_REPORT.md`](SPEC42_VALIDATION_REPORT.md), which covers the robot model corpus.
 
@@ -18,7 +18,7 @@ C:\Git\spec42\target\debug\spec42.exe `
   --workspace-root C:\Git\sysml-domain-libraries `
   --format text
 
-# Robot vacuum (18 documents)
+# Robot vacuum (21 documents)
 C:\Git\spec42\target\debug\spec42.exe check C:\Git\sysml-robot-vacuum-cleaner\model --format text
 
 # Official OMG validation corpus (reference / stdlib stress test)

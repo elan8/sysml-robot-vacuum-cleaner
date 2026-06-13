@@ -18,4 +18,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import ProductContext::*;
   private import SafetyAnalysis::*;
   private import TradeStudies::*;
+  private import ElectricalInterfaces::*;
+  private import InterfaceControl::*;
+  private import FirmwareArchitecture::*;
 }

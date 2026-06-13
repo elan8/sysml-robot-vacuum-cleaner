@@ -12,6 +12,9 @@ package ModelViews {
   private import ProductContext::*;
   private import SafetyAnalysis::*;
   private import TradeStudies::*;
+  private import ElectricalInterfaces::*;
+  private import InterfaceControl::*;
+  private import FirmwareArchitecture::*;
 
   part def StakeholderRole;
 
@@ -58,6 +61,12 @@ package ModelViews {
     stakeholder :>> systemsEngineer;
   }
 
+  concern implementationInterfaceConcern {
+    subject;
+    stakeholder :>> systemsEngineer;
+    stakeholder :>> verificationEngineer;
+  }
+
   viewpoint productStructurePerspective {
     frame productBreakdown;
   }
@@ -84,6 +93,10 @@ package ModelViews {
 
   viewpoint tradePerspective {
     frame tradeRationaleConcern;
+  }
+
+  viewpoint implementationInterfacePerspective {
+    frame implementationInterfaceConcern;
   }
 
   view operationalContext {
@@ -175,5 +188,38 @@ package ModelViews {
     expose AnalysisCases::ProductCostAnalysis;
     expose AnalysisCases::MissionEnergyAnalysis;
     render asElementTable;
+  }
+
+  view electricalInterfaceControl {
+    satisfy implementationInterfacePerspective;
+    expose ElectricalInterfaces::mainControlPcbInterfaces::**;
+    render asElementTable;
+  }
+
+  view firmwareTaskArchitecture {
+    satisfy implementationInterfacePerspective;
+    expose FirmwareArchitecture::firmwareTaskArchitecture::**;
+    render asElementTable;
+  }
+
+  view softwareMessageContracts {
+    satisfy implementationInterfacePerspective;
+    expose InterfaceControl::*;
+    render asElementTable;
+  }
+
+  view safetyFaultResponse {
+    satisfy safetyPerspective;
+    expose BehaviorStates::SafetyFaultResponseBehavior;
+    expose FirmwareArchitecture::SafetySupervisorTask;
+    expose InterfaceControl::hazardEventContract;
+    expose InterfaceControl::driveCommandContract;
+  }
+
+  view startupSelfTestFlow {
+    satisfy behaviorPerspective;
+    expose BehaviorStates::StartupSelfTestBehavior;
+    expose FirmwareArchitecture::DiagnosticsTask;
+    expose FirmwareArchitecture::SafetySupervisorTask;
   }
 }

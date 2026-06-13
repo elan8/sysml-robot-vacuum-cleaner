@@ -173,4 +173,37 @@ package Verification {
     then action runFaultInjectionTest : RunPhysicalTest;
     then action recordSafetyReactionAnalysis : RecordModelAnalysisEvidence;
   }
+
+  verification verifyElectricalInterfaceControl {
+    doc /* Confirm PCB harnesses, power rails, bus speeds, addresses, and fault polarities match the interface-control model. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement superviseHazards;
+      verify requirement chargeSafely;
+    }
+    then action reviewSchematicAgainstIcd : RunPhysicalTest;
+  }
+
+  verification verifyFirmwareSchedulerTiming {
+    doc /* Confirm safety, motor, sensor, mission, app, diagnostics, and storage tasks meet declared periods and deadlines. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement superviseHazards;
+      verify requirement localizeReliably;
+      verify requirement reportCleaningStatus;
+    }
+    then action runSchedulerTimingTest : RunPhysicalTest;
+    then action recordTimingAnalysis : RecordModelAnalysisEvidence;
+  }
+
+  verification verifyProtocolContracts {
+    doc /* Confirm app messages, user commands, mission status, telemetry, map updates, and diagnostics conform to data contracts. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement reportCleaningStatus;
+      verify requirement protectMapPrivacy;
+      verify requirement notifyMaintenanceNeeded;
+    }
+    then action runProtocolConformanceTest : RunPhysicalTest;
+  }
 }

@@ -19,6 +19,7 @@ Model a residential robot vacuum with:
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
 - canonical SysML v2 views with concerns, viewpoints, expose filters, and standard renderings for structure, interconnections, behavior, traceability, safety, and deployment
 - safety analysis, maintainability requirements, technical margins, and trade-study rationale for realistic product engineering
+- implementation-facing interface control for PCB harnesses, power rails, firmware tasks, scheduler timing, and software message contracts
 - verification cases with physical and model-based evidence
 - analysis cases for power, cost, mass, mission energy, localization, coverage resolution, and safety reaction timing
 
@@ -98,6 +99,9 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 | [ArchitectureCommon.sysml](model/ArchitectureCommon.sysml) | `ArchitectureCommon` | Mission/application items and CPS ports (functional layer) |
 | [PhysicalProtocols.sysml](model/PhysicalProtocols.sysml) | `PhysicalProtocols` | Product bus aliases; re-exports domain electronics libraries |
 | [ProductContext.sysml](model/ProductContext.sysml) | `ProductContext` | External systems, home environment, dock, app/cloud, and context boundary |
+| [ElectricalInterfaces.sysml](model/ElectricalInterfaces.sysml) | `ElectricalInterfaces` | PCB interface-control records for connectors, signals, rails, and buses |
+| [InterfaceControl.sysml](model/InterfaceControl.sysml) | `InterfaceControl` | Software-facing data contracts and producer/consumer ownership |
+| [FirmwareArchitecture.sysml](model/FirmwareArchitecture.sysml) | `FirmwareArchitecture` | Firmware task decomposition, scheduler timing, and MCU allocation surface |
 | [FunctionalArchitecture.sysml](model/FunctionalArchitecture.sysml) | `FunctionalArchitecture` | Capability `action def`s, `OperateCleaningRobot` composition, mission actions, requirement `satisfy` |
 | [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Product assemblies, typed physical harness (`I2cPort`, `PwmPort`, …), mass/BOM/power roll-ups |
 | [ArchitectureAllocations.sysml](model/ArchitectureAllocations.sysml) | `ArchitectureAllocations` | Capability → LRU/software; software → MCU (`SoftwareToComputeNode`); scenario action allocations |
@@ -117,15 +121,18 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 3. `FunctionalArchitecture.sysml` — capability actions, functional composition, requirement traceability
 4. `PhysicalProtocols.sysml` — electronics library imports and product bus aliases
 5. `ProductContext.sysml` — external actors, dock, app/cloud, and home environment
-6. `PhysicalArchitecture.sysml` — product assemblies and typed physical connections
-7. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
-8. `Architecture.sysml` — hub package and system-level constraints
-9. `BehaviorStates.sysml` — mission lifecycle states
-10. `OperationalScenarios.sysml` — use cases over the combined system model
-11. `SafetyAnalysis.sysml` and `TradeStudies.sysml` — hazards, mitigations, and design rationale
-12. `ModelViews.sysml` — stakeholder views and viewpoint satisfaction over the model
-13. `Verification.sysml` and `AnalysisCases.sysml` — V&V, parametric evidence, and margins
-14. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
+6. `ElectricalInterfaces.sysml` — PCB harness, connector, signal, bus, and rail interface control
+7. `InterfaceControl.sysml` — software message contracts and producer/consumer ownership
+8. `FirmwareArchitecture.sysml` — firmware tasks, scheduler timing, and deployment surface
+9. `PhysicalArchitecture.sysml` — product assemblies and typed physical connections
+10. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
+11. `Architecture.sysml` — hub package and system-level constraints
+12. `BehaviorStates.sysml` — mission lifecycle states and detailed implementation behaviors
+13. `OperationalScenarios.sysml` — use cases over the combined system model
+14. `SafetyAnalysis.sysml` and `TradeStudies.sysml` — hazards, mitigations, and design rationale
+15. `ModelViews.sysml` — stakeholder views and viewpoint satisfaction over the model
+16. `Verification.sysml` and `AnalysisCases.sysml` — V&V, parametric evidence, and margins
+17. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
 
 ## Engineering threads
 
@@ -134,6 +141,7 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 - **Safety assurance:** `SafetyAnalysis` links hazards to mitigations, requirements, analyses, and fault-injection verification.
 - **Design rationale:** `TradeStudies` records selected and deferred options for sensors, suction, battery, safety supervision, and privacy.
 - **Margins:** `AnalysisCases` tracks nominal values and engineering margins for mass, power, cost, runtime, localization, coverage, and reaction timing.
+- **Implementation handoff:** `ElectricalInterfaces`, `InterfaceControl`, and `FirmwareArchitecture` capture PCB-facing interface metadata, software message contracts, and task timing.
 
 ## Suggested views
 
@@ -145,6 +153,11 @@ The [`ModelViews.sysml`](model/ModelViews.sysml) package defines first-class Sys
 - `safetyAssurance` — hazards, mitigations, safety requirements, and verification evidence
 - `tradeStudyRationale` — selected and deferred architecture options
 - `budgetMargins` — mass, power, cost, and energy margin analyses
+- `electricalInterfaceControl` — PCB connector, signal, bus, and power-rail interface records
+- `firmwareTaskArchitecture` — firmware task decomposition and scheduler timing
+- `softwareMessageContracts` — data contracts and producer/consumer ownership
+- `safetyFaultResponse` — hazard-to-safe-stop software path
+- `startupSelfTestFlow` — startup diagnostic behavior and involved tasks
 - `operatingLifecycle` — mission lifecycle state behavior
 - `requirementsTraceability` — stakeholder needs, system requirements, verification cases, and analyses
 
@@ -153,6 +166,7 @@ With Spec42 diagram export support, these can be rendered from the model workspa
 ```powershell
 spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
 spec42 diagrams export model --selected-view operationalContext --format svg --output target/diagrams
+spec42 diagrams export model --selected-view firmwareTaskArchitecture --format svg --output target/diagrams
 spec42 diagrams export model --selected-view physicalInterconnections --format svg --output target/diagrams
 spec42 diagrams export model --selected-view operatingLifecycle --format svg --output target/diagrams
 ```

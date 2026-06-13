@@ -1,6 +1,6 @@
 # Spec42 Validation Report
 
-Date: 2026-06-13 (re-validated after context / safety / trade-study / view-model additions)
+Date: 2026-06-13 (re-validated after interface-control / firmware-behavior additions)
 
 Validated with the local Spec42 checkout at `C:\Git\spec42`.
 
@@ -30,7 +30,7 @@ C:\Git\spec42\target\debug\spec42.exe check model `
 
 | Metric | Count |
 | --- | ---: |
-| Documents checked | 18 |
+| Documents checked | 21 |
 | Errors | 0 |
 | Warnings | 0 |
 | Information | 0 |
@@ -82,6 +82,9 @@ The model uses a functional / physical split (June 2026):
 | [`ArchitectureAllocations.sysml`](../model/ArchitectureAllocations.sysml) | Capability → LRU/software; software → MCU deployment; scenario action allocations |
 | [`Architecture.sysml`](../model/Architecture.sysml) | Public import hub, `part robot`, system-level `satisfy` |
 | [`ProductContext.sysml`](../model/ProductContext.sysml) | External app/cloud/dock/user/home context and boundary interactions |
+| [`ElectricalInterfaces.sysml`](../model/ElectricalInterfaces.sysml) | PCB connector, signal, bus, and power-rail interface-control records |
+| [`InterfaceControl.sysml`](../model/InterfaceControl.sysml) | Software-facing data contracts and producer/consumer ownership |
+| [`FirmwareArchitecture.sysml`](../model/FirmwareArchitecture.sysml) | Firmware task decomposition, scheduler timing, and MCU allocation surface |
 | [`SafetyAnalysis.sysml`](../model/SafetyAnalysis.sysml) | Hazards, mitigations, and safety requirement satisfaction |
 | [`TradeStudies.sysml`](../model/TradeStudies.sysml) | Sensor, suction, battery, safety-supervision, and privacy trade rationale |
 | [`ModelViews.sysml`](../model/ModelViews.sysml) | Canonical SysML v2 concerns, viewpoints, views, expose slices, and renderings |
