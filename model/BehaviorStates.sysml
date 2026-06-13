@@ -12,6 +12,8 @@ package BehaviorStates {
   state def Fault;
 
   state def RobotOperatingBehavior {
+    entry;
+    then idle;
     state idle;
     state selfTest;
     state mapping;

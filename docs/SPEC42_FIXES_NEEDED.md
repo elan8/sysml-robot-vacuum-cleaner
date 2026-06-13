@@ -1,6 +1,6 @@
 # Spec42 fixes needed
 
-Date: 2026-06-12 (updated after re-validation)
+Date: 2026-06-13 (updated after robot showcase context / safety / trade-study additions)
 
 This document tracks **Spec42 tool gaps and false positives** discovered while extending `sysml-domain-libraries` (electronics interconnection / wireless) and validating the robot-vacuum showcase. It complements [`SPEC42_VALIDATION_REPORT.md`](SPEC42_VALIDATION_REPORT.md), which covers the robot model corpus.
 
@@ -18,7 +18,7 @@ C:\Git\spec42\target\debug\spec42.exe `
   --workspace-root C:\Git\sysml-domain-libraries `
   --format text
 
-# Robot vacuum (13 documents)
+# Robot vacuum (18 documents)
 C:\Git\spec42\target\debug\spec42.exe check C:\Git\sysml-robot-vacuum-cleaner\model --format text
 
 # Official OMG validation corpus (reference / stdlib stress test)
@@ -28,12 +28,12 @@ C:\Git\spec42\target\debug\spec42.exe check "C:\Git\sysml-v2-release\sysml\src\v
 C:\Git\spec42\target\debug\spec42.exe doctor --format json
 ```
 
-Current counts (re-validated 2026-06-12):
+Current counts (re-validated 2026-06-13):
 
 | Corpus | Errors | Warnings | Info |
 | --- | ---: | ---: | ---: |
 | `sysml-domain-libraries` (local) | 0 | **0** | 1 |
-| `sysml-robot-vacuum-cleaner/model` | 0 | **0** | 1 |
+| `sysml-robot-vacuum-cleaner/model` | 0 | **0** | 0 |
 | OMG `14c-Language Extensions` | 0 | 26 | 2 |
 
 ---
@@ -112,7 +112,7 @@ In attribute typing / restriction checks, treat resolved reflective stdlib metad
 info [missing_final_state] on OrderLifecycleStateMachine (webshop example)
 ```
 
-One behavior state machine in the domain-library webshop example still reports missing finality. The robot showcase intentionally accepts `missing_initial_state` on a cyclic lifecycle ([`SPEC42_VALIDATION_REPORT.md`](SPEC42_VALIDATION_REPORT.md)).
+One behavior state machine in the domain-library webshop example still reports missing finality. The robot showcase now declares an explicit initial transition and has no behavior diagnostics ([`SPEC42_VALIDATION_REPORT.md`](SPEC42_VALIDATION_REPORT.md)).
 
 ### Suggested fix
 

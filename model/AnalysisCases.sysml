@@ -8,6 +8,10 @@ package AnalysisCases {
 
   analysis def TotalPowerConsumptionAnalysis {
     attribute powerBudgetW : PowerValue = 75 [W];
+    attribute ecoModePowerW : PowerValue = 52 [W];
+    attribute standardModePowerW : PowerValue = 71 [W];
+    attribute maxModePowerW : PowerValue = 92 [W];
+    attribute standardModeMarginW : PowerValue = 4 [W];
     subject robot : AutonomousFloorCleaningRobot;
     return ref powerWithinBudget {
       return sum(
@@ -30,6 +34,8 @@ package AnalysisCases {
   }
   analysis def ProductCostAnalysis {
     attribute bomCostBudget : MonetaryAmount = 400 [EUR];
+    attribute estimatedBomCost : MonetaryAmount = 377 [EUR];
+    attribute bomCostMargin : MonetaryAmount = 23 [EUR];
     subject robot : AutonomousFloorCleaningRobot;
     return ref costWithinTarget {
       return sum(
@@ -51,6 +57,10 @@ package AnalysisCases {
   }
   analysis def TotalMassAnalysis {
     attribute massBudget : MassValue = 5.0 [kg];
+    attribute estimatedMass : MassValue = 4.96 [kg];
+    attribute manufacturingMassAllowance : MassValue = 0.25 [kg];
+    attribute designTargetMass : MassValue = 4.75 [kg];
+    attribute massMarginToTarget : MassValue = -0.21 [kg];
     subject robot : AutonomousFloorCleaningRobot;
     return ref massWithinLimit {
       return sum(
@@ -67,12 +77,17 @@ package AnalysisCases {
     objective estimateMass {
       doc /*
         Model-based evidence for limitTotalMass: mass roll-up vs DesignLimits.massBudget (5.0 kg).
+        The nominal roll-up fits the absolute limit but misses the 4.75 kg engineering target
+        once manufacturing allowance is included, so the design needs a mass-reduction action.
       */
     }
   }
   analysis def MissionEnergyAnalysis {
     attribute missionChargeDraw : ElectricChargeValue = 9375 [mAh];
     attribute chargeBudget : ElectricChargeValue = 12500 [mAh];
+    attribute reserveCharge : ElectricChargeValue = 1875 [mAh];
+    attribute usableMissionBudget : ElectricChargeValue = 10625 [mAh];
+    attribute missionChargeMargin : ElectricChargeValue = 1250 [mAh];
     subject robot : AutonomousFloorCleaningRobot;
     return ref energyWithinBudget {
       return missionChargeDraw <= chargeBudget;

@@ -83,6 +83,21 @@ package SystemRequirements {
     @StatusInfo { status = done; }
     doc /* The robot shall command a safe stop when cliff, bumper, lift, overcurrent, or thermal hazards are detected. */
   }
+  requirement emptyBinWithoutTools {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The dust bin shall be removable and replaceable by a home user without tools. */
+  }
+  requirement detectBinRemovedOrMissing {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall detect when the dust bin is removed, missing, or not latched before cleaning starts. */
+  }
+  requirement notifyMaintenanceNeeded {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall notify the user when dust-bin emptying or routine cleaning-head maintenance is needed. */
+  }
 
   #derivation connection {
     end #original ::> cleanLargeAreas;
@@ -147,5 +162,17 @@ package SystemRequirements {
   #derivation connection {
     end #original ::> protectHomes;
     end #derive ::> superviseHazards;
+  }
+  #derivation connection {
+    end #original ::> easyToEmpty;
+    end #derive ::> emptyBinWithoutTools;
+  }
+  #derivation connection {
+    end #original ::> easyToEmpty;
+    end #derive ::> detectBinRemovedOrMissing;
+  }
+  #derivation connection {
+    end #original ::> easyToEmpty;
+    end #derive ::> notifyMaintenanceNeeded;
   }
 }

@@ -143,4 +143,34 @@ package Verification {
     }
     then action runChargingSafetyTest : RunPhysicalTest;
   }
+
+  verification verifyToolLessBinService {
+    doc /* Confirm the dust bin can be removed, emptied, and reinstalled without tools. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement emptyBinWithoutTools;
+    }
+    then action runBinServiceUsabilityTest : RunPhysicalTest;
+  }
+
+  verification verifyBinPresenceDetection {
+    doc /* Confirm missing or unlatched bin status prevents cleaning and notifies the user. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement detectBinRemovedOrMissing;
+      verify requirement notifyMaintenanceNeeded;
+    }
+    then action runBinLatchDetectionTest : RunPhysicalTest;
+  }
+
+  verification verifyLiftOvercurrentThermalHazards {
+    doc /* Confirm lift, motor overcurrent, and thermal fault inputs are aggregated into safe stop. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement superviseHazards;
+      verify requirement chargeSafely;
+    }
+    then action runFaultInjectionTest : RunPhysicalTest;
+    then action recordSafetyReactionAnalysis : RecordModelAnalysisEvidence;
+  }
 }

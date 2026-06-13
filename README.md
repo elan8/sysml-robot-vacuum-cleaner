@@ -14,8 +14,11 @@ Model a residential robot vacuum with:
 - physical decomposition as **monteerbare assemblies** with typed electronics harnesses (I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, 3-phase BLDC wheel drives, PWM brushed/vacuum motors, GPIO safety/HMI, power rails)
 - **three allocation layers**: capability → software/LRU (`ArchitectureAllocations`), software → MCU (`allocate` to `mainControlPcb.mcu`), peripheral I/O (`connect` on `MainControlPcb`)
 - cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
+- operational product context with user, mobile app, home network, optional cloud backup, dock, floor surfaces, obstacles, and stair edges
 - operating behavior state machine with self-test, cleaning, pause, recovery, safe-stop, fault, docking, and charging states
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
+- canonical SysML v2 views with concerns, viewpoints, expose filters, and standard renderings for structure, interconnections, behavior, traceability, safety, and deployment
+- safety analysis, maintainability requirements, technical margins, and trade-study rationale for realistic product engineering
 - verification cases with physical and model-based evidence
 - analysis cases for power, cost, mass, mission energy, localization, coverage resolution, and safety reaction timing
 
@@ -94,14 +97,18 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 | [DesignLimits.sysml](model/DesignLimits.sysml) | `DesignLimits` | BOM and mass budgets |
 | [ArchitectureCommon.sysml](model/ArchitectureCommon.sysml) | `ArchitectureCommon` | Mission/application items and CPS ports (functional layer) |
 | [PhysicalProtocols.sysml](model/PhysicalProtocols.sysml) | `PhysicalProtocols` | Product bus aliases; re-exports domain electronics libraries |
+| [ProductContext.sysml](model/ProductContext.sysml) | `ProductContext` | External systems, home environment, dock, app/cloud, and context boundary |
 | [FunctionalArchitecture.sysml](model/FunctionalArchitecture.sysml) | `FunctionalArchitecture` | Capability `action def`s, `OperateCleaningRobot` composition, mission actions, requirement `satisfy` |
 | [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Product assemblies, typed physical harness (`I2cPort`, `PwmPort`, …), mass/BOM/power roll-ups |
 | [ArchitectureAllocations.sysml](model/ArchitectureAllocations.sysml) | `ArchitectureAllocations` | Capability → LRU/software; software → MCU (`SoftwareToComputeNode`); scenario action allocations |
 | [Architecture.sysml](model/Architecture.sysml) | `Architecture` | Import hub, `part robot`, system-level `satisfy` |
 | [BehaviorStates.sysml](model/BehaviorStates.sysml) | `BehaviorStates` | Operating state machine |
 | [OperationalScenarios.sysml](model/OperationalScenarios.sysml) | `OperationalScenarios` | Use-case context and mission action flows |
+| [SafetyAnalysis.sysml](model/SafetyAnalysis.sysml) | `SafetyAnalysis` | Hazards, mitigations, and safety requirement satisfaction |
+| [TradeStudies.sysml](model/TradeStudies.sysml) | `TradeStudies` | Product trade options and selected architecture rationale |
+| [ModelViews.sysml](model/ModelViews.sysml) | `ModelViews` | Canonical views, concerns, viewpoints, expose slices, and renderings |
 | [Verification.sysml](model/Verification.sysml) | `Verification` | Verification cases |
-| [AnalysisCases.sysml](model/AnalysisCases.sysml) | `AnalysisCases` | Power, cost, mass, energy roll-ups |
+| [AnalysisCases.sysml](model/AnalysisCases.sysml) | `AnalysisCases` | Power, cost, mass, energy, timing, and margin analyses |
 
 ## Suggested reading order
 
@@ -109,13 +116,46 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 2. `SystemRequirements.sysml` — derived system requirements
 3. `FunctionalArchitecture.sysml` — capability actions, functional composition, requirement traceability
 4. `PhysicalProtocols.sysml` — electronics library imports and product bus aliases
-5. `PhysicalArchitecture.sysml` — product assemblies and typed physical connections
-6. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
-7. `Architecture.sysml` — hub package and system-level constraints
-8. `BehaviorStates.sysml` — mission lifecycle states
-9. `OperationalScenarios.sysml` — use cases over the combined system model
-10. `Verification.sysml` and `AnalysisCases.sysml` — V&V and parametric evidence
-11. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
+5. `ProductContext.sysml` — external actors, dock, app/cloud, and home environment
+6. `PhysicalArchitecture.sysml` — product assemblies and typed physical connections
+7. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
+8. `Architecture.sysml` — hub package and system-level constraints
+9. `BehaviorStates.sysml` — mission lifecycle states
+10. `OperationalScenarios.sysml` — use cases over the combined system model
+11. `SafetyAnalysis.sysml` and `TradeStudies.sysml` — hazards, mitigations, and design rationale
+12. `ModelViews.sysml` — stakeholder views and viewpoint satisfaction over the model
+13. `Verification.sysml` and `AnalysisCases.sysml` — V&V, parametric evidence, and margins
+14. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
+
+## Engineering threads
+
+- **Context to architecture:** `ProductContext` defines external systems and environmental stimuli; `Architecture` and `PhysicalArchitecture` define the robot boundary and internal realization.
+- **Needs to evidence:** stakeholder needs derive system requirements, which are satisfied by actions/parts and verified by `Verification` cases.
+- **Safety assurance:** `SafetyAnalysis` links hazards to mitigations, requirements, analyses, and fault-injection verification.
+- **Design rationale:** `TradeStudies` records selected and deferred options for sensors, suction, battery, safety supervision, and privacy.
+- **Margins:** `AnalysisCases` tracks nominal values and engineering margins for mass, power, cost, runtime, localization, coverage, and reaction timing.
+
+## Suggested views
+
+The [`ModelViews.sysml`](model/ModelViews.sysml) package defines first-class SysML v2 views. Useful entry points are:
+
+- `productStructure` — product breakdown rendered as a tree diagram
+- `operationalContext` — robot, app, cloud, dock, user, and home environment boundary
+- `physicalInterconnections` — physical wiring and cyberphysical links rendered as an interconnection diagram
+- `safetyAssurance` — hazards, mitigations, safety requirements, and verification evidence
+- `tradeStudyRationale` — selected and deferred architecture options
+- `budgetMargins` — mass, power, cost, and energy margin analyses
+- `operatingLifecycle` — mission lifecycle state behavior
+- `requirementsTraceability` — stakeholder needs, system requirements, verification cases, and analyses
+
+With Spec42 diagram export support, these can be rendered from the model workspace, for example:
+
+```powershell
+spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
+spec42 diagrams export model --selected-view operationalContext --format svg --output target/diagrams
+spec42 diagrams export model --selected-view physicalInterconnections --format svg --output target/diagrams
+spec42 diagrams export model --selected-view operatingLifecycle --format svg --output target/diagrams
+```
 
 ## Parser notes
 

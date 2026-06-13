@@ -1,6 +1,6 @@
 # Spec42 Validation Report
 
-Date: 2026-06-12 (re-validated after Spec42 metadata / requirement-conformance fixes)
+Date: 2026-06-13 (re-validated after context / safety / trade-study / view-model additions)
 
 Validated with the local Spec42 checkout at `C:\Git\spec42`.
 
@@ -30,16 +30,14 @@ C:\Git\spec42\target\debug\spec42.exe check model `
 
 | Metric | Count |
 | --- | ---: |
-| Documents checked | 14 |
+| Documents checked | 18 |
 | Errors | 0 |
 | Warnings | 0 |
-| Information | 1 |
+| Information | 0 |
 
-## Remaining diagnostic
+## Remaining diagnostics
 
-| Code | Count | Assessment |
-| --- | ---: | --- |
-| `missing_initial_state` | 1 | Information-level guidance on [`RobotOperatingBehavior`](../model/BehaviorStates.sysml). The lifecycle is a deliberate cyclic controller (idle → mission → dock → charge → idle). No model change required unless an explicit initial transition is desired for tooling clarity. |
+None. [`RobotOperatingBehavior`](../model/BehaviorStates.sysml) now has an explicit initial transition to `idle`, so the former `missing_initial_state` information diagnostic is no longer emitted.
 
 All former **warning**-level diagnostics from earlier Spec42 builds (`analysis_evaluation_unresolved`, `unknown_unit_symbol`, `unresolved_redefines_target`, `multiple_initial_states`, `missing_final_state`) are **no longer emitted** on this corpus.
 
@@ -83,6 +81,10 @@ The model uses a functional / physical split (June 2026):
 | [`PhysicalArchitecture.sysml`](../model/PhysicalArchitecture.sysml) | Product assemblies, typed physical harness, mass/BOM/power |
 | [`ArchitectureAllocations.sysml`](../model/ArchitectureAllocations.sysml) | Capability → LRU/software; software → MCU deployment; scenario action allocations |
 | [`Architecture.sysml`](../model/Architecture.sysml) | Public import hub, `part robot`, system-level `satisfy` |
+| [`ProductContext.sysml`](../model/ProductContext.sysml) | External app/cloud/dock/user/home context and boundary interactions |
+| [`SafetyAnalysis.sysml`](../model/SafetyAnalysis.sysml) | Hazards, mitigations, and safety requirement satisfaction |
+| [`TradeStudies.sysml`](../model/TradeStudies.sysml) | Sensor, suction, battery, safety-supervision, and privacy trade rationale |
+| [`ModelViews.sysml`](../model/ModelViews.sysml) | Canonical SysML v2 concerns, viewpoints, views, expose slices, and renderings |
 
 ### Physical protocol topology (June 2026)
 
@@ -124,5 +126,5 @@ After the Spec42 0.30 upgrade, the following model accommodations were dropped:
 
 ## Optional follow-up
 
-- Add an explicit initial transition to `RobotOperatingBehavior` if `missing_initial_state` should be silenced.
 - Revisit **`flow`** instead of port-only `connect` in the physical architecture now that `S42-LIM-005` is resolved (cosmetic / notation preference only).
+- Consider an independent safety monitor variant if the showcase should represent a higher-assurance product tier.

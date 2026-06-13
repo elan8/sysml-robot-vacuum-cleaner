@@ -14,4 +14,8 @@ package AutonomousFloorCleaningRobotDemo {
   private import ArchitectureAllocations::*;
   private import Architecture::*;
   private import OperationalScenarios::*;
+  private import ModelViews::*;
+  private import ProductContext::*;
+  private import SafetyAnalysis::*;
+  private import TradeStudies::*;
 }

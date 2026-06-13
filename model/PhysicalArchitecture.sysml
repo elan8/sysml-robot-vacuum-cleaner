@@ -90,10 +90,16 @@ package PhysicalArchitecture {
   }
   part def DustBin {
     attribute capacity : VolumeValue = 450 [mL];
+    attribute toolLessRemoval : Boolean = true;
+    port latchStatusOut : MissionStatusPort;
   }
   part def DustLevelSensor {
     attribute sensorType : String = "optical interrupt";
     port statusOut : MissionStatusPort;
+  }
+  part def DustBinLatchSensor {
+    attribute detectsMissingBin : Boolean = true;
+    port latchStatusOut : MissionStatusPort;
   }
 
   part def CleaningHeadModule :> PhysicalAssembly {
@@ -114,6 +120,7 @@ package PhysicalArchitecture {
     part vacuumFan : VacuumFan;
     part dustBin : DustBin;
     part dustLevelSensor : DustLevelSensor;
+    part dustBinLatchSensor : DustBinLatchSensor;
     connect powerIn to mainBrushMotor.powerIn;
     connect powerIn to sideBrushMotor.powerIn;
     connect powerIn to vacuumFan.powerIn;
@@ -121,6 +128,8 @@ package PhysicalArchitecture {
     connect sideBrushPwmIn to sideBrushMotor.commandIn;
     connect vacuumPwmIn to vacuumFan.commandIn;
     connect dustLevelSensor.statusOut to statusOut;
+    connect dustBin.latchStatusOut to statusOut;
+    connect dustBinLatchSensor.latchStatusOut to statusOut;
     connect mainBrushMotor.faultOut to faultOut;
     connect sideBrushMotor.faultOut to faultOut;
   }
@@ -284,6 +293,13 @@ package PhysicalArchitecture {
     part flash : NonVolatileMemory;
     part leftMotorDriver : MotorDriverIC;
     part rightMotorDriver : MotorDriverIC;
+    part liftSensorInput {
+      port hazardOut : GpioPort;
+    }
+    part boardThermalSensor {
+      attribute overTemperatureThresholdK = 343.15;
+      port hazardOut : GpioPort;
+    }
     part wirelessUart : McuWirelessUart;
     connect mcu.sensorI2c to mcuI2cMaster.busPort;
     connect sensorBusHarness to mcuI2cMaster.busPort;
@@ -351,6 +367,8 @@ package PhysicalArchitecture {
     connect mainControlPcb.rightMotorPhaseOut to rightMotorPhaseOut;
     connect mainControlPcb.leftMotorDriver.faultOut to hazardIn;
     connect mainControlPcb.rightMotorDriver.faultOut to hazardIn;
+    connect mainControlPcb.liftSensorInput.hazardOut to hazardIn;
+    connect mainControlPcb.boardThermalSensor.hazardOut to hazardIn;
   }
 
   part def PushButton {
