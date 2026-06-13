@@ -6,10 +6,32 @@ package PhysicalProtocols {
   public import EmbeddedComputeDomain::*;
   public import WirelessDomain::*;
 
-  part def SensorI2cBus :> I2cBusHub;
-  part def BmsSmbusHub :> I2cBusHub;
-  part def FlashSpiBus :> SpiBusHub;
-  part def WirelessUartHub :> UartBusHub;
+  doc /*
+    Product-specific bus media: specialize domain bus types with named attachment
+    ports for each participant (OMG CAN-style), not generic numbered fan-out.
+  */
+
+  part def SensorI2cBus :> I2cBus {
+    port hostBackplane : I2cPort;
+    port frontTof : I2cPort;
+    port leftWallTof : I2cPort;
+    port rightWallTof : I2cPort;
+    port imu : I2cPort;
+  }
+
+  part def BmsSmbusBus :> SmbusBus {
+    port hostBackplane : I2cPort;
+    port bms : I2cPort;
+  }
+
+  part def FlashSpiBus :> SpiBus {
+    port flash : SpiPort;
+  }
+
+  part def McuWirelessUart :> UartBus {
+    port mcu : UartPort;
+    port wirelessModule : UartPort;
+  }
 
   part def RobotWirelessModule :> WirelessModule;
 }

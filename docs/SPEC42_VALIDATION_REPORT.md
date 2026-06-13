@@ -88,11 +88,11 @@ The model uses a functional / physical split (June 2026):
 
 | Harness | Domain types | Product usage |
 | --- | --- | --- |
-| Sensor I2C | `I2cPort`, `I2cBusHub`, `I2cBusSlaveNode`, `I2cBusMasterNode` | ToF ×3 + IMU on `SensorI2cBus`; MCU master on main electronics |
-| BMS SMBus | `I2cPort`, `BmsSmbusHub` | `PowerModule` → `MainElectronicsAssembly` |
-| SPI flash | `SpiBusHub`, `SpiBusSlaveNode` | On `MainControlPcb` |
-| UART / wireless | `UartPort`, `WirelessUartHub`, `RobotWirelessModule` | MCU ↔ Wi‑Fi/BLE module |
-| Actuation | `PwmPort` | Wheel/br/vacuum motor drivers |
+| Sensor I2C | `I2cPort`, `I2cBus`, `I2cBusSlaveNode`, `I2cBusMasterNode` | ToF ×3 + IMU on product `SensorI2cBus` (named attachments); MCU master on main electronics |
+| BMS SMBus | `I2cPort`, `SmbusBus`, product `BmsSmbusBus` | `PowerModule` → `MainElectronicsAssembly` |
+| SPI flash | `SpiBus`, product `FlashSpiBus`, `SpiBusSlaveNode` | On `MainControlPcb` |
+| UART / wireless | `UartPort`, product `McuWirelessUart`, `RobotWirelessModule` | MCU ↔ Wi‑Fi/BLE module |
+| Actuation | `ThreePhaseMotorPort`, `PwmPort` | BLDC wheel drives: inverter U/V/W to `DriveModule`; brushed brush/vacuum on PWM |
 | Safety / HMI | `GpioPort`, `QuadratureEncoderPort` | Bumpers, cliffs, encoders, buttons, dock beacon |
 | Power | `PowerRailPort` | 14.4 V distribution from `PowerModule` |
 

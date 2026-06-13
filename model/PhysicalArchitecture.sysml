@@ -17,10 +17,13 @@ package PhysicalArchitecture {
   }
 
   part def BrushlessDriveMotor {
+    doc /*
+      Wye-connected BLDC wheel motor: three phase windings driven by an inverter
+      on the main PCB
+    */
     attribute ratedPower : PowerValue = 14 [W];
     attribute massKg : MassValue = 0.18 [kg];
-    port powerIn : PowerRailPort;
-    port phaseCommandIn : PwmPort;
+    port phaseIn : ~ThreePhaseMotorPort;
   }
   part def WheelGearbox {
     attribute reductionRatio : Real = 38.0;
@@ -31,9 +34,13 @@ package PhysicalArchitecture {
     port odometryOut : QuadratureEncoderPort;
   }
   part def MotorDriverIC {
+    doc /*
+      Three-phase gate driver / inverter: MCU PWM commands, battery switched to U/V/W.
+    */
     attribute peakCurrent : ElectricCurrentValue = 3.0 [A];
     port powerIn : PowerRailPort;
     port commandIn : PwmPort;
+    port phaseOut : ThreePhaseMotorPort;
     port faultOut : GpioPort;
   }
   part def BumperSwitchArray {
@@ -50,9 +57,8 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 28 [W];
     attribute :>> massKg = 1.2 [kg];
     attribute :>> bomCost = 100 [EUR];
-    port powerIn : PowerRailPort;
-    port phaseLeftIn : PwmPort;
-    port phaseRightIn : PwmPort;
+    port phaseLeftIn : ThreePhaseMotorPort;
+    port phaseRightIn : ThreePhaseMotorPort;
     port encoderOut : QuadratureEncoderPort;
     port bumperHazardOut : GpioPort;
     part leftMotor : BrushlessDriveMotor;
@@ -62,10 +68,8 @@ package PhysicalArchitecture {
     part leftEncoder : WheelEncoder;
     part rightEncoder : WheelEncoder;
     part bumperSwitches : BumperSwitchArray;
-    connect powerIn to leftMotor.powerIn;
-    connect powerIn to rightMotor.powerIn;
-    connect leftMotor.phaseCommandIn to phaseLeftIn;
-    connect rightMotor.phaseCommandIn to phaseRightIn;
+    connect leftMotor.phaseIn to phaseLeftIn;
+    connect rightMotor.phaseIn to phaseRightIn;
     connect leftEncoder.odometryOut to encoderOut;
     connect rightEncoder.odometryOut to encoderOut;
     connect bumperSwitches.hazardOut to bumperHazardOut;
@@ -167,11 +171,11 @@ package PhysicalArchitecture {
     part cliffSensorRearLeft : InfraredCliffSensor;
     part cliffSensorRearRight : InfraredCliffSensor;
     part imu : InertialMeasurementUnit;
-    connect sensorBusOut to sensorI2c.nodePort0;
-    connect frontTofNode.busPort to sensorI2c.nodePort1;
-    connect leftWallTofNode.busPort to sensorI2c.nodePort2;
-    connect rightWallTofNode.busPort to sensorI2c.nodePort3;
-    connect imuNode.busPort to sensorI2c.nodePort4;
+    connect sensorBusOut to sensorI2c.hostBackplane;
+    connect frontTofNode.busPort to sensorI2c.frontTof;
+    connect leftWallTofNode.busPort to sensorI2c.leftWallTof;
+    connect rightWallTofNode.busPort to sensorI2c.rightWallTof;
+    connect imuNode.busPort to sensorI2c.imu;
     connect cliffSensorFrontLeft.cliffOut to cliffHazardOut;
     connect cliffSensorFrontRight.cliffOut to cliffHazardOut;
     connect cliffSensorRearLeft.cliffOut to cliffHazardOut;
@@ -210,7 +214,7 @@ package PhysicalArchitecture {
     port hazardOut : GpioPort;
     part batteryPack : LithiumIonBatteryPack;
     part bms : BatteryManagementSystem;
-    part bmsSmbus : BmsSmbusHub;
+    part bmsSmbus : BmsSmbusBus;
     part logicRegulator : BuckRegulator;
     part motorRegulator : BuckRegulator;
     connect batteryPack.packOut to mainPowerOut;
@@ -218,8 +222,8 @@ package PhysicalArchitecture {
     connect batteryPack.packOut to motorRegulator.powerIn;
     connect logicRegulator.powerOut to mainPowerOut;
     connect motorRegulator.powerOut to mainPowerOut;
-    connect bmsBusOut to bmsSmbus.nodePort0;
-    connect bms.smbusPort to bmsSmbus.nodePort1;
+    connect bmsBusOut to bmsSmbus.hostBackplane;
+    connect bms.smbusPort to bmsSmbus.bms;
     connect bms.hazardOut to hazardOut;
   }
 
@@ -256,6 +260,8 @@ package PhysicalArchitecture {
   }
   part def MainControlPcb {
     attribute layerCount : Integer = 4;
+    port leftMotorPhaseOut : ThreePhaseMotorPort;
+    port rightMotorPhaseOut : ThreePhaseMotorPort;
     port mcuUartOut : UartPort;
     part mcu : MicrocontrollerUnit;
     part wirelessModule : RobotWirelessModule;
@@ -264,10 +270,12 @@ package PhysicalArchitecture {
     part flash : NonVolatileMemory;
     part leftMotorDriver : MotorDriverIC;
     part rightMotorDriver : MotorDriverIC;
-    part wirelessUart : WirelessUartHub;
-    connect flashNode.busPort to flashSpi.nodePort0;
-    connect mcuUartOut to wirelessUart.nodePort0;
-    connect wirelessModule.hostLink to wirelessUart.nodePort1;
+    part wirelessUart : McuWirelessUart;
+    connect leftMotorDriver.phaseOut to leftMotorPhaseOut;
+    connect rightMotorDriver.phaseOut to rightMotorPhaseOut;
+    connect flashNode.busPort to flashSpi.flash;
+    connect mcuUartOut to wirelessUart.mcu;
+    connect wirelessModule.hostLink to wirelessUart.wirelessModule;
   }
   part def ApplicationFirmware {
     doc /*
@@ -294,8 +302,8 @@ package PhysicalArchitecture {
     attribute :>> massKg = 0.28 [kg];
     attribute :>> bomCost = 48 [EUR];
     port powerIn : PowerRailPort;
-    port leftMotorDriveOut : PwmPort;
-    port rightMotorDriveOut : PwmPort;
+    port leftMotorPhaseOut : ThreePhaseMotorPort;
+    port rightMotorPhaseOut : ThreePhaseMotorPort;
     port mainBrushPwmOut : PwmPort;
     port sideBrushPwmOut : PwmPort;
     port vacuumPwmOut : PwmPort;
@@ -316,8 +324,8 @@ package PhysicalArchitecture {
     part coveragePlanner : CoveragePlannerSoftware;
     exhibit state behavior : RobotOperatingBehavior;
     connect sensorBusIn to mcuI2cMaster.busPort;
-    connect mainControlPcb.leftMotorDriver.commandIn to leftMotorDriveOut;
-    connect mainControlPcb.rightMotorDriver.commandIn to rightMotorDriveOut;
+    connect mainControlPcb.leftMotorPhaseOut to leftMotorPhaseOut;
+    connect mainControlPcb.rightMotorPhaseOut to rightMotorPhaseOut;
     connect mainControlPcb.leftMotorDriver.faultOut to hazardIn;
     connect mainControlPcb.rightMotorDriver.faultOut to hazardIn;
   }
@@ -365,7 +373,6 @@ package PhysicalArchitecture {
     part powerModule : PowerModule;
     part dockInterface : DockInterfaceModule;
     part hmi : HumanMachineInterface;
-    connect powerModule.mainPowerOut to driveModule.powerIn;
     connect powerModule.mainPowerOut to cleaningHead.powerIn;
     connect powerModule.mainPowerOut to sensorAssembly.powerIn;
     connect powerModule.mainPowerOut to mainElectronics.powerIn;
@@ -373,8 +380,8 @@ package PhysicalArchitecture {
     connect powerModule.mainPowerOut to hmi.powerIn;
     connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.leftMotorDriver.powerIn;
     connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.rightMotorDriver.powerIn;
-    connect mainElectronics.leftMotorDriveOut to driveModule.phaseLeftIn;
-    connect mainElectronics.rightMotorDriveOut to driveModule.phaseRightIn;
+    connect mainElectronics.leftMotorPhaseOut to driveModule.phaseLeftIn;
+    connect mainElectronics.rightMotorPhaseOut to driveModule.phaseRightIn;
     connect driveModule.encoderOut to mainElectronics.encoderIn;
     connect sensorAssembly.sensorBusOut to mainElectronics.sensorBusIn;
     connect powerModule.bmsBusOut to mainElectronics.bmsBusIn;

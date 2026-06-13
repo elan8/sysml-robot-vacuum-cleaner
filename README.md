@@ -11,7 +11,7 @@ Model a residential robot vacuum with:
 - stakeholder and system requirements (implicit usages with `@RequirementRole` and `@StatusInfo` metadata)
 - requirement derivation from user needs to system requirements
 - functional decomposition as **`action def` capabilities** (`ProvideLocomotion`, `SenseEnvironment`, …) composed in `OperateCleaningRobot`, with mission scenarios and requirement `satisfy`
-- physical decomposition as **monteerbare assemblies** with typed electronics harnesses (I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, PWM motor drives, GPIO safety/HMI, power rails)
+- physical decomposition as **monteerbare assemblies** with typed electronics harnesses (I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, 3-phase BLDC wheel drives, PWM brushed/vacuum motors, GPIO safety/HMI, power rails)
 - cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
 - operating behavior state machine with self-test, cleaning, pause, recovery, safe-stop, fault, docking, and charging states
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
@@ -33,9 +33,9 @@ Requires packages from [sysml-domain-libraries](https://github.com/elan8/sysml-d
 **Electronics / communication (physical layer)**
 
 - `ElectronicsInterconnection` (`I2cPort`, `PwmPort`, `PowerRailPort`, `GpioPort`, …)
-- `ElectronicBusDomain` (`I2cBusHub`, `I2cBusMasterNode`, `I2cBusSlaveNode`, …)
+- `ElectronicBusDomain` (`I2cBus`, `I2cBusMasterNode`, `I2cBusSlaveNode`, `SmbusBus`, …)
 - `WirelessDomain` (`WirelessModule`, `BleCommunicationChannel`)
-- Composed in project-local [`PhysicalProtocols.sysml`](model/PhysicalProtocols.sysml) (`SensorI2cBus`, `BmsSmbusHub`, …)
+- Composed in project-local [`PhysicalProtocols.sysml`](model/PhysicalProtocols.sysml) — product bus media with named attachment ports (`SensorI2cBus`, `BmsSmbusBus`, …)
 
 Point your tool's library roots at `domain/`, `technical/`, and `generic/` under that repository.
 
