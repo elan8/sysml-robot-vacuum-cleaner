@@ -58,7 +58,7 @@ Override the model directory with `BABEL42_ROBOT_VACUUM_MODEL_PATH` when develop
 |-----------|-------|
 | BOM budget | 400 EUR |
 | Mass budget | 5.0 kg |
-| Battery energy budget | 648 kJ |
+| Battery capacity budget | 12500 mAh (12.5 Ah at 14.4 V nominal) |
 | Localization error limit | 150 mm |
 | Safe-stop reaction limit | 100 ms |
 

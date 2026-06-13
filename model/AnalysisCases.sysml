@@ -71,15 +71,16 @@ package AnalysisCases {
     }
   }
   analysis def MissionEnergyAnalysis {
-    attribute missionEnergy : EnergyValue = 486 [kJ];
-    attribute energyBudget : EnergyValue = 648 [kJ];
+    attribute missionChargeDraw : ElectricChargeValue = 9375 [mAh];
+    attribute chargeBudget : ElectricChargeValue = 12500 [mAh];
     subject robot : AutonomousFloorCleaningRobot;
     return ref energyWithinBudget {
-      return missionEnergy <= energyBudget;
+      return missionChargeDraw <= chargeBudget;
     }
     objective estimateMissionEnergy {
       doc /*
-        Supporting mission energy vs battery budget (informs cleanAtLeastEighty runtime; no separate requirement).
+        Supporting mission charge draw vs battery capacity (9375 mAh mission profile
+        against 12500 mAh pack at 14.4 V nominal; informs cleanAtLeastEighty runtime).
       */
     }
   }
@@ -98,8 +99,8 @@ package AnalysisCases {
     }
   }
   analysis def SafetyReactionAnalysis {
-    attribute measuredReactionTimeMs : Integer = 90;
-    attribute reactionTimeLimitMs : Integer = 100;
+    attribute measuredReactionTime : DurationValue = 90 [ms];
+    attribute reactionTimeLimit : DurationValue = 100 [ms];
     subject robot : AutonomousFloorCleaningRobot;
     return ref reactsWithinLimit {
       return measuredReactionTimeMs <= reactionTimeLimitMs;

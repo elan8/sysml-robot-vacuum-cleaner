@@ -30,7 +30,7 @@ package PhysicalArchitecture {
     port odometryOut : OdometryPort;
   }
   part def MotorDriverIC {
-    attribute peakCurrentA : Real = 3.0;
+    attribute peakCurrent : ElectricCurrentValue = 3.0 [A];
     port powerIn : PowerLoadPort;
     port commandIn : MissionCommandPort;
     port faultOut : HazardPort;
@@ -82,7 +82,7 @@ package PhysicalArchitecture {
     port commandIn : MissionCommandPort;
   }
   part def DustBin {
-    attribute capacityMl : Integer = 450;
+    attribute capacity : VolumeValue = 450 [mL];
   }
   part def DustLevelSensor {
     attribute sensorType : String = "optical interrupt";
@@ -92,7 +92,7 @@ package PhysicalArchitecture {
   part def CleaningHeadModule :> PhysicalAssembly {
     attribute brushPowerW : PowerValue = 12 [W];
     attribute vacuumPowerW : PowerValue = 6 [W];
-    attribute dustBinCapacityMl : Integer = 450;
+    attribute dustBinCapacity : VolumeValue = 450 [mL];
     attribute :>> powerDrawW = 18 [W];
     attribute :>> massKg = 0.9 [kg];
     attribute :>> bomCost = 75 [EUR];
@@ -165,26 +165,27 @@ package PhysicalArchitecture {
 
   part def LithiumIonBatteryPack {
     attribute cellConfiguration : String = "4S2P";
-    attribute nominalEnergy : EnergyValue = 648 [kJ];
-    attribute nominalVoltageV : Real = 14.4;
+    attribute nominalCapacity : ElectricChargeValue = 12500 [mAh];
+    attribute nominalVoltage : ElectricPotentialDifferenceValue = 14.4 [V];
     port powerOut;
   }
   part def BatteryManagementSystem {
-    attribute maxChargeCurrentA : Real = 2.0;
-    attribute maxCellTemperatureC : Real = 55.0;
+    doc /* Limits charge current and cell temperature (55 °C maximum) within the safe operating area. */
+    attribute maxChargeCurrent : ElectricCurrentValue = 2.0 [A];
+    attribute maxCellTemperature : ThermodynamicTemperatureValue = 328.15 [K];
     port batteryTelemetryOut : TelemetryPort;
     port hazardOut : HazardPort;
   }
   part def BuckRegulator {
-    attribute outputVoltageV : Real = 5.0;
+    attribute outputVoltage : ElectricPotentialDifferenceValue = 5.0 [V];
     port powerIn : PowerLoadPort;
     port powerOut;
   }
 
   part def PowerModule :> PhysicalAssembly {
-    attribute batteryCapacity : EnergyValue = 648 [kJ];
+    attribute batteryCapacity : ElectricChargeValue = 12500 [mAh];
     attribute lowBatteryThresholdPercent : Real = 15.0;
-    attribute reserveEnergy : EnergyValue = 97 [kJ];
+    attribute reserveCapacity : ElectricChargeValue = 1875 [mAh];
     attribute :>> powerDrawW = 8 [W];
     attribute :>> massKg = 0.72 [kg];
     attribute :>> bomCost = 68 [EUR];
@@ -224,15 +225,15 @@ package PhysicalArchitecture {
 
   part def MicrocontrollerUnit {
     attribute core : String = "Arm Cortex-M33";
-    attribute clockMHz : Integer = 120;
-    attribute flashKb : Integer = 1024;
-    attribute ramKb : Integer = 256;
+    attribute clockFrequency : FrequencyValue = 120000000 [Hz];
+    attribute flashCapacity : StorageCapacityValue = 1048576 [B];
+    attribute ramCapacity : StorageCapacityValue = 262144 [B];
   }
   part def WirelessModule {
     attribute radios : String = "Wi-Fi 2.4 GHz and Bluetooth LE";
   }
   part def NonVolatileMemory {
-    attribute capacityMb : Integer = 128;
+    attribute capacity : StorageCapacityValue = 134217728 [B];
   }
   part def MainControlPcb {
     attribute layerCount : Integer = 4;
@@ -246,22 +247,22 @@ package PhysicalArchitecture {
     doc /*
       Mission orchestration, command arbitration, and app-facing status on the main MCU.
     */
-    attribute controlLoopPeriodMs : Integer = 50;
+    attribute controlLoopPeriod : DurationValue = 50 [ms];
     exhibit state behavior : RobotOperatingBehavior;
   }
   part def SafetySupervisorFirmware {
     doc /*
       Safety-monitoring firmware task with inputs from sensors, motor drivers, and BMS.
     */
-    attribute safeStopReactionTimeMs : Integer = 100;
+    attribute safeStopReactionTime : DurationValue = 100 [ms];
   }
 
   part def MainElectronicsAssembly :> PhysicalAssembly {
     doc /*
       Compute LRU: main PCB, motor drivers, and all deployed navigation/perception/control firmware.
     */
-    attribute controlLoopPeriodMs : Integer = 50;
-    attribute hazardReactionTimeMs : Integer = 100;
+    attribute controlLoopPeriod : DurationValue = 50 [ms];
+    attribute hazardReactionTime : DurationValue = 100 [ms];
     attribute coverageCellSizeMm : LengthValue = 100 [mm];
     attribute :>> powerDrawW = 9 [W];
     attribute :>> massKg = 0.28 [kg];
