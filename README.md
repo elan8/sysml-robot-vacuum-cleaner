@@ -12,6 +12,7 @@ Model a residential robot vacuum with:
 - requirement derivation from user needs to system requirements
 - functional decomposition as **`action def` capabilities** (`ProvideLocomotion`, `SenseEnvironment`, …) composed in `OperateCleaningRobot`, with mission scenarios and requirement `satisfy`
 - physical decomposition as **monteerbare assemblies** with typed electronics harnesses (I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, 3-phase BLDC wheel drives, PWM brushed/vacuum motors, GPIO safety/HMI, power rails)
+- **three allocation layers**: capability → software/LRU (`ArchitectureAllocations`), software → MCU (`allocate` to `mainControlPcb.mcu`), peripheral I/O (`connect` on `MainControlPcb`)
 - cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
 - operating behavior state machine with self-test, cleaning, pause, recovery, safe-stop, fault, docking, and charging states
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
@@ -36,6 +37,12 @@ Requires packages from [sysml-domain-libraries](https://github.com/elan8/sysml-d
 - `ElectronicBusDomain` (`I2cBus`, `I2cBusMasterNode`, `I2cBusSlaveNode`, `SmbusBus`, …)
 - `WirelessDomain` (`WirelessModule`, `BleCommunicationChannel`)
 - Composed in project-local [`PhysicalProtocols.sysml`](model/PhysicalProtocols.sysml) — product bus media with named attachment ports (`SensorI2cBus`, `BmsSmbusBus`, …)
+
+**Software / compute (deployment layer)**
+
+- `SoftwareCore` (`ExecutableComponent`, `DeploymentNode`, …)
+- `EmbeddedComputeDomain` (`Microcontroller`, `EmbeddedComputeUnit`)
+- Product firmware in [`PhysicalArchitecture.sysml`](model/PhysicalArchitecture.sysml) as `RobotFirmwareSuite` (`:> ExecutableComponent`); deployed to `MicrocontrollerUnit :> Microcontroller` via `allocate` in [`ArchitectureAllocations.sysml`](model/ArchitectureAllocations.sysml)
 
 Point your tool's library roots at `domain/`, `technical/`, and `generic/` under that repository.
 
@@ -89,7 +96,7 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 | [PhysicalProtocols.sysml](model/PhysicalProtocols.sysml) | `PhysicalProtocols` | Product bus aliases; re-exports domain electronics libraries |
 | [FunctionalArchitecture.sysml](model/FunctionalArchitecture.sysml) | `FunctionalArchitecture` | Capability `action def`s, `OperateCleaningRobot` composition, mission actions, requirement `satisfy` |
 | [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Product assemblies, typed physical harness (`I2cPort`, `PwmPort`, …), mass/BOM/power roll-ups |
-| [ArchitectureAllocations.sysml](model/ArchitectureAllocations.sysml) | `ArchitectureAllocations` | `perform`/`allocate` from capability actions to physical parts |
+| [ArchitectureAllocations.sysml](model/ArchitectureAllocations.sysml) | `ArchitectureAllocations` | Capability → LRU/software; software → MCU (`SoftwareToComputeNode`); scenario action allocations |
 | [Architecture.sysml](model/Architecture.sysml) | `Architecture` | Import hub, `part robot`, system-level `satisfy` |
 | [BehaviorStates.sysml](model/BehaviorStates.sysml) | `BehaviorStates` | Operating state machine |
 | [OperationalScenarios.sysml](model/OperationalScenarios.sysml) | `OperationalScenarios` | Use-case context and mission action flows |

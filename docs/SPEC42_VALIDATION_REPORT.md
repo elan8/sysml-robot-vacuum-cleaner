@@ -81,7 +81,7 @@ The model uses a functional / physical split (June 2026):
 | [`PhysicalProtocols.sysml`](../model/PhysicalProtocols.sysml) | Product bus aliases; `public import` of domain electronics libraries |
 | [`FunctionalArchitecture.sysml`](../model/FunctionalArchitecture.sysml) | Capability `action def`s, `OperateCleaningRobot` bindings, requirement `satisfy` |
 | [`PhysicalArchitecture.sysml`](../model/PhysicalArchitecture.sysml) | Product assemblies, typed physical harness, mass/BOM/power |
-| [`ArchitectureAllocations.sysml`](../model/ArchitectureAllocations.sysml) | `allocate` from functions and scenario actions to physical parts |
+| [`ArchitectureAllocations.sysml`](../model/ArchitectureAllocations.sysml) | Capability → LRU/software; software → MCU deployment; scenario action allocations |
 | [`Architecture.sysml`](../model/Architecture.sysml) | Public import hub, `part robot`, system-level `satisfy` |
 
 ### Physical protocol topology (June 2026)
@@ -95,6 +95,16 @@ The model uses a functional / physical split (June 2026):
 | Actuation | `ThreePhaseMotorPort`, `PwmPort` | BLDC wheel drives: inverter U/V/W to `DriveModule`; brushed brush/vacuum on PWM |
 | Safety / HMI | `GpioPort`, `QuadratureEncoderPort` | Bumpers, cliffs, encoders, buttons, dock beacon |
 | Power | `PowerRailPort` | 14.4 V distribution from `PowerModule` |
+
+### Software deployment (June 2026)
+
+| Layer | Mechanism | Example |
+| --- | --- | --- |
+| Capability → software | `allocate operate.missionControl to …robotFirmware.applicationFirmware` | Function-to-deployable mapping |
+| Software → MCU | `allocate …robotFirmware.mapProcessing to …mainControlPcb.mcu` | Canonical SysML v2 deployment (`SoftwareToComputeNode`) |
+| MCU → harness | `connect` on `MainControlPcb` | `mcu.sensorI2c` / `mcuI2cMaster` → sensor bus; `mcu.leftMotorPwm` → motor drivers |
+
+Firmware modules live in `RobotFirmwareSuite` (`ExecutableComponent`); `MicrocontrollerUnit :> Microcontroller` is the execution node. Operating behavior (`RobotOperatingBehavior`) is exhibited only on `ApplicationFirmware`.
 
 The hub uses **public** imports so downstream packages resolve `AutonomousFloorCleaningRobot` and related types via `import Architecture::*`.
 

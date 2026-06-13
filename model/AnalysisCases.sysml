@@ -93,8 +93,9 @@ package AnalysisCases {
     }
     objective estimateLocalization {
       doc /*
-        Model-based evidence for localizeReliably: localization firmware on mainElectronics
-        keeps fused odometry and perception estimate below the 150 mm limit.
+        Model-based evidence for localizeReliably: robotFirmware.localizationEstimator
+        on mainElectronics (allocated to mainControlPcb.mcu) keeps fused odometry and
+        perception estimate below the 150 mm limit.
       */
     }
   }
@@ -107,8 +108,8 @@ package AnalysisCases {
     }
     objective estimateSafeStopTiming {
       doc /*
-        Model-based evidence for superviseHazards: safetySupervisor firmware on mainElectronics
-        reacts within the 100 ms budget.
+        Model-based evidence for superviseHazards: robotFirmware.safetySupervisor
+        on mainElectronics (allocated to mainControlPcb.mcu) reacts within the 100 ms budget.
       */
     }
   }
@@ -121,8 +122,9 @@ package AnalysisCases {
     }
     objective estimateCoverageMapResolution {
       doc /*
-        Model-based evidence for updateCoverageMap: mapProcessing and coveragePlanner firmware
-        on mainElectronics use a grid resolution fine enough for room-scale coverage decisions.
+        Model-based evidence for updateCoverageMap: robotFirmware.mapProcessing and
+        robotFirmware.coveragePlanner on mainElectronics (allocated to mainControlPcb.mcu)
+        use a grid resolution fine enough for room-scale coverage decisions.
       */
     }
   }

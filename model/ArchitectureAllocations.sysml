@@ -1,6 +1,13 @@
 package ArchitectureAllocations {
   private import FunctionalArchitecture::*;
   private import PhysicalArchitecture::*;
+  private import SoftwareCore::*;
+  private import EmbeddedComputeDomain::*;
+
+  allocation def SoftwareToComputeNode {
+    end software : ExecutableComponent;
+    end computeNode : EmbeddedComputeUnit;
+  }
 
   part def AutonomousFloorCleaningRobotSystem {
     part physical : AutonomousFloorCleaningRobot;
@@ -21,15 +28,26 @@ package ArchitectureAllocations {
     allocate operate.locomotion to physical.driveModule;
     allocate operate.cleaning to physical.cleaningHead;
     allocate operate.perception to physical.sensorAssembly;
-    allocate operate.perception to physical.mainElectronics.mapProcessing;
-    allocate operate.navigation to physical.mainElectronics.localizationEstimator;
-    allocate operate.navigation to physical.mainElectronics.coveragePlanner;
+    allocate operate.perception to physical.mainElectronics.robotFirmware.mapProcessing;
+    allocate operate.navigation to physical.mainElectronics.robotFirmware.localizationEstimator;
+    allocate operate.navigation to physical.mainElectronics.robotFirmware.coveragePlanner;
     allocate operate.powerManagement to physical.powerModule;
     allocate operate.docking to physical.dockInterface;
-    allocate operate.missionControl to physical.mainElectronics.applicationFirmware;
-    allocate operate.safetySupervision to physical.mainElectronics.safetySupervisor;
+    allocate operate.missionControl to physical.mainElectronics.robotFirmware.applicationFirmware;
+    allocate operate.safetySupervision to physical.mainElectronics.robotFirmware.safetySupervisor;
     allocate operate.userInteraction to physical.hmi;
-    allocate operate.userInteraction to physical.mainElectronics.applicationFirmware;
+    allocate operate.userInteraction to physical.mainElectronics.robotFirmware.applicationFirmware;
+
+    allocate physical.mainElectronics.robotFirmware.applicationFirmware
+        to physical.mainElectronics.mainControlPcb.mcu;
+    allocate physical.mainElectronics.robotFirmware.safetySupervisor
+        to physical.mainElectronics.mainControlPcb.mcu;
+    allocate physical.mainElectronics.robotFirmware.mapProcessing
+        to physical.mainElectronics.mainControlPcb.mcu;
+    allocate physical.mainElectronics.robotFirmware.localizationEstimator
+        to physical.mainElectronics.mainControlPcb.mcu;
+    allocate physical.mainElectronics.robotFirmware.coveragePlanner
+        to physical.mainElectronics.mainControlPcb.mcu;
 
     allocate startMission to operate.missionControl;
     allocate buildMap to operate.perception;

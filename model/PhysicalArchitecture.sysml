@@ -2,6 +2,8 @@ package PhysicalArchitecture {
   private import ArchitectureCommon::*;
   private import PhysicalProtocols::*;
   private import BehaviorStates::*;
+  private import SoftwareCore::*;
+  private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;
   private import ISQ::*;
   private import SI::*;
@@ -135,13 +137,13 @@ package PhysicalArchitecture {
     attribute axisCount : Integer = 6;
     port poseOut : OdometryPort;
   }
-  part def MapProcessingSoftware {
+  part def MapProcessingSoftware :> ExecutableComponent {
     attribute gridCellSizeMm : LengthValue = 100 [mm];
   }
-  part def CoveragePlannerSoftware {
+  part def CoveragePlannerSoftware :> ExecutableComponent {
     attribute plannerType : String = "boustrophedon with obstacle replanning";
   }
-  part def LocalizationEstimatorSoftware {
+  part def LocalizationEstimatorSoftware :> ExecutableComponent {
     attribute estimatorType : String = "wheel odometry plus IMU plus range observations";
     attribute localizationErrorMm : LengthValue = 120 [mm];
   }
@@ -249,7 +251,7 @@ package PhysicalArchitecture {
     connect beaconReceiver.statusOut to dockStatusOut;
   }
 
-  part def MicrocontrollerUnit {
+  part def MicrocontrollerUnit :> Microcontroller {
     attribute core : String = "Arm Cortex-M33";
     attribute clockFrequency : FrequencyValue = 120000000 [Hz];
     attribute flashCapacity : StorageCapacityValue = 1048576 [B];
@@ -259,11 +261,23 @@ package PhysicalArchitecture {
     attribute capacity : StorageCapacityValue = 134217728 [B];
   }
   part def MainControlPcb {
+    doc /*
+      Main PCB: MCU execution node, motor inverters, wireless link, and external flash.
+      Software deployment to mcu uses allocate (ArchitectureAllocations); peripheral I/O uses connect.
+    */
     attribute layerCount : Integer = 4;
     port leftMotorPhaseOut : ThreePhaseMotorPort;
     port rightMotorPhaseOut : ThreePhaseMotorPort;
+    port sensorBusHarness : I2cPort;
+    port bmsBusHarness : I2cPort;
     port mcuUartOut : UartPort;
-    part mcu : MicrocontrollerUnit;
+    part mcu : MicrocontrollerUnit {
+      port sensorI2c : I2cPort;
+      port bmsI2c : I2cPort;
+      port leftMotorPwm : PwmPort;
+      port rightMotorPwm : PwmPort;
+    }
+    part mcuI2cMaster : I2cBusMasterNode;
     part wirelessModule : RobotWirelessModule;
     part flashSpi : FlashSpiBus;
     part flashNode : SpiBusSlaveNode;
@@ -271,24 +285,38 @@ package PhysicalArchitecture {
     part leftMotorDriver : MotorDriverIC;
     part rightMotorDriver : MotorDriverIC;
     part wirelessUart : McuWirelessUart;
+    connect mcu.sensorI2c to mcuI2cMaster.busPort;
+    connect sensorBusHarness to mcuI2cMaster.busPort;
+    connect bmsBusHarness to mcu.bmsI2c;
+    connect mcu.leftMotorPwm to leftMotorDriver.commandIn;
+    connect mcu.rightMotorPwm to rightMotorDriver.commandIn;
     connect leftMotorDriver.phaseOut to leftMotorPhaseOut;
     connect rightMotorDriver.phaseOut to rightMotorPhaseOut;
     connect flashNode.busPort to flashSpi.flash;
     connect mcuUartOut to wirelessUart.mcu;
     connect wirelessModule.hostLink to wirelessUart.wirelessModule;
   }
-  part def ApplicationFirmware {
+  part def ApplicationFirmware :> ExecutableComponent {
     doc /*
       Mission orchestration, command arbitration, and app-facing status on the main MCU.
     */
     attribute controlLoopPeriod : DurationValue = 50 [ms];
     exhibit state behavior : RobotOperatingBehavior;
   }
-  part def SafetySupervisorFirmware {
+  part def SafetySupervisorFirmware :> ExecutableComponent {
     doc /*
       Safety-monitoring firmware task with inputs from sensors, motor drivers, and BMS.
     */
     attribute safeStopReactionTime : DurationValue = 100 [ms];
+  }
+
+  part def RobotFirmwareSuite {
+    doc /* Deployable firmware modules on the main MCU (see ArchitectureAllocations). */
+    part applicationFirmware : ApplicationFirmware;
+    part safetySupervisor : SafetySupervisorFirmware;
+    part mapProcessing : MapProcessingSoftware;
+    part localizationEstimator : LocalizationEstimatorSoftware;
+    part coveragePlanner : CoveragePlannerSoftware;
   }
 
   part def MainElectronicsAssembly :> PhysicalAssembly {
@@ -315,15 +343,10 @@ package PhysicalArchitecture {
     port hazardIn : GpioPort;
     port statusOut : MissionStatusPort;
     port userCommandIn : GpioPort;
-    part mcuI2cMaster : I2cBusMasterNode;
     part mainControlPcb : MainControlPcb;
-    part applicationFirmware : ApplicationFirmware;
-    part safetySupervisor : SafetySupervisorFirmware;
-    part mapProcessing : MapProcessingSoftware;
-    part localizationEstimator : LocalizationEstimatorSoftware;
-    part coveragePlanner : CoveragePlannerSoftware;
-    exhibit state behavior : RobotOperatingBehavior;
-    connect sensorBusIn to mcuI2cMaster.busPort;
+    part robotFirmware : RobotFirmwareSuite;
+    connect sensorBusIn to mainControlPcb.sensorBusHarness;
+    connect bmsBusIn to mainControlPcb.bmsBusHarness;
     connect mainControlPcb.leftMotorPhaseOut to leftMotorPhaseOut;
     connect mainControlPcb.rightMotorPhaseOut to rightMotorPhaseOut;
     connect mainControlPcb.leftMotorDriver.faultOut to hazardIn;
