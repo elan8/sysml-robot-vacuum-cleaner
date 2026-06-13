@@ -1,5 +1,6 @@
 package PhysicalArchitecture {
   private import ArchitectureCommon::*;
+  private import PhysicalProtocols::*;
   private import BehaviorStates::*;
   private import MonetaryUnits::*;
   private import ISQ::*;
@@ -18,8 +19,8 @@ package PhysicalArchitecture {
   part def BrushlessDriveMotor {
     attribute ratedPower : PowerValue = 14 [W];
     attribute massKg : MassValue = 0.18 [kg];
-    port powerIn : PowerLoadPort;
-    port phaseCommandIn : MissionCommandPort;
+    port powerIn : PowerRailPort;
+    port phaseCommandIn : PwmPort;
   }
   part def WheelGearbox {
     attribute reductionRatio : Real = 38.0;
@@ -27,17 +28,17 @@ package PhysicalArchitecture {
   }
   part def WheelEncoder {
     attribute countsPerRevolution : Integer = 384;
-    port odometryOut : OdometryPort;
+    port odometryOut : QuadratureEncoderPort;
   }
   part def MotorDriverIC {
     attribute peakCurrent : ElectricCurrentValue = 3.0 [A];
-    port powerIn : PowerLoadPort;
-    port commandIn : MissionCommandPort;
-    port faultOut : HazardPort;
+    port powerIn : PowerRailPort;
+    port commandIn : PwmPort;
+    port faultOut : GpioPort;
   }
   part def BumperSwitchArray {
     attribute switchCount : Integer = 6;
-    port hazardOut : HazardPort;
+    port hazardOut : GpioPort;
   }
 
   part def DriveModule :> PhysicalAssembly {
@@ -49,11 +50,11 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 28 [W];
     attribute :>> massKg = 1.2 [kg];
     attribute :>> bomCost = 100 [EUR];
-    port powerIn : PowerLoadPort;
-    port phaseLeftIn : MissionCommandPort;
-    port phaseRightIn : MissionCommandPort;
-    port encoderOut : OdometryPort;
-    port bumperHazardOut : HazardPort;
+    port powerIn : PowerRailPort;
+    port phaseLeftIn : PwmPort;
+    port phaseRightIn : PwmPort;
+    port encoderOut : QuadratureEncoderPort;
+    port bumperHazardOut : GpioPort;
     part leftMotor : BrushlessDriveMotor;
     part rightMotor : BrushlessDriveMotor;
     part leftGearbox : WheelGearbox;
@@ -72,14 +73,14 @@ package PhysicalArchitecture {
 
   part def BrushMotor {
     attribute ratedPower : PowerValue = 8 [W];
-    port powerIn : PowerLoadPort;
-    port commandIn : MissionCommandPort;
-    port faultOut : HazardPort;
+    port powerIn : PowerRailPort;
+    port commandIn : PwmPort;
+    port faultOut : GpioPort;
   }
   part def VacuumFan {
     attribute ratedPower : PowerValue = 6 [W];
-    port powerIn : PowerLoadPort;
-    port commandIn : MissionCommandPort;
+    port powerIn : PowerRailPort;
+    port commandIn : PwmPort;
   }
   part def DustBin {
     attribute capacity : VolumeValue = 450 [mL];
@@ -96,10 +97,12 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 18 [W];
     attribute :>> massKg = 0.9 [kg];
     attribute :>> bomCost = 75 [EUR];
-    port powerIn : PowerLoadPort;
-    port commandIn : MissionCommandPort;
+    port powerIn : PowerRailPort;
+    port mainBrushPwmIn : PwmPort;
+    port sideBrushPwmIn : PwmPort;
+    port vacuumPwmIn : PwmPort;
     port statusOut : MissionStatusPort;
-    port faultOut : HazardPort;
+    port faultOut : GpioPort;
     part mainBrushMotor : BrushMotor;
     part sideBrushMotor : BrushMotor;
     part vacuumFan : VacuumFan;
@@ -108,9 +111,9 @@ package PhysicalArchitecture {
     connect powerIn to mainBrushMotor.powerIn;
     connect powerIn to sideBrushMotor.powerIn;
     connect powerIn to vacuumFan.powerIn;
-    connect commandIn to mainBrushMotor.commandIn;
-    connect commandIn to sideBrushMotor.commandIn;
-    connect commandIn to vacuumFan.commandIn;
+    connect mainBrushPwmIn to mainBrushMotor.commandIn;
+    connect sideBrushPwmIn to sideBrushMotor.commandIn;
+    connect vacuumPwmIn to vacuumFan.commandIn;
     connect dustLevelSensor.statusOut to statusOut;
     connect mainBrushMotor.faultOut to faultOut;
     connect sideBrushMotor.faultOut to faultOut;
@@ -122,7 +125,7 @@ package PhysicalArchitecture {
   }
   part def InfraredCliffSensor {
     attribute triggerHeightMm : LengthValue = 50 [mm];
-    port cliffOut : HazardPort;
+    port cliffOut : GpioPort;
   }
   part def InertialMeasurementUnit {
     attribute axisCount : Integer = 6;
@@ -140,15 +143,22 @@ package PhysicalArchitecture {
   }
 
   part def SensorAssembly :> PhysicalAssembly {
-    doc /* Sensor hardware LRU: range, cliff, and inertial sensing (no application firmware). */
+    doc /*
+      Sensor hardware LRU: ToF, cliff, and IMU on sensor I2C; cliff lines as GPIO hazards.
+    */
     attribute obstacleDetectionRangeMm : LengthValue = 1200 [mm];
     attribute cliffDetectionHeightMm : LengthValue = 50 [mm];
     attribute :>> powerDrawW = 5 [W];
     attribute :>> massKg = 0.28 [kg];
     attribute :>> bomCost = 38 [EUR];
-    port powerIn : PowerLoadPort;
-    port sensorBusOut;
-    port cliffHazardOut : HazardPort;
+    port powerIn : PowerRailPort;
+    port sensorBusOut : I2cPort;
+    port cliffHazardOut : GpioPort;
+    part sensorI2c : SensorI2cBus;
+    part frontTofNode : I2cBusSlaveNode;
+    part leftWallTofNode : I2cBusSlaveNode;
+    part rightWallTofNode : I2cBusSlaveNode;
+    part imuNode : I2cBusSlaveNode;
     part frontTofSensor : TimeOfFlightRangeSensor;
     part leftWallTofSensor : TimeOfFlightRangeSensor;
     part rightWallTofSensor : TimeOfFlightRangeSensor;
@@ -157,6 +167,11 @@ package PhysicalArchitecture {
     part cliffSensorRearLeft : InfraredCliffSensor;
     part cliffSensorRearRight : InfraredCliffSensor;
     part imu : InertialMeasurementUnit;
+    connect sensorBusOut to sensorI2c.nodePort0;
+    connect frontTofNode.busPort to sensorI2c.nodePort1;
+    connect leftWallTofNode.busPort to sensorI2c.nodePort2;
+    connect rightWallTofNode.busPort to sensorI2c.nodePort3;
+    connect imuNode.busPort to sensorI2c.nodePort4;
     connect cliffSensorFrontLeft.cliffOut to cliffHazardOut;
     connect cliffSensorFrontRight.cliffOut to cliffHazardOut;
     connect cliffSensorRearLeft.cliffOut to cliffHazardOut;
@@ -167,19 +182,19 @@ package PhysicalArchitecture {
     attribute cellConfiguration : String = "4S2P";
     attribute nominalCapacity : ElectricChargeValue = 12500 [mAh];
     attribute nominalVoltage : ElectricPotentialDifferenceValue = 14.4 [V];
-    port powerOut;
+    port packOut : PowerRailPort;
   }
   part def BatteryManagementSystem {
     doc /* Limits charge current and cell temperature (55 °C maximum) within the safe operating area. */
     attribute maxChargeCurrent : ElectricCurrentValue = 2.0 [A];
     attribute maxCellTemperature : ThermodynamicTemperatureValue = 328.15 [K];
-    port batteryTelemetryOut : TelemetryPort;
-    port hazardOut : HazardPort;
+    port smbusPort : ~I2cPort;
+    port hazardOut : GpioPort;
   }
   part def BuckRegulator {
     attribute outputVoltage : ElectricPotentialDifferenceValue = 5.0 [V];
-    port powerIn : PowerLoadPort;
-    port powerOut;
+    port powerIn : PowerRailPort;
+    port powerOut : PowerRailPort;
   }
 
   part def PowerModule :> PhysicalAssembly {
@@ -189,25 +204,32 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 8 [W];
     attribute :>> massKg = 0.72 [kg];
     attribute :>> bomCost = 68 [EUR];
-    port mainPowerOut;
+    port mainPowerOut : PowerRailPort;
+    port bmsBusOut : I2cPort;
     port telemetryOut : TelemetryPort;
-    port hazardOut : HazardPort;
+    port hazardOut : GpioPort;
     part batteryPack : LithiumIonBatteryPack;
     part bms : BatteryManagementSystem;
+    part bmsSmbus : BmsSmbusHub;
     part logicRegulator : BuckRegulator;
     part motorRegulator : BuckRegulator;
-    connect batteryPack.powerOut to mainPowerOut;
-    connect bms.batteryTelemetryOut to telemetryOut;
+    connect batteryPack.packOut to mainPowerOut;
+    connect batteryPack.packOut to logicRegulator.powerIn;
+    connect batteryPack.packOut to motorRegulator.powerIn;
+    connect logicRegulator.powerOut to mainPowerOut;
+    connect motorRegulator.powerOut to mainPowerOut;
+    connect bmsBusOut to bmsSmbus.nodePort0;
+    connect bms.smbusPort to bmsSmbus.nodePort1;
     connect bms.hazardOut to hazardOut;
   }
 
   part def ChargingContactPair {
     attribute contactMaterial : String = "spring loaded plated copper";
-    port powerIn : PowerLoadPort;
+    port powerIn : PowerRailPort;
   }
   part def DockBeaconReceiver {
     attribute receiverType : String = "infrared homing receiver";
-    port statusOut : MissionStatusPort;
+    port statusOut : GpioPort;
   }
 
   part def DockInterfaceModule :> PhysicalAssembly {
@@ -215,8 +237,8 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 2 [W];
     attribute :>> massKg = 0.38 [kg];
     attribute :>> bomCost = 24 [EUR];
-    port powerIn : PowerLoadPort;
-    port dockStatusOut;
+    port powerIn : PowerRailPort;
+    port dockStatusOut : GpioPort;
     part chargingContacts : ChargingContactPair;
     part beaconReceiver : DockBeaconReceiver;
     connect powerIn to chargingContacts.powerIn;
@@ -229,19 +251,23 @@ package PhysicalArchitecture {
     attribute flashCapacity : StorageCapacityValue = 1048576 [B];
     attribute ramCapacity : StorageCapacityValue = 262144 [B];
   }
-  part def WirelessModule {
-    attribute radios : String = "Wi-Fi 2.4 GHz and Bluetooth LE";
-  }
   part def NonVolatileMemory {
     attribute capacity : StorageCapacityValue = 134217728 [B];
   }
   part def MainControlPcb {
     attribute layerCount : Integer = 4;
+    port mcuUartOut : UartPort;
     part mcu : MicrocontrollerUnit;
-    part wireless : WirelessModule;
+    part wirelessModule : RobotWirelessModule;
+    part flashSpi : FlashSpiBus;
+    part flashNode : SpiBusSlaveNode;
     part flash : NonVolatileMemory;
     part leftMotorDriver : MotorDriverIC;
     part rightMotorDriver : MotorDriverIC;
+    part wirelessUart : WirelessUartHub;
+    connect flashNode.busPort to flashSpi.nodePort0;
+    connect mcuUartOut to wirelessUart.nodePort0;
+    connect wirelessModule.hostLink to wirelessUart.nodePort1;
   }
   part def ApplicationFirmware {
     doc /*
@@ -267,17 +293,21 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 9 [W];
     attribute :>> massKg = 0.28 [kg];
     attribute :>> bomCost = 48 [EUR];
-    port powerIn : PowerLoadPort;
-    port leftMotorDriveOut : MissionCommandPort;
-    port rightMotorDriveOut : MissionCommandPort;
-    port sensorBusIn;
-    port encoderIn : OdometryPort;
-    port cleaningCommandOut : MissionCommandPort;
+    port powerIn : PowerRailPort;
+    port leftMotorDriveOut : PwmPort;
+    port rightMotorDriveOut : PwmPort;
+    port mainBrushPwmOut : PwmPort;
+    port sideBrushPwmOut : PwmPort;
+    port vacuumPwmOut : PwmPort;
+    port sensorBusIn : I2cPort;
+    port bmsBusIn : I2cPort;
+    port encoderIn : QuadratureEncoderPort;
     port telemetryIn : TelemetryPort;
-    port dockStatusIn;
-    port hazardIn : HazardPort;
-    port statusOut;
-    port userCommandIn;
+    port dockStatusIn : GpioPort;
+    port hazardIn : GpioPort;
+    port statusOut : MissionStatusPort;
+    port userCommandIn : GpioPort;
+    part mcuI2cMaster : I2cBusMasterNode;
     part mainControlPcb : MainControlPcb;
     part applicationFirmware : ApplicationFirmware;
     part safetySupervisor : SafetySupervisorFirmware;
@@ -285,6 +315,7 @@ package PhysicalArchitecture {
     part localizationEstimator : LocalizationEstimatorSoftware;
     part coveragePlanner : CoveragePlannerSoftware;
     exhibit state behavior : RobotOperatingBehavior;
+    connect sensorBusIn to mcuI2cMaster.busPort;
     connect mainControlPcb.leftMotorDriver.commandIn to leftMotorDriveOut;
     connect mainControlPcb.rightMotorDriver.commandIn to rightMotorDriveOut;
     connect mainControlPcb.leftMotorDriver.faultOut to hazardIn;
@@ -292,15 +323,14 @@ package PhysicalArchitecture {
   }
 
   part def PushButton {
-    port commandOut;
+    port commandOut : GpioPort;
   }
   part def StatusLedRing {
-    port statusIn;
+    port statusIn : GpioPort;
   }
   part def MobileAppInterface {
     attribute cloudBackupDefaultEnabled : Boolean = false;
-    port commandOut;
-    port statusIn;
+    ref bleChannel : BleCommunicationChannel;
   }
 
   part def HumanMachineInterface :> PhysicalAssembly {
@@ -308,18 +338,15 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 1 [W];
     attribute :>> massKg = 0.65 [kg];
     attribute :>> bomCost = 4 [EUR];
-    port powerIn : PowerLoadPort;
-    port statusIn;
-    port userCommandOut;
+    port powerIn : PowerRailPort;
+    port statusIn : MissionStatusPort;
+    port userCommandOut : GpioPort;
     part cleanButton : PushButton;
     part homeButton : PushButton;
     part statusLedRing : StatusLedRing;
     part mobileApp : MobileAppInterface;
     connect cleanButton.commandOut to userCommandOut;
     connect homeButton.commandOut to userCommandOut;
-    connect mobileApp.commandOut to userCommandOut;
-    connect statusIn to statusLedRing.statusIn;
-    connect statusIn to mobileApp.statusIn;
   }
 
   part def ChassisAssembly :> PhysicalAssembly {
@@ -350,7 +377,11 @@ package PhysicalArchitecture {
     connect mainElectronics.rightMotorDriveOut to driveModule.phaseRightIn;
     connect driveModule.encoderOut to mainElectronics.encoderIn;
     connect sensorAssembly.sensorBusOut to mainElectronics.sensorBusIn;
-    connect mainElectronics.cleaningCommandOut to cleaningHead.commandIn;
+    connect powerModule.bmsBusOut to mainElectronics.bmsBusIn;
+    connect powerModule.telemetryOut to mainElectronics.telemetryIn;
+    connect mainElectronics.mainBrushPwmOut to cleaningHead.mainBrushPwmIn;
+    connect mainElectronics.sideBrushPwmOut to cleaningHead.sideBrushPwmIn;
+    connect mainElectronics.vacuumPwmOut to cleaningHead.vacuumPwmIn;
     connect mainElectronics.statusOut to hmi.statusIn;
     connect hmi.userCommandOut to mainElectronics.userCommandIn;
     connect dockInterface.dockStatusOut to mainElectronics.dockStatusIn;
@@ -358,6 +389,5 @@ package PhysicalArchitecture {
     connect driveModule.bumperHazardOut to mainElectronics.hazardIn;
     connect cleaningHead.faultOut to mainElectronics.hazardIn;
     connect powerModule.hazardOut to mainElectronics.hazardIn;
-    connect powerModule.telemetryOut to mainElectronics.telemetryIn;
   }
 }

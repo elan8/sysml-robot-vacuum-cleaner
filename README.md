@@ -11,8 +11,7 @@ Model a residential robot vacuum with:
 - stakeholder and system requirements (implicit usages with `@RequirementRole` and `@StatusInfo` metadata)
 - requirement derivation from user needs to system requirements
 - functional decomposition as **`action def` capabilities** (`ProvideLocomotion`, `SenseEnvironment`, …) composed in `OperateCleaningRobot`, with mission scenarios and requirement `satisfy`
-- physical decomposition as **monteerbare assemblies** (`DriveModule`, `SensorAssembly`, `MainElectronicsAssembly`, …) with firmware on the main compute LRU, linked by explicit `allocate` relations
-- physical mapping to drive module, cleaning head, sensor kit, main electronics (PCB, motor drivers, all firmware), power module, dock interface, HMI, and chassis
+- physical decomposition as **monteerbare assemblies** with typed electronics harnesses (I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, PWM motor drives, GPIO safety/HMI, power rails)
 - cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
 - operating behavior state machine with self-test, cleaning, pause, recovery, safe-stop, fault, docking, and charging states
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
@@ -23,11 +22,20 @@ Model a residential robot vacuum with:
 
 Requires packages from [sysml-domain-libraries](https://github.com/elan8/sysml-domain-libraries), especially:
 
+**Generic / requirements**
+
 - `RequirementMetadata` (`RequirementRole`, `RequirementRoleKind`)
 - `ModelingMetadata` (`StatusInfo`, OMG `StatusKind`)
 - `RequirementManagement` (evidence, baseline, traceability scaffolding — not requirement defs)
 - `MonetaryUnits` (`MonetaryAmount`)
 - `ISQ` / `SI` quantity types
+
+**Electronics / communication (physical layer)**
+
+- `ElectronicsInterconnection` (`I2cPort`, `PwmPort`, `PowerRailPort`, `GpioPort`, …)
+- `ElectronicBusDomain` (`I2cBusHub`, `I2cBusMasterNode`, `I2cBusSlaveNode`, …)
+- `WirelessDomain` (`WirelessModule`, `BleCommunicationChannel`)
+- Composed in project-local [`PhysicalProtocols.sysml`](model/PhysicalProtocols.sysml) (`SensorI2cBus`, `BmsSmbusHub`, …)
 
 Point your tool's library roots at `domain/`, `technical/`, and `generic/` under that repository.
 
@@ -35,9 +43,14 @@ Point your tool's library roots at `domain/`, `technical/`, and `generic/` under
 
 From a checkout that includes domain libraries on the library path:
 
-```bash
-spec42 check model/
+```powershell
+spec42 check model/ `
+  --library-path C:\Git\sysml-domain-libraries\domain `
+  --library-path C:\Git\sysml-domain-libraries\technical `
+  --library-path C:\Git\sysml-domain-libraries\generic
 ```
+
+When using a sibling checkout of `sysml-domain-libraries`, adjust paths accordingly. The bundled domain libraries in Spec42 may lag behind local electronics packages until republished.
 
 ## Try it with Babel42
 
@@ -72,9 +85,10 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 | [StakeholderNeeds.sysml](model/StakeholderNeeds.sysml) | `StakeholderNeeds` | User requirements |
 | [SystemRequirements.sysml](model/SystemRequirements.sysml) | `SystemRequirements` | System requirements and derivations |
 | [DesignLimits.sysml](model/DesignLimits.sysml) | `DesignLimits` | BOM and mass budgets |
-| [ArchitectureCommon.sysml](model/ArchitectureCommon.sysml) | `ArchitectureCommon` | Shared items, ports, and interfaces |
+| [ArchitectureCommon.sysml](model/ArchitectureCommon.sysml) | `ArchitectureCommon` | Mission/application items and CPS ports (functional layer) |
+| [PhysicalProtocols.sysml](model/PhysicalProtocols.sysml) | `PhysicalProtocols` | Product bus aliases; re-exports domain electronics libraries |
 | [FunctionalArchitecture.sysml](model/FunctionalArchitecture.sysml) | `FunctionalArchitecture` | Capability `action def`s, `OperateCleaningRobot` composition, mission actions, requirement `satisfy` |
-| [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Product assemblies, physical harness connections, mass/BOM/power roll-ups |
+| [PhysicalArchitecture.sysml](model/PhysicalArchitecture.sysml) | `PhysicalArchitecture` | Product assemblies, typed physical harness (`I2cPort`, `PwmPort`, …), mass/BOM/power roll-ups |
 | [ArchitectureAllocations.sysml](model/ArchitectureAllocations.sysml) | `ArchitectureAllocations` | `perform`/`allocate` from capability actions to physical parts |
 | [Architecture.sysml](model/Architecture.sysml) | `Architecture` | Import hub, `part robot`, system-level `satisfy` |
 | [BehaviorStates.sysml](model/BehaviorStates.sysml) | `BehaviorStates` | Operating state machine |
@@ -87,13 +101,14 @@ Defined in `DesignLimits.sysml` and referenced by system requirements and analys
 1. `StakeholderNeeds.sysml` — user needs
 2. `SystemRequirements.sysml` — derived system requirements
 3. `FunctionalArchitecture.sysml` — capability actions, functional composition, requirement traceability
-4. `PhysicalArchitecture.sysml` — product assemblies (drive, sensors, compute, power, …) and physical connections
-5. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
-6. `Architecture.sysml` — hub package and system-level constraints
-7. `BehaviorStates.sysml` — mission lifecycle states
-8. `OperationalScenarios.sysml` — use cases over the combined system model
-9. `Verification.sysml` and `AnalysisCases.sysml` — V&V and parametric evidence
-10. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
+4. `PhysicalProtocols.sysml` — electronics library imports and product bus aliases
+5. `PhysicalArchitecture.sysml` — product assemblies and typed physical connections
+6. `ArchitectureAllocations.sysml` — function-to-physical and action allocations
+7. `Architecture.sysml` — hub package and system-level constraints
+8. `BehaviorStates.sysml` — mission lifecycle states
+9. `OperationalScenarios.sysml` — use cases over the combined system model
+10. `Verification.sysml` and `AnalysisCases.sysml` — V&V and parametric evidence
+11. `AutonomousFloorCleaningRobotDemo.sysml` — full workspace import hub
 
 ## Parser notes
 

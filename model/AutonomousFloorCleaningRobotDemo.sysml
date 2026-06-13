@@ -8,6 +8,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import AnalysisCases::*;
   private import BehaviorStates::*;
   private import ArchitectureCommon::*;
+  private import PhysicalProtocols::*;
   private import FunctionalArchitecture::*;
   private import PhysicalArchitecture::*;
   private import ArchitectureAllocations::*;

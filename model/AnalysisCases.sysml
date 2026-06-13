@@ -103,7 +103,7 @@ package AnalysisCases {
     attribute reactionTimeLimit : DurationValue = 100 [ms];
     subject robot : AutonomousFloorCleaningRobot;
     return ref reactsWithinLimit {
-      return measuredReactionTimeMs <= reactionTimeLimitMs;
+      return measuredReactionTime <= reactionTimeLimit;
     }
     objective estimateSafeStopTiming {
       doc /*

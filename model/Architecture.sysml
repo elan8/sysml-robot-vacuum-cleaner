@@ -1,5 +1,6 @@
 package Architecture {
   public import ArchitectureCommon::*;
+  public import PhysicalProtocols::*;
   public import FunctionalArchitecture::*;
   public import PhysicalArchitecture::*;
   public import ArchitectureAllocations::*;
