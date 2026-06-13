@@ -106,6 +106,9 @@ package FunctionalArchitecture {
     bind missionControl.hazardIn = cleaning.fault;
     bind missionControl.hazardIn = powerManagement.hazard;
     bind safetySupervision.hazardIn = perception.hazard;
+    bind safetySupervision.hazardIn = locomotion.fault;
+    bind safetySupervision.hazardIn = cleaning.fault;
+    bind safetySupervision.hazardIn = powerManagement.hazard;
   }
 
   action operateCleaningRobot : OperateCleaningRobot;
