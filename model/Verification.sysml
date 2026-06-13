@@ -12,8 +12,6 @@ package Verification {
       verify requirement coverFloor;
     }
     then action runCoverageTest : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyBatteryRuntime {
@@ -23,8 +21,6 @@ package Verification {
       verify requirement cleanAtLeastEighty;
     }
     then action runRuntimeTest : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyObstacleAvoidance {
@@ -34,8 +30,6 @@ package Verification {
       verify requirement avoidObstacles;
     }
     then action runObstacleScenario : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyDockingSuccess {
@@ -45,8 +39,6 @@ package Verification {
       verify requirement returnToDock;
     }
     then action runDockingTest : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyDustBinDetection {
@@ -56,8 +48,6 @@ package Verification {
       verify requirement detectDustBin;
     }
     then action runBinFullTest : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyNoiseLevel {
@@ -67,8 +57,6 @@ package Verification {
       verify requirement keepNoise;
     }
     then action runNoiseTest : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyBomCost {
@@ -81,10 +69,7 @@ package Verification {
       verify requirement limitBomCost;
     }
     then action recordBomAnalysis : RecordModelAnalysisEvidence;
-    
     then action optionalBomAudit : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyTotalMass {
@@ -97,10 +82,7 @@ package Verification {
       verify requirement limitTotalMass;
     }
     then action recordMassAnalysis : RecordModelAnalysisEvidence;
-    
     then action optionalWeighIn : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyCliffDetection {
@@ -111,10 +93,7 @@ package Verification {
       verify requirement superviseHazards;
     }
     then action runCliffEdgeTest : RunPhysicalTest;
-    
     then action recordReactionTiming : RecordModelAnalysisEvidence;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyLocalizationAccuracy {
@@ -124,10 +103,7 @@ package Verification {
       verify requirement localizeReliably;
     }
     then action recordLocalizationAnalysis : RecordModelAnalysisEvidence;
-    
     then action runLocalizationScenario : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyCoverageMap {
@@ -137,10 +113,7 @@ package Verification {
       verify requirement updateCoverageMap;
     }
     then action recordCoverageMapAnalysis : RecordModelAnalysisEvidence;
-    
     then action runCoverageMapScenario : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyStallRecovery {
@@ -151,8 +124,6 @@ package Verification {
       verify requirement superviseHazards;
     }
     then action runStallRecoveryScenario : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifyPrivacyControls {
@@ -162,8 +133,6 @@ package Verification {
       verify requirement protectMapPrivacy;
     }
     then action runPrivacyConfigurationReview : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 
   verification verifySafeCharging {
@@ -173,8 +142,5 @@ package Verification {
       verify requirement chargeSafely;
     }
     then action runChargingSafetyTest : RunPhysicalTest;
-    
-    return ref verdictResult { return VerdictKind::pass; }
   }
 }
-
