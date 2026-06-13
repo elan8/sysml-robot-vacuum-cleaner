@@ -146,6 +146,25 @@ package PhysicalArchitecture {
     attribute axisCount : Integer = 6;
     port poseOut : OdometryPort;
   }
+  part def TwoDimensionalLidarModule {
+    attribute scanRateHz : FrequencyValue = 10 [Hz];
+    attribute rangeMm : LengthValue = 6000 [mm];
+    attribute angularResolutionDeg : Real = 1.0;
+    attribute interfaceType : String = "3.3 V UART, 5 V sensor power";
+    attribute powerDrawW : PowerValue = 2 [W];
+    port scanOut : UartPort;
+  }
+  part def VisionObstacleModule {
+    attribute cameraCount : Integer = 2;
+    attribute fieldOfViewDeg : Real = 136.0;
+    attribute selectedForBaseline : Boolean = false;
+    port visionDataOut : UartPort;
+  }
+  part def AiInferenceAccelerator {
+    attribute localInferenceOnly : Boolean = true;
+    attribute selectedForBaseline : Boolean = false;
+    port hostLink : SpiPort;
+  }
   part def MapProcessingSoftware :> ExecutableComponent {
     attribute gridCellSizeMm : LengthValue = 100 [mm];
   }
@@ -153,23 +172,27 @@ package PhysicalArchitecture {
     attribute plannerType : String = "boustrophedon with obstacle replanning";
   }
   part def LocalizationEstimatorSoftware :> ExecutableComponent {
-    attribute estimatorType : String = "wheel odometry plus IMU plus range observations";
-    attribute localizationErrorMm : LengthValue = 120 [mm];
+    attribute estimatorType : String = "wheel odometry plus IMU plus 2D LiDAR scan matching plus ToF observations";
+    attribute localizationErrorMm : LengthValue = 95 [mm];
   }
 
   part def SensorAssembly :> PhysicalAssembly {
     doc /*
-      Sensor hardware LRU: ToF, cliff, and IMU on sensor I2C; cliff lines as GPIO hazards.
+      Sensor hardware LRU: 2D LiDAR/dToF, ToF, cliff, and IMU.
+      ToF and IMU are on sensor I2C; LiDAR uses a serial link; cliff lines are GPIO hazards.
     */
     attribute obstacleDetectionRangeMm : LengthValue = 1200 [mm];
+    attribute lidarMappingRangeMm : LengthValue = 6000 [mm];
     attribute cliffDetectionHeightMm : LengthValue = 50 [mm];
-    attribute :>> powerDrawW = 5 [W];
-    attribute :>> massKg = 0.28 [kg];
-    attribute :>> bomCost = 38 [EUR];
+    attribute :>> powerDrawW = 7 [W];
+    attribute :>> massKg = 0.34 [kg];
+    attribute :>> bomCost = 58 [EUR];
     port powerIn : PowerRailPort;
     port sensorBusOut : I2cPort;
+    port lidarSerialOut : UartPort;
     port cliffHazardOut : GpioPort;
     part sensorI2c : SensorI2cBus;
+    part lidarSerial : LidarSerialBus;
     part frontTofNode : I2cBusSlaveNode;
     part leftWallTofNode : I2cBusSlaveNode;
     part rightWallTofNode : I2cBusSlaveNode;
@@ -182,7 +205,10 @@ package PhysicalArchitecture {
     part cliffSensorRearLeft : InfraredCliffSensor;
     part cliffSensorRearRight : InfraredCliffSensor;
     part imu : InertialMeasurementUnit;
+    part lidar : TwoDimensionalLidarModule;
     connect sensorBusOut to sensorI2c.hostBackplane;
+    connect lidarSerialOut to lidarSerial.mcu;
+    connect lidar.scanOut to lidarSerial.lidarModule;
     connect frontTofNode.busPort to sensorI2c.frontTof;
     connect leftWallTofNode.busPort to sensorI2c.leftWallTof;
     connect rightWallTofNode.busPort to sensorI2c.rightWallTof;
@@ -278,10 +304,12 @@ package PhysicalArchitecture {
     port leftMotorPhaseOut : ThreePhaseMotorPort;
     port rightMotorPhaseOut : ThreePhaseMotorPort;
     port sensorBusHarness : I2cPort;
+    port lidarUartHarness : UartPort;
     port bmsBusHarness : I2cPort;
     port mcuUartOut : UartPort;
     part mcu : MicrocontrollerUnit {
       port sensorI2c : I2cPort;
+      port lidarUart : UartPort;
       port bmsI2c : I2cPort;
       port leftMotorPwm : PwmPort;
       port rightMotorPwm : PwmPort;
@@ -303,6 +331,7 @@ package PhysicalArchitecture {
     part wirelessUart : McuWirelessUart;
     connect mcu.sensorI2c to mcuI2cMaster.busPort;
     connect sensorBusHarness to mcuI2cMaster.busPort;
+    connect lidarUartHarness to mcu.lidarUart;
     connect bmsBusHarness to mcu.bmsI2c;
     connect mcu.leftMotorPwm to leftMotorDriver.commandIn;
     connect mcu.rightMotorPwm to rightMotorDriver.commandIn;
@@ -352,6 +381,7 @@ package PhysicalArchitecture {
     port sideBrushPwmOut : PwmPort;
     port vacuumPwmOut : PwmPort;
     port sensorBusIn : I2cPort;
+    port lidarSerialIn : UartPort;
     port bmsBusIn : I2cPort;
     port encoderIn : QuadratureEncoderPort;
     port telemetryIn : TelemetryPort;
@@ -362,6 +392,7 @@ package PhysicalArchitecture {
     part mainControlPcb : MainControlPcb;
     part robotFirmware : RobotFirmwareSuite;
     connect sensorBusIn to mainControlPcb.sensorBusHarness;
+    connect lidarSerialIn to mainControlPcb.lidarUartHarness;
     connect bmsBusIn to mainControlPcb.bmsBusHarness;
     connect mainControlPcb.leftMotorPhaseOut to leftMotorPhaseOut;
     connect mainControlPcb.rightMotorPhaseOut to rightMotorPhaseOut;
@@ -401,7 +432,7 @@ package PhysicalArchitecture {
   part def ChassisAssembly :> PhysicalAssembly {
     doc /* Structural shell, wheel mounts, and assembly hardware. */
     attribute :>> powerDrawW = 0 [W];
-    attribute :>> massKg = 0.55 [kg];
+    attribute :>> massKg = 0.48 [kg];
     attribute :>> bomCost = 20 [EUR];
   }
 
@@ -425,6 +456,7 @@ package PhysicalArchitecture {
     connect mainElectronics.rightMotorPhaseOut to driveModule.phaseRightIn;
     connect driveModule.encoderOut to mainElectronics.encoderIn;
     connect sensorAssembly.sensorBusOut to mainElectronics.sensorBusIn;
+    connect sensorAssembly.lidarSerialOut to mainElectronics.lidarSerialIn;
     connect powerModule.bmsBusOut to mainElectronics.bmsBusIn;
     connect powerModule.telemetryOut to mainElectronics.telemetryIn;
     connect mainElectronics.mainBrushPwmOut to cleaningHead.mainBrushPwmIn;

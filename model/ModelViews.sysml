@@ -202,6 +202,22 @@ package ModelViews {
     render asElementTable;
   }
 
+  view sensorSlamArchitecture {
+    satisfy implementationInterfacePerspective;
+    expose PhysicalArchitecture::SensorAssembly;
+    expose PhysicalArchitecture::TwoDimensionalLidarModule;
+    expose PhysicalArchitecture::LocalizationEstimatorSoftware;
+    expose FirmwareArchitecture::SlamTask;
+    expose FirmwareArchitecture::LocalizationTask;
+    expose InterfaceControl::lidarScanFrameContract;
+    expose InterfaceControl::poseGraphUpdateContract;
+    expose TradeStudies::sensorLidarUpgrade;
+    expose TradeStudies::flagshipAiVisionUpgrade;
+    expose SystemRequirements::supportRoomScaleSlam;
+    expose AnalysisCases::LocalizationPerformanceAnalysis;
+    render asElementTable;
+  }
+
   view softwareMessageContracts {
     satisfy implementationInterfacePerspective;
     expose InterfaceControl::*;

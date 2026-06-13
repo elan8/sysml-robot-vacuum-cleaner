@@ -8,10 +8,10 @@ package AnalysisCases {
 
   analysis def TotalPowerConsumptionAnalysis {
     attribute powerBudgetW : PowerValue = 75 [W];
-    attribute ecoModePowerW : PowerValue = 52 [W];
-    attribute standardModePowerW : PowerValue = 71 [W];
-    attribute maxModePowerW : PowerValue = 92 [W];
-    attribute standardModeMarginW : PowerValue = 4 [W];
+    attribute ecoModePowerW : PowerValue = 54 [W];
+    attribute standardModePowerW : PowerValue = 73 [W];
+    attribute maxModePowerW : PowerValue = 94 [W];
+    attribute standardModeMarginW : PowerValue = 2 [W];
     subject robot : AutonomousFloorCleaningRobot;
     return ref powerWithinBudget {
       return sum(
@@ -34,8 +34,8 @@ package AnalysisCases {
   }
   analysis def ProductCostAnalysis {
     attribute bomCostBudget : MonetaryAmount = 400 [EUR];
-    attribute estimatedBomCost : MonetaryAmount = 377 [EUR];
-    attribute bomCostMargin : MonetaryAmount = 23 [EUR];
+    attribute estimatedBomCost : MonetaryAmount = 397 [EUR];
+    attribute bomCostMargin : MonetaryAmount = 3 [EUR];
     subject robot : AutonomousFloorCleaningRobot;
     return ref costWithinTarget {
       return sum(
@@ -57,10 +57,10 @@ package AnalysisCases {
   }
   analysis def TotalMassAnalysis {
     attribute massBudget : MassValue = 5.0 [kg];
-    attribute estimatedMass : MassValue = 4.96 [kg];
+    attribute estimatedMass : MassValue = 4.95 [kg];
     attribute manufacturingMassAllowance : MassValue = 0.25 [kg];
     attribute designTargetMass : MassValue = 4.75 [kg];
-    attribute massMarginToTarget : MassValue = -0.21 [kg];
+    attribute massMarginToTarget : MassValue = -0.20 [kg];
     subject robot : AutonomousFloorCleaningRobot;
     return ref massWithinLimit {
       return sum(
@@ -100,7 +100,9 @@ package AnalysisCases {
     }
   }
   analysis def LocalizationPerformanceAnalysis {
-    attribute estimatedLocalizationError : LengthValue = 120 [mm];
+    attribute baselineTofImuLocalizationError : LengthValue = 180 [mm];
+    attribute premiumLidarSlamLocalizationError : LengthValue = 95 [mm];
+    attribute estimatedLocalizationError : LengthValue = 95 [mm];
     attribute localizationErrorLimit : LengthValue = 150 [mm];
     subject robot : AutonomousFloorCleaningRobot;
     return ref localizationWithinLimit {
@@ -109,8 +111,10 @@ package AnalysisCases {
     objective estimateLocalization {
       doc /*
         Model-based evidence for localizeReliably: robotFirmware.localizationEstimator
-        on mainElectronics (allocated to mainControlPcb.mcu) keeps fused odometry and
-        perception estimate below the 150 mm limit.
+        on mainElectronics (allocated to mainControlPcb.mcu) uses wheel odometry,
+        IMU, 2D LiDAR scan matching, and short-range ToF observations. The former
+        ToF+IMU baseline is retained as a low-cost trade option but does not meet
+        the 150 mm standard-home-layout target with sufficient robustness.
       */
     }
   }

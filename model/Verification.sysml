@@ -116,6 +116,18 @@ package Verification {
     then action runCoverageMapScenario : RunPhysicalTest;
   }
 
+  verification verifyRoomScaleSlam {
+    doc /* Confirm selected premium LiDAR SLAM maintains stable maps and below-150 mm localization across a standard home layout. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify requirement localizeReliably;
+      verify requirement updateCoverageMap;
+      verify requirement supportRoomScaleSlam;
+    }
+    then action recordLocalizationAnalysis : RecordModelAnalysisEvidence;
+    then action runSlamReferenceHomeScenario : RunPhysicalTest;
+  }
+
   verification verifyStallRecovery {
     doc /* Confirm wheel-stall detection enters bounded recovery and escalates to safe stop when recovery fails. */
     subject robot : AutonomousFloorCleaningRobot;

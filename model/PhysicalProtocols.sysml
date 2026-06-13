@@ -33,5 +33,10 @@ package PhysicalProtocols {
     port wirelessModule : UartPort;
   }
 
+  part def LidarSerialBus :> UartBus {
+    port mcu : UartPort;
+    port lidarModule : UartPort;
+  }
+
   part def RobotWirelessModule :> WirelessModule;
 }

@@ -12,14 +12,20 @@ package TradeStudies {
 
   part sensorBaseline : TradeOption {
     attribute :>> optionName = "ToF plus IMU";
-    attribute :>> selected = true;
-    attribute :>> rationale = "lowest BOM and power while meeting the 150 mm reference-layout localization target";
+    attribute :>> selected = false;
+    attribute :>> rationale = "low-cost privacy tier for simple reference layouts; deferred because it is not robust enough for premium room-scale SLAM";
   }
 
   part sensorLidarUpgrade : TradeOption {
-    attribute :>> optionName = "ToF plus IMU plus 2D lidar";
+    attribute :>> optionName = "ToF plus IMU plus 2D dToF/LiDAR";
+    attribute :>> selected = true;
+    attribute :>> rationale = "selected premium architecture for robust room-scale SLAM, stable maps, and 150 mm localization target without camera-by-default privacy impact";
+  }
+
+  part flagshipAiVisionUpgrade : TradeOption {
+    attribute :>> optionName = "LiDAR plus RGB/dual camera plus local AI accelerator plus 3D ToF";
     attribute :>> selected = false;
-    attribute :>> rationale = "better mapping robustness, held as premium variant due to cost and height impact";
+    attribute :>> rationale = "best semantic obstacle recognition, deferred because it adds privacy, compute, power, BOM, and regulatory concerns";
   }
 
   part standardFan : TradeOption {
@@ -58,8 +64,11 @@ package TradeStudies {
     attribute :>> rationale = "satisfies protectMapPrivacy without requiring cloud trust";
   }
 
-  satisfy sensorBaseline by localizeReliably;
   satisfy sensorBaseline by limitBomCost;
+  satisfy sensorLidarUpgrade by localizeReliably;
+  satisfy sensorLidarUpgrade by updateCoverageMap;
+  satisfy flagshipAiVisionUpgrade by avoidObstacles;
+  satisfy flagshipAiVisionUpgrade by protectMapPrivacy;
   satisfy standardFan by keepNoise;
   satisfy standardFan by cleanAtLeastEighty;
   satisfy battery4s2p by cleanAtLeastEighty;

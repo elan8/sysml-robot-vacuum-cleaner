@@ -56,12 +56,17 @@ package SystemRequirements {
   requirement localizeReliably {
     @RequirementRole { role = system; }
     @StatusInfo { status = done; }
-    doc /* The robot shall maintain localization error below 150 mm during a standard cleaning mission. */
+    doc /* The robot shall maintain localization error below 150 mm during a standard home-layout cleaning mission using the selected premium SLAM sensor set. */
   }
   requirement updateCoverageMap {
     @RequirementRole { role = system; }
     @StatusInfo { status = done; }
     doc /* The robot shall maintain a coverage map with cleaned, unreachable, and unknown cells during the mission. */
+  }
+  requirement supportRoomScaleSlam {
+    @RequirementRole { role = system; }
+    @StatusInfo { status = done; }
+    doc /* The robot shall build and reuse a room-scale map using wheel odometry, IMU, 2D LiDAR scan matching, and short-range ToF observations. */
   }
   requirement recoverFromStall {
     @RequirementRole { role = system; }
@@ -142,6 +147,10 @@ package SystemRequirements {
   #derivation connection {
     end #original ::> adaptToHomes;
     end #derive ::> localizeReliably;
+  }
+  #derivation connection {
+    end #original ::> adaptToHomes;
+    end #derive ::> supportRoomScaleSlam;
   }
   #derivation connection {
     end #original ::> adaptToHomes;

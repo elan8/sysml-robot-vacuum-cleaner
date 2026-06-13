@@ -71,6 +71,7 @@ package ArchitectureAllocations {
     allocate firmwareTasks.safetySupervisor to physical.mainElectronics.robotFirmware.safetySupervisor;
     allocate firmwareTasks.batteryManager to physical.mainElectronics.robotFirmware.safetySupervisor;
     allocate firmwareTasks.sensorAcquisition to physical.mainElectronics.robotFirmware.mapProcessing;
+    allocate firmwareTasks.slam to physical.mainElectronics.robotFirmware.mapProcessing;
     allocate firmwareTasks.localization to physical.mainElectronics.robotFirmware.localizationEstimator;
     allocate firmwareTasks.coveragePlanner to physical.mainElectronics.robotFirmware.coveragePlanner;
 
@@ -79,6 +80,7 @@ package ArchitectureAllocations {
     allocate firmwareTasks.motorControl to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.sensorAcquisition to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.localization to physical.mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.slam to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.coveragePlanner to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.batteryManager to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.cleaningControl to physical.mainElectronics.mainControlPcb.mcu;

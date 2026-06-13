@@ -1,6 +1,6 @@
 # Spec42 Validation Report
 
-Date: 2026-06-13 (re-validated after interface-control / firmware-behavior additions)
+Date: 2026-06-13 (re-validated after premium LiDAR SLAM selection)
 
 Validated with the local Spec42 checkout at `C:\Git\spec42`.
 
@@ -94,6 +94,7 @@ The model uses a functional / physical split (June 2026):
 | Harness | Domain types | Product usage |
 | --- | --- | --- |
 | Sensor I2C | `I2cPort`, `I2cBus`, `I2cBusSlaveNode`, `I2cBusMasterNode` | ToF ×3 + IMU on product `SensorI2cBus` (named attachments); MCU master on main electronics |
+| LiDAR serial | `UartPort`, product `LidarSerialBus` | 2D dToF/LiDAR scan frames from selected premium `SensorAssembly` to MCU |
 | BMS SMBus | `I2cPort`, `SmbusBus`, product `BmsSmbusBus` | `PowerModule` → `MainElectronicsAssembly` |
 | SPI flash | `SpiBus`, product `FlashSpiBus`, `SpiBusSlaveNode` | On `MainControlPcb` |
 | UART / wireless | `UartPort`, product `McuWirelessUart`, `RobotWirelessModule` | MCU ↔ Wi‑Fi/BLE module |
@@ -109,7 +110,7 @@ The model uses a functional / physical split (June 2026):
 | Software → MCU | `allocate …robotFirmware.mapProcessing to …mainControlPcb.mcu` | Canonical SysML v2 deployment (`SoftwareToComputeNode`) |
 | MCU → harness | `connect` on `MainControlPcb` | `mcu.sensorI2c` / `mcuI2cMaster` → sensor bus; `mcu.leftMotorPwm` → motor drivers |
 
-Firmware modules live in `RobotFirmwareSuite` (`ExecutableComponent`); `MicrocontrollerUnit :> Microcontroller` is the execution node. Operating behavior (`RobotOperatingBehavior`) is exhibited only on `ApplicationFirmware`.
+Firmware modules live in `RobotFirmwareSuite` (`ExecutableComponent`); `MicrocontrollerUnit :> Microcontroller` is the execution node. Operating behavior (`RobotOperatingBehavior`) is exhibited only on `ApplicationFirmware`. The selected SLAM stack separates LiDAR scan acquisition (`SensorAcquisitionTask`), map/pose-graph processing (`SlamTask`), localization fusion (`LocalizationTask`), and coverage planning (`CoveragePlannerTask`).
 
 The hub uses **public** imports so downstream packages resolve `AutonomousFloorCleaningRobot` and related types via `import Architecture::*`.
 

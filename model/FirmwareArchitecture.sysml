@@ -62,8 +62,8 @@ package FirmwareArchitecture {
     attribute :>> criticality = "control-critical";
     attribute :>> owningFirmwareModule = "MapProcessingSoftware";
     attribute :>> allocatedTarget = "MicrocontrollerUnit";
-    attribute :>> consumesContracts = "sensor I2C samples, safety GPIO";
-    attribute :>> producesContracts = "HazardEvent, MapUpdate input observations";
+    attribute :>> consumesContracts = "sensor I2C samples, LiDAR serial scan frames, safety GPIO";
+    attribute :>> producesContracts = "HazardEvent, LidarScanFrame, MapUpdate input observations";
   }
 
   part def LocalizationTask :> FirmwareTask {
@@ -73,8 +73,30 @@ package FirmwareArchitecture {
     attribute :>> criticality = "mission-critical";
     attribute :>> owningFirmwareModule = "LocalizationEstimatorSoftware";
     attribute :>> allocatedTarget = "MicrocontrollerUnit";
-    attribute :>> consumesContracts = "odometry, IMU, ToF observations";
+    attribute :>> consumesContracts = "odometry, IMU, LiDAR scan frames, ToF observations, PoseGraphUpdate";
     attribute :>> producesContracts = "PoseEstimate";
+  }
+
+  part def SlamTask :> FirmwareTask {
+    attribute :>> taskName = "SlamTask";
+    attribute :>> periodMs = 50.0;
+    attribute :>> deadlineMs = 50.0;
+    attribute :>> criticality = "mission-critical";
+    attribute :>> owningFirmwareModule = "MapProcessingSoftware";
+    attribute :>> allocatedTarget = "MicrocontrollerUnit";
+    attribute :>> consumesContracts = "LidarScanFrame, PoseEstimate, ToF observations";
+    attribute :>> producesContracts = "PoseGraphUpdate, MapUpdate";
+  }
+
+  part def ObstacleClassificationTask :> FirmwareTask {
+    attribute :>> taskName = "ObstacleClassificationTask";
+    attribute :>> periodMs = 100.0;
+    attribute :>> deadlineMs = 100.0;
+    attribute :>> criticality = "deferred flagship";
+    attribute :>> owningFirmwareModule = "DeferredVisionObstacleSoftware";
+    attribute :>> allocatedTarget = "AiInferenceAccelerator";
+    attribute :>> consumesContracts = "RGB/3D ToF frames";
+    attribute :>> producesContracts = "ObstacleClassEvent";
   }
 
   part def CoveragePlannerTask :> FirmwareTask {
@@ -156,12 +178,14 @@ package FirmwareArchitecture {
     part motorControl : MotorControlTask;
     part sensorAcquisition : SensorAcquisitionTask;
     part localization : LocalizationTask;
+    part slam : SlamTask;
     part coveragePlanner : CoveragePlannerTask;
     part batteryManager : BatteryManagerTask;
     part cleaningControl : CleaningControlTask;
     part appProtocol : AppProtocolTask;
     part diagnostics : DiagnosticsTask;
     part storage : StorageTask;
+    part deferredObstacleClassification : ObstacleClassificationTask;
   }
 
   part firmwareTaskArchitecture : FirmwareTaskArchitecture;

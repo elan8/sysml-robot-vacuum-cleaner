@@ -1,6 +1,6 @@
 # Spec42 fixes needed
 
-Date: 2026-06-13 (updated after robot showcase interface-control / firmware-behavior additions)
+Date: 2026-06-13 (updated after premium LiDAR SLAM selection)
 
 This document tracks **Spec42 tool gaps and false positives** discovered while extending `sysml-domain-libraries` (electronics interconnection / wireless) and validating the robot-vacuum showcase. It complements [`SPEC42_VALIDATION_REPORT.md`](SPEC42_VALIDATION_REPORT.md), which covers the robot model corpus.
 

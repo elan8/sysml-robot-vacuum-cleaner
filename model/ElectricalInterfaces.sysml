@@ -89,6 +89,49 @@ package ElectricalInterfaces {
       attribute :>> implementationNote = "MCU TX/RX cross to wireless RX/TX; optional wake/reset GPIO.";
     }
 
+    part lidarSerialInterface : InterfaceControlRecord {
+      attribute :>> interfaceName = "2D dToF/LiDAR serial link";
+      attribute :>> connectorName = "J_LIDAR";
+      attribute :>> connectorType = "6-pin JST-GH";
+      attribute :>> pinCount = 6;
+      attribute :>> voltageDomain = "5 V sensor power plus 3.3 V logic";
+      attribute :>> busSpeed = "1 Mbps UART target";
+      attribute :>> addressOrSelect = "UART2_LIDAR";
+      attribute :>> implementationNote = "MCU TX/RX cross to LiDAR RX/TX; 5 V power, ground, optional motor-sync or health GPIO.";
+      part txToLidar : InterfaceSignal {
+        attribute :>> signalName = "MCU_LIDAR_TX";
+        attribute :>> direction = "mcu to lidar";
+        attribute :>> voltageDomain = "3.3 V";
+        attribute :>> polarity = "idle high UART";
+        attribute :>> nominalCurrentClass = "logic";
+      }
+      part rxFromLidar : InterfaceSignal {
+        attribute :>> signalName = "LIDAR_MCU_RX";
+        attribute :>> direction = "lidar to mcu";
+        attribute :>> voltageDomain = "3.3 V";
+        attribute :>> polarity = "idle high UART";
+        attribute :>> nominalCurrentClass = "logic";
+      }
+      part power5v : InterfaceSignal {
+        attribute :>> signalName = "LIDAR_5V";
+        attribute :>> direction = "board to lidar";
+        attribute :>> voltageDomain = "5 V";
+        attribute :>> polarity = "positive supply";
+        attribute :>> nominalCurrentClass = "sensor power below 500 mA";
+      }
+    }
+
+    part flagshipVisionOptionInterface : InterfaceControlRecord {
+      attribute :>> interfaceName = "deferred flagship vision and AI option";
+      attribute :>> connectorName = "J_VISION_OPTION";
+      attribute :>> connectorType = "board-to-board mezzanine candidate";
+      attribute :>> pinCount = 30;
+      attribute :>> voltageDomain = "5 V module power plus 3.3 V control";
+      attribute :>> busSpeed = "MIPI/parallel camera candidate plus SPI/I2C control";
+      attribute :>> addressOrSelect = "not selected for premium privacy-first variant";
+      attribute :>> implementationNote = "Trade-study artifact only; not a selected PCB requirement until AI vision option is chosen.";
+    }
+
     part motorAndActuatorPwm : InterfaceControlRecord {
       attribute :>> interfaceName = "motor and actuator PWM";
       attribute :>> connectorName = "J_MOTOR_PWM";

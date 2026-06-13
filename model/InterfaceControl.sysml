@@ -21,6 +21,25 @@ package InterfaceControl {
     attribute requiresConsent : Boolean;
   }
 
+  item def LidarScanFrame {
+    attribute scanSequence : Integer;
+    attribute scanRateHz : Real;
+    attribute rangeSampleCount : Integer;
+    attribute includesRawImageData : Boolean;
+  }
+
+  item def PoseGraphUpdate {
+    attribute nodeCount : Integer;
+    attribute loopClosureCandidateCount : Integer;
+    attribute mapStabilityScore : Real;
+  }
+
+  item def ObstacleClassEvent {
+    attribute className : String;
+    attribute confidencePercent : Real;
+    attribute sourceSensor : String;
+  }
+
   part def DataContract {
     attribute contractName : String;
     attribute payloadType : String;
@@ -89,8 +108,35 @@ package InterfaceControl {
     attribute :>> payloadType = "sequenceNumber, changedCellCount, includesRawHomeMap";
     attribute :>> allowedValues = "includesRawHomeMap false for app status; true only inside local storage boundary";
     attribute :>> ownerTask = "StorageTask";
-    attribute :>> producer = "CoveragePlannerTask, MapProcessingSoftware";
+    attribute :>> producer = "SlamTask, CoveragePlannerTask, MapProcessingSoftware";
     attribute :>> consumers = "StorageTask, AppProtocolTask";
+  }
+
+  part lidarScanFrameContract : DataContract {
+    attribute :>> contractName = "LidarScanFrame";
+    attribute :>> payloadType = "scanSequence, scanRateHz, rangeSampleCount, includesRawImageData";
+    attribute :>> allowedValues = "includesRawImageData false; scan frames contain range/intensity samples only";
+    attribute :>> ownerTask = "SensorAcquisitionTask";
+    attribute :>> producer = "SensorAcquisitionTask";
+    attribute :>> consumers = "SlamTask, LocalizationTask";
+  }
+
+  part poseGraphUpdateContract : DataContract {
+    attribute :>> contractName = "PoseGraphUpdate";
+    attribute :>> payloadType = "nodeCount, loopClosureCandidateCount, mapStabilityScore";
+    attribute :>> allowedValues = "mapStabilityScore 0.0 to 1.0; loop closure candidates reviewed locally";
+    attribute :>> ownerTask = "SlamTask";
+    attribute :>> producer = "SlamTask";
+    attribute :>> consumers = "LocalizationTask, CoveragePlannerTask, StorageTask, AppProtocolTask";
+  }
+
+  part obstacleClassEventContract : DataContract {
+    attribute :>> contractName = "ObstacleClassEvent";
+    attribute :>> payloadType = "className, confidencePercent, sourceSensor";
+    attribute :>> allowedValues = "deferred flagship AI vision option; className examples: cable, pet-waste, shoe, unknown";
+    attribute :>> ownerTask = "ObstacleClassificationTask";
+    attribute :>> producer = "ObstacleClassificationTask";
+    attribute :>> consumers = "SafetySupervisorTask, MissionControllerTask";
   }
 
   part diagnosticEventContract : DataContract {

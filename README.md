@@ -11,7 +11,7 @@ Model a residential robot vacuum with:
 - stakeholder and system requirements (implicit usages with `@RequirementRole` and `@StatusInfo` metadata)
 - requirement derivation from user needs to system requirements
 - functional decomposition as **`action def` capabilities** (`ProvideLocomotion`, `SenseEnvironment`, …) composed in `OperateCleaningRobot`, with mission scenarios and requirement `satisfy`
-- physical decomposition as **monteerbare assemblies** with typed electronics harnesses (I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, 3-phase BLDC wheel drives, PWM brushed/vacuum motors, GPIO safety/HMI, power rails)
+- physical decomposition as **monteerbare assemblies** with typed electronics harnesses (2D dToF/LiDAR serial, I2C sensor bus, SMBus BMS, SPI flash, UART/BLE wireless, 3-phase BLDC wheel drives, PWM brushed/vacuum motors, GPIO safety/HMI, power rails)
 - **three allocation layers**: capability → software/LRU (`ArchitectureAllocations`), software → MCU (`allocate` to `mainControlPcb.mcu`), peripheral I/O (`connect` on `MainControlPcb`)
 - cyberphysical interfaces and flows for maps, pose estimates, hazard events, commands, and mission status
 - operational product context with user, mobile app, home network, optional cloud backup, dock, floor surfaces, obstacles, and stair edges
@@ -19,6 +19,7 @@ Model a residential robot vacuum with:
 - operational scenarios for the nominal autonomous cleaning mission and obstacle recovery
 - canonical SysML v2 views with concerns, viewpoints, expose filters, and standard renderings for structure, interconnections, behavior, traceability, safety, and deployment
 - safety analysis, maintainability requirements, technical margins, and trade-study rationale for realistic product engineering
+- selected premium privacy-conscious SLAM variant with 2D dToF/LiDAR, wheel odometry, IMU, cliff and ToF sensing; RGB/AI vision remains a deferred flagship trade option
 - implementation-facing interface control for PCB harnesses, power rails, firmware tasks, scheduler timing, and software message contracts
 - verification cases with physical and model-based evidence
 - analysis cases for power, cost, mass, mission energy, localization, coverage resolution, and safety reaction timing
@@ -155,6 +156,7 @@ The [`ModelViews.sysml`](model/ModelViews.sysml) package defines first-class Sys
 - `budgetMargins` — mass, power, cost, and energy margin analyses
 - `electricalInterfaceControl` — PCB connector, signal, bus, and power-rail interface records
 - `firmwareTaskArchitecture` — firmware task decomposition and scheduler timing
+- `sensorSlamArchitecture` — selected premium LiDAR SLAM architecture, firmware contracts, requirement, analysis, and trade rationale
 - `softwareMessageContracts` — data contracts and producer/consumer ownership
 - `safetyFaultResponse` — hazard-to-safe-stop software path
 - `startupSelfTestFlow` — startup diagnostic behavior and involved tasks
@@ -167,6 +169,7 @@ With Spec42 diagram export support, these can be rendered from the model workspa
 spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
 spec42 diagrams export model --selected-view operationalContext --format svg --output target/diagrams
 spec42 diagrams export model --selected-view firmwareTaskArchitecture --format svg --output target/diagrams
+spec42 diagrams export model --selected-view sensorSlamArchitecture --format svg --output target/diagrams
 spec42 diagrams export model --selected-view physicalInterconnections --format svg --output target/diagrams
 spec42 diagrams export model --selected-view operatingLifecycle --format svg --output target/diagrams
 ```
