@@ -58,9 +58,7 @@ Run these after changing `ModelViews`, view exposure paths, or file layout:
 
 ```powershell
 spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
-spec42 diagrams export model --selected-view operationalContext --format svg --output target/diagrams
-spec42 diagrams export model --selected-view physicalInterconnections --format svg --output target/diagrams
-spec42 diagrams export model --selected-view firmwareTaskArchitecture --format svg --output target/diagrams
+spec42 diagrams export model --selected-view functionalArchitecture --format svg --output target/diagrams
 spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
 ```
 

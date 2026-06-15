@@ -76,27 +76,17 @@ The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and r
 
 ## Useful Views
 
-The [`ModelViews.sysml`](model/ModelViews.sysml) package defines first-class SysML v2 views. Useful entry points are:
+The [`ModelViews.sysml`](model/ModelViews.sysml) package defines three first-class SysML v2 views focused on core systems-engineering workflows:
 
-- `productStructure`
-- `operationalContext`
-- `physicalInterconnections`
-- `firmwareTaskArchitecture`
-- `sensorSlamArchitecture`
-- `softwareMessageContracts`
-- `safetyFaultResponse`
-- `operatingLifecycle`
-- `requirementsTraceability`
-- `safetyAssurance`
-- `tradeStudyRationale`
-- `budgetMargins`
+- `productStructure` — robot part tree (physical breakdown, General View)
+- `functionalArchitecture` — capability decomposition with bindings
+- `requirementsTraceability` — linked needs, requirements, verification, and design (Requirement View)
 
 With Spec42 diagram export support:
 
 ```powershell
 spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
-spec42 diagrams export model --selected-view operationalContext --format svg --output target/diagrams
-spec42 diagrams export model --selected-view firmwareTaskArchitecture --format svg --output target/diagrams
+spec42 diagrams export model --selected-view functionalArchitecture --format svg --output target/diagrams
 spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
 ```
 
