@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 ![Autonomous floor cleaning robot in action](docs/assets/robot-vacuum-hero.png)
 
-Canonical SysML v2 model for an autonomous floor-cleaning robot. The model is used as a Babel42 bootstrap demo, Spec42 validation corpus, and teaching example for requirements traceability, subsystem architecture, behavior, verification, and analysis.
+SysML v2 model for an autonomous floor-cleaning robot. The model is used as an example for requirements traceability, subsystem architecture, behavior, verification, and analysis.
 
 The workspace currently keeps one top-level package per `.sysml` file under [`model/`](model/) so `private import PackageName::*` resolves consistently across tools.
 
@@ -21,7 +21,7 @@ This repository gives systems engineers, tool builders, and educators a realisti
 
 It demonstrates how requirements, functional architecture, physical architecture, firmware allocation, safety analysis, verification, analysis cases, and stakeholder views can live together in one coherent model.
 
-## What Makes This High-End
+## Highlights
 
 - Requirements-to-architecture-to-verification traceability across needs, system requirements, design elements, verification cases, and analyses.
 - Functional and physical decomposition with explicit allocation layers.
@@ -29,22 +29,9 @@ It demonstrates how requirements, functional architecture, physical architecture
 - Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
 - First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
 
-## Quick Start
+## Validation
 
-Validate the model with Spec42:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
-```
-
-By default the script uses `spec42` from `PATH` when available and adds a local `sysml-domain-libraries` checkout when present. Override paths when needed:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
-  -Spec42Exe <path-to-spec42> `
-  -DomainLibrariesRoot <path-to-sysml-domain-libraries>
-```
-
+This model was build and validated using Spec42.
 Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). Pull requests are also validated by the Spec42 GitHub Action in this repository.
 
 ## What Is Modeled
@@ -57,13 +44,13 @@ Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). Pull
 
 ## Design Limits
 
-| Attribute | Value |
-| --- | --- |
-| BOM budget | 400 EUR |
-| Mass budget | 5.0 kg |
-| Battery capacity budget | 12500 mAh (12.5 Ah at 14.4 V nominal) |
-| Localization error limit | 150 mm |
-| Safe-stop reaction limit | 100 ms |
+| Attribute                | Value                                 |
+| ------------------------ | ------------------------------------- |
+| BOM budget               | 400 EUR                               |
+| Mass budget              | 5.0 kg                                |
+| Battery capacity budget  | 12500 mAh (12.5 Ah at 14.4 V nominal) |
+| Localization error limit | 150 mm                                |
+| Safe-stop reaction limit | 100 ms                                |
 
 The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and referenced by system requirements and analysis cases.
 
@@ -133,13 +120,3 @@ Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md), fol
 ## License
 
 This repository is licensed under the [MIT License](LICENSE). See [`NOTICE.md`](NOTICE.md) for trademark and showcase-disclaimer notes.
-
-## Babel42
-
-Sync into Babel42's `third_party/` tree from a sibling checkout, then enable demo mode or install the demo project from the bootstrap UI:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\sync-sysml-robot-vacuum-cleaner-from-local.ps1
-```
-
-Set `BABEL42_DEMO_MODE=true` or use `BABEL42_ROBOT_VACUUM_MODEL_PATH` when developing against a local clone of this repository.
