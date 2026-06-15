@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns product assemblies, physical ports, firmware suite parts, physical
  * connections, and mass/BOM/power roll-ups. Depends on shared items, physical
  * protocols, behavior, software, compute, and unit libraries. Keep PCB metadata,

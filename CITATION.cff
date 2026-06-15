@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2026 Elan8
+# SPDX-License-Identifier: MIT
+cff-version: 1.2.0
+message: "If you use this SysML v2 showcase, please cite it using this metadata."
+title: "Autonomous Floor Cleaning Robot SysML v2 Showcase"
+type: software
+authors:
+  - name: "Elan8"
+license: MIT
+repository-code: "https://github.com/elan8/sysml-robot-vacuum-cleaner"
+abstract: "Engineering-grade SysML v2 showcase model for an autonomous floor-cleaning robot, covering requirements, architecture, firmware, safety, verification, analysis, and views."
+keywords:
+  - SysML v2
+  - MBSE
+  - robotics
+  - requirements
+  - verification
+  - digital engineering

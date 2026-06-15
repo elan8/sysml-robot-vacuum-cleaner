@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Elan8
+# SPDX-License-Identifier: MIT
+
 [CmdletBinding()]
 param(
     [string]$Spec42Exe,
@@ -13,18 +16,21 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $resolvedModelPath = Join-Path $repoRoot $ModelPath
 
 if (-not $Spec42Exe) {
-    $localSpec42 = "C:\Git\spec42\target\debug\spec42.exe"
-    if (Test-Path $localSpec42) {
-        $Spec42Exe = $localSpec42
+    if ($env:SPEC42_EXE) {
+        $Spec42Exe = $env:SPEC42_EXE
     } else {
         $Spec42Exe = "spec42"
     }
 }
 
 if (-not $DomainLibrariesRoot) {
-    $defaultDomainLibrariesRoot = "C:\Git\sysml-domain-libraries"
-    if (Test-Path $defaultDomainLibrariesRoot) {
-        $DomainLibrariesRoot = $defaultDomainLibrariesRoot
+    if ($env:SYSML_DOMAIN_LIBRARIES_ROOT) {
+        $DomainLibrariesRoot = $env:SYSML_DOMAIN_LIBRARIES_ROOT
+    } else {
+        $siblingDomainLibrariesRoot = Join-Path (Split-Path -Parent $repoRoot) "sysml-domain-libraries"
+        if (Test-Path $siblingDomainLibrariesRoot) {
+            $DomainLibrariesRoot = $siblingDomainLibrariesRoot
+        }
     }
 }
 

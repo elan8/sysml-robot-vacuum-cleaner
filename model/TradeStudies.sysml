@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns selected and deferred product trade options with rationale. Depends on
  * requirements, physical architecture, analyses, and scalar values. Keep the
  * realized baseline structure in PhysicalArchitecture and allocation packages.

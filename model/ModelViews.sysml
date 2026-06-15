@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns stakeholder concerns, viewpoints, view definitions, expose filters, and
  * renderings. Depends on all packages that are sliced for presentation. Keep
  * primary engineering facts in their source packages rather than in views.

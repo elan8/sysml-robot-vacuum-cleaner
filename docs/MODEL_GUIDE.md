@@ -1,6 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2026 Elan8
+SPDX-License-Identifier: MIT
+-->
+
 # Model Guide
 
 This guide explains how the robot-vacuum model is organized and how to read it without needing to inspect every package first.
+
+## Showcase Tour
+
+Use this tour when evaluating the model as a high-end SysML v2 example:
+
+1. Start in `StakeholderNeeds` and `SystemRequirements` to see user needs, derived requirements, metadata, and derivation links.
+2. Read `FunctionalArchitecture` for capability actions and mission-level behavior.
+3. Read `PhysicalArchitecture` for product assemblies, typed ports, harnesses, firmware suite parts, and mass/BOM/power roll-ups.
+4. Read `ArchitectureAllocations` to follow capability-to-LRU, software-to-MCU, scenario-action, and firmware-task allocations.
+5. Read `ElectricalInterfaces`, `InterfaceControl`, and `FirmwareArchitecture` as the implementation handoff layer.
+6. Read `SafetyAnalysis`, `TradeStudies`, `Verification`, and `AnalysisCases` for assurance, rationale, and engineering margins.
+7. Finish in `ModelViews` to see curated stakeholder slices over the same source model.
 
 ## Model Layers
 

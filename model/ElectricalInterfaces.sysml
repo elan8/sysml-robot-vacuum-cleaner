@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns PCB-facing interface-control records for connectors, signals, buses,
  * rails, and fault polarities. Depends on board/electronics libraries,
  * protocols, and physical architecture. Keep software message schemas in

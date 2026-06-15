@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns firmware task definitions, scheduler assumptions, task criticality, and
  * task architecture instances. Depends on interface contracts, shared items,
  * physical architecture, and software libraries. Keep physical harness wiring

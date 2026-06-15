@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns capability action definitions, operating composition, mission actions,
  * and direct requirement satisfaction by functions. Depends on shared
  * architecture items and system requirements. Keep physical realization and task

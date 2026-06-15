@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns allocation links across capabilities, scenario actions, firmware
  * modules, and MCU execution targets. Depends on functional, physical, firmware,
  * software, and compute packages. Keep primary design definitions in the

@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns stakeholder-level user needs with requirement metadata. Depends on
  * requirement and modeling metadata libraries. Keep derived system requirements
  * and solution details in downstream packages.

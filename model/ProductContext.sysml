@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns external actors, home environment, dock/app/cloud context, and boundary
  * interactions around the robot. Depends on shared architecture, realized
  * architecture, physical protocols, and scalar values. Keep internal robot

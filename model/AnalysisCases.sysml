@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns quantitative analysis cases for mass, power, cost, energy, localization,
  * coverage, and safety timing. Depends on architecture, design limits, and unit
  * libraries. Keep requirements text and verification procedures in their

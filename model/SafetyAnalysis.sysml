@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns hazards, mitigations, safety satisfaction links, and safety evidence
  * references. Depends on requirements, design, behavior, verification, analyses,
  * and scalar values. Keep primary requirements and verification procedures in

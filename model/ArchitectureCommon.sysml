@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns shared mission items, commands, telemetry, map data, and cyberphysical
  * ports used across functional and physical architecture. Depends only on
  * scalar values. Keep subsystem decomposition and implementation contracts in

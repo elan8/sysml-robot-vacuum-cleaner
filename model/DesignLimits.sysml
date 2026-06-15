@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns shared numeric design limits for budgets, mass, battery capacity,
  * localization, and safe-stop timing. Depends on unit and monetary libraries.
  * Keep requirement wording and analysis calculations outside this package.

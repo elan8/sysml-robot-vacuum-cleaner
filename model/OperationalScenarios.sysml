@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns scenario-level use cases over the robot, user, dock, and environment.
  * Depends on architecture, functional actions, and product context. Keep
  * reusable capability definitions in FunctionalArchitecture.

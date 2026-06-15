@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns derived system requirements and requirement derivation links from
  * stakeholder needs. Depends on metadata libraries and StakeholderNeeds. Keep
  * verification procedures, analyses, and physical solution structure elsewhere.

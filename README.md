@@ -1,10 +1,33 @@
+<!--
+SPDX-FileCopyrightText: 2026 Elan8
+SPDX-License-Identifier: MIT
+-->
+
 # Autonomous Floor Cleaning Robot (SysML v2)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![SysML v2](https://img.shields.io/badge/SysML-v2-0f8fa8.svg)](https://www.omg.org/spec/SysML/)
+[![Spec42](https://img.shields.io/badge/validated%20with-Spec42-0f8fa8.svg)](https://github.com/elan8/spec42)
 
 ![Autonomous floor cleaning robot in action](docs/assets/robot-vacuum-hero.png)
 
 Canonical SysML v2 model for an autonomous floor-cleaning robot. The model is used as a Babel42 bootstrap demo, Spec42 validation corpus, and teaching example for requirements traceability, subsystem architecture, behavior, verification, and analysis.
 
 The workspace currently keeps one top-level package per `.sysml` file under [`model/`](model/) so `private import PackageName::*` resolves consistently across tools.
+
+## Why This Exists
+
+This repository gives systems engineers, tool builders, and educators a realistic SysML v2 corpus that is larger than a toy example but still small enough to read end to end.
+
+It demonstrates how requirements, functional architecture, physical architecture, firmware allocation, safety analysis, verification, analysis cases, and stakeholder views can live together in one coherent model.
+
+## What Makes This High-End
+
+- Requirements-to-architecture-to-verification traceability across needs, system requirements, design elements, verification cases, and analyses.
+- Functional and physical decomposition with explicit allocation layers.
+- Implementation-facing interface control for PCB harnesses, software message contracts, firmware tasks, scheduler timing, and MCU deployment.
+- Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
+- First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
 
 ## Quick Start
 
@@ -14,13 +37,15 @@ Validate the model with Spec42:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-By default the script expects a sibling checkout at `C:\Git\sysml-domain-libraries`. Override paths when needed:
+By default the script uses `spec42` from `PATH` when available and adds a local `sysml-domain-libraries` checkout when present. Override paths when needed:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
-  -Spec42Exe C:\Git\spec42\target\debug\spec42.exe `
-  -DomainLibrariesRoot C:\Git\sysml-domain-libraries
+  -Spec42Exe <path-to-spec42> `
+  -DomainLibrariesRoot <path-to-sysml-domain-libraries>
 ```
+
+Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). Pull requests are also validated by the Spec42 GitHub Action in this repository.
 
 ## What Is Modeled
 
@@ -93,6 +118,21 @@ spec42 diagrams export model --selected-view requirementsTraceability --format s
 - [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) - model layers, package map, and engineering threads.
 - [`docs/MODEL_CONVENTIONS.md`](docs/MODEL_CONVENTIONS.md) - naming, imports, comments, package ownership, and future folder structure.
 - [`docs/VALIDATION.md`](docs/VALIDATION.md) - Spec42 setup, library paths, validation commands, and known tool notes.
+
+## Known Limitations
+
+- This is an engineering-grade showcase and validation corpus, not a certified product design or regulatory compliance package.
+- The robot architecture is realistic enough for MBSE demonstration, but it is not a complete commercial robot-vacuum design.
+- Generated documentation imagery is illustrative and not a product rendering from a manufactured device.
+- The model currently keeps a flat `model/` folder for broad tool compatibility; a folder split should be validated as a separate change.
+
+## Contributing
+
+Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md), follow [`docs/MODEL_CONVENTIONS.md`](docs/MODEL_CONVENTIONS.md), and run validation before opening a PR.
+
+## License
+
+This repository is licensed under the [MIT License](LICENSE). See [`NOTICE.md`](NOTICE.md) for trademark and showcase-disclaimer notes.
 
 ## Babel42
 

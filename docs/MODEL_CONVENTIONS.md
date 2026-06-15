@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2026 Elan8
+SPDX-License-Identifier: MIT
+-->
+
 # Model Conventions
 
 These conventions keep the SysML model readable and maintainable while preserving tool compatibility.
@@ -54,4 +59,13 @@ These conventions keep the SysML model readable and maintainable while preservin
 
 - Run `scripts/validate.ps1` after changing model files.
 - Run selected diagram exports after changing `ModelViews`, package structure, or view exposure paths.
-- Keep validation notes in `docs/VALIDATION.md` and historical tool-gap notes in the Spec42 docs.
+- Keep validation notes in `docs/VALIDATION.md`.
+- Keep tool-specific investigation notes outside the public repository.
+
+## Open-Source Contribution Rules
+
+- Preserve package ownership boundaries unless the PR explicitly changes and documents them.
+- Validate before opening a PR; warnings are treated as failures in CI.
+- Keep generated repository assets under `docs/assets/` and avoid visible third-party brand marks.
+- Use MIT SPDX identifiers for new text files.
+- Do not add links to private workspaces, local absolute paths, or internal investigation documents in public docs.

@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2026 Elan8
+# SPDX-License-Identifier: MIT
+name: Validate SysML
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  spec42:
+    name: Spec42
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate model
+        uses: elan8/spec42@v0.30.0
+        with:
+          path: model
+          format: sarif
+          warnings-as-errors: true
+          upload-sarif: true

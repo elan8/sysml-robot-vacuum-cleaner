@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns operating lifecycle and detailed behavior fragments for startup, safety,
  * docking, and mission execution. Depends only on core language constructs.
  * Keep structural allocation and verification evidence in their own packages.

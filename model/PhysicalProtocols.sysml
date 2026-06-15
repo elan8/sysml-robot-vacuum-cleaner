@@ -1,4 +1,7 @@
 /*
+ * SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT
+ *
  * Owns product-specific physical protocol aliases for buses, wireless links,
  * power rails, and harness attachment points. Depends on domain electronics,
  * communication, and software libraries. Keep concrete product assemblies in
