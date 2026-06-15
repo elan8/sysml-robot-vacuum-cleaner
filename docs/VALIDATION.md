@@ -70,7 +70,7 @@ The robot-vacuum corpus should validate with:
 - `0 warnings`
 - `0 information` diagnostics
 
-The latest local run should be recorded in commit notes or CI logs rather than checked into the public model repository.
+The three `ModelViews` catalog views use only normative SysML v2 standard view types (`GeneralView`). Requirement traceability is a filtered `GeneralView` specialization per §9.2.20.2.3; Spec42 applies traceability projection when filters reference requirement or verification kinds.
 
 ## Known Notes
 

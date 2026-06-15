@@ -48,27 +48,25 @@ package ModelViews {
     frame requirementCoverage;
   }
 
-  // Product breakdown: robot part tree (part usages only).
+  // Product breakdown
   view productStructure : GeneralView {
     satisfy productStructurePerspective;
     expose Architecture::robot;
     filter @SysML::PartUsage;
   }
 
-  // Functional decomposition: capability actions and their bindings.
-  view functionalArchitecture {
+  // Functional decomposition
+  view functionalArchitecture : GeneralView {
     satisfy behaviorPerspective;
     expose FunctionalArchitecture::OperateCleaningRobot;
   }
 
-  // Requirements traceability: needs, requirements, verification, and design links.
-  view requirementsTraceability : RequirementView {
+  // Requirements traceability
+  view requirementsTraceability : GeneralView {
     satisfy traceabilityPerspective;
     expose StakeholderNeeds::*;
     expose SystemRequirements::*;
     expose Verification::*;
-    expose Architecture::robot;
-    expose FunctionalArchitecture::operateCleaningRobot;
     filter @SysML::RequirementUsage or @SysML::VerificationCase or @SysML::PartUsage or @SysML::ActionUsage;
   }
 }

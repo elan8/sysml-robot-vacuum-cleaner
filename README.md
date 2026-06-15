@@ -78,9 +78,9 @@ The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and r
 
 The [`ModelViews.sysml`](model/ModelViews.sysml) package defines three first-class SysML v2 views focused on core systems-engineering workflows:
 
-- `productStructure` — robot part tree (physical breakdown, General View)
-- `functionalArchitecture` — capability decomposition with bindings
-- `requirementsTraceability` — linked needs, requirements, verification, and design (Requirement View)
+- `productStructure` — robot part tree (`GeneralView`, part usages only)
+- `functionalArchitecture` — functional decomposition; actions as functions (`GeneralView`)
+- `requirementsTraceability` — needs, requirements, verification, and linked design (`GeneralView` + traceability filters)
 
 With Spec42 diagram export support:
 
