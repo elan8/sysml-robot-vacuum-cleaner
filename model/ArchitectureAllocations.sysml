@@ -1,3 +1,9 @@
+/*
+ * Owns allocation links across capabilities, scenario actions, firmware
+ * modules, and MCU execution targets. Depends on functional, physical, firmware,
+ * software, and compute packages. Keep primary design definitions in the
+ * packages being allocated.
+ */
 package ArchitectureAllocations {
   private import FunctionalArchitecture::*;
   private import PhysicalArchitecture::*;
@@ -13,6 +19,7 @@ package ArchitectureAllocations {
   part def AutonomousFloorCleaningRobotSystem {
     part physical : AutonomousFloorCleaningRobot;
 
+    // Scenario and capability usage surface for allocation.
     perform action operate : OperateCleaningRobot;
     perform action nominalMission : AutonomousCleaningMission;
     perform action recoveryMission : ObstacleRecoveryMission;
@@ -26,6 +33,7 @@ package ArchitectureAllocations {
     perform action returnToDock : ReturnToDock;
     perform action chargeBattery : ChargeBattery;
 
+    // Capability-to-LRU/software realization.
     allocate operate.locomotion to physical.driveModule;
     allocate operate.cleaning to physical.cleaningHead;
     allocate operate.perception to physical.sensorAssembly;
@@ -39,6 +47,7 @@ package ArchitectureAllocations {
     allocate operate.userInteraction to physical.hmi;
     allocate operate.userInteraction to physical.mainElectronics.robotFirmware.applicationFirmware;
 
+    // Deployable firmware modules to their MCU execution node.
     allocate physical.mainElectronics.robotFirmware.applicationFirmware
         to physical.mainElectronics.mainControlPcb.mcu;
     allocate physical.mainElectronics.robotFirmware.safetySupervisor
@@ -50,6 +59,7 @@ package ArchitectureAllocations {
     allocate physical.mainElectronics.robotFirmware.coveragePlanner
         to physical.mainElectronics.mainControlPcb.mcu;
 
+    // Scenario action ownership by operational capability.
     allocate startMission to operate.missionControl;
     allocate buildMap to operate.perception;
     allocate planCoveragePath to operate.navigation;
@@ -62,6 +72,7 @@ package ArchitectureAllocations {
 
     part firmwareTasks : FirmwareTaskArchitecture;
 
+    // Firmware task ownership by deployable software module.
     allocate firmwareTasks.missionController to physical.mainElectronics.robotFirmware.applicationFirmware;
     allocate firmwareTasks.motorControl to physical.mainElectronics.robotFirmware.applicationFirmware;
     allocate firmwareTasks.cleaningControl to physical.mainElectronics.robotFirmware.applicationFirmware;
@@ -75,6 +86,7 @@ package ArchitectureAllocations {
     allocate firmwareTasks.localization to physical.mainElectronics.robotFirmware.localizationEstimator;
     allocate firmwareTasks.coveragePlanner to physical.mainElectronics.robotFirmware.coveragePlanner;
 
+    // Firmware task deployment to the MCU execution node.
     allocate firmwareTasks.missionController to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.safetySupervisor to physical.mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.motorControl to physical.mainElectronics.mainControlPcb.mcu;

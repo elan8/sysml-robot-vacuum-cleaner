@@ -1,3 +1,8 @@
+/*
+ * Owns stakeholder concerns, viewpoints, view definitions, expose filters, and
+ * renderings. Depends on all packages that are sliced for presentation. Keep
+ * primary engineering facts in their source packages rather than in views.
+ */
 package ModelViews {
   private import Views::*;
   private import StakeholderNeeds::*;
@@ -99,6 +104,7 @@ package ModelViews {
     frame implementationInterfaceConcern;
   }
 
+  // Context, structure, behavior, and traceability views.
   view operationalContext {
     satisfy contextPerspective;
     expose ProductContext::residentialCleaningContext::**;
@@ -164,6 +170,7 @@ package ModelViews {
     expose AnalysisCases::SafetyReactionAnalysis;
   }
 
+  // Deployment, rationale, margin, and implementation-interface views.
   view softwareDeployment {
     satisfy deploymentPerspective;
     expose ArchitectureAllocations::robotSystem;

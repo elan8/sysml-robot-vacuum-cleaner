@@ -1,3 +1,9 @@
+/*
+ * Owns hazards, mitigations, safety satisfaction links, and safety evidence
+ * references. Depends on requirements, design, behavior, verification, analyses,
+ * and scalar values. Keep primary requirements and verification procedures in
+ * their source packages.
+ */
 package SafetyAnalysis {
   private import SystemRequirements::*;
   private import PhysicalArchitecture::*;

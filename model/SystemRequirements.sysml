@@ -1,3 +1,8 @@
+/*
+ * Owns derived system requirements and requirement derivation links from
+ * stakeholder needs. Depends on metadata libraries and StakeholderNeeds. Keep
+ * verification procedures, analyses, and physical solution structure elsewhere.
+ */
 package SystemRequirements {
   private import RequirementMetadata::*;
   private import ModelingMetadata::*;

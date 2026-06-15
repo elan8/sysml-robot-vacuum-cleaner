@@ -1,3 +1,9 @@
+/*
+ * Owns firmware task definitions, scheduler assumptions, task criticality, and
+ * task architecture instances. Depends on interface contracts, shared items,
+ * physical architecture, and software libraries. Keep physical harness wiring
+ * and message schemas in their source packages.
+ */
 package FirmwareArchitecture {
   private import ArchitectureCommon::*;
   private import InterfaceControl::*;
@@ -22,6 +28,7 @@ package FirmwareArchitecture {
     attribute overloadPolicy : String;
   }
 
+  // Mission, safety, control, perception, and navigation tasks.
   part def MissionControllerTask :> FirmwareTask {
     attribute :>> taskName = "MissionControllerTask";
     attribute :>> periodMs = 50.0;
@@ -88,6 +95,7 @@ package FirmwareArchitecture {
     attribute :>> producesContracts = "PoseGraphUpdate, MapUpdate";
   }
 
+  // Deferred flagship vision path retained for trade-study traceability.
   part def ObstacleClassificationTask :> FirmwareTask {
     attribute :>> taskName = "ObstacleClassificationTask";
     attribute :>> periodMs = 100.0;
@@ -99,6 +107,7 @@ package FirmwareArchitecture {
     attribute :>> producesContracts = "ObstacleClassEvent";
   }
 
+  // Planning, power, cleaning, app, diagnostic, and storage tasks.
   part def CoveragePlannerTask :> FirmwareTask {
     attribute :>> taskName = "CoveragePlannerTask";
     attribute :>> periodMs = 100.0;
@@ -165,6 +174,7 @@ package FirmwareArchitecture {
     attribute :>> producesContracts = "DiagnosticEvent, AppMessage map-summary";
   }
 
+  // Concrete task architecture used by allocation and view packages.
   part def FirmwareTaskArchitecture {
     ref firmwareSuite : RobotFirmwareSuite;
     ref mcu : MicrocontrollerUnit;

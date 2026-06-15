@@ -1,3 +1,9 @@
+/*
+ * Owns PCB-facing interface-control records for connectors, signals, buses,
+ * rails, and fault polarities. Depends on board/electronics libraries,
+ * protocols, and physical architecture. Keep software message schemas in
+ * InterfaceControl.
+ */
 package ElectricalInterfaces {
   private import BoardIntegrationDomain::*;
   private import ElectronicsCore::*;

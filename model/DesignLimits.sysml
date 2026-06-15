@@ -1,3 +1,8 @@
+/*
+ * Owns shared numeric design limits for budgets, mass, battery capacity,
+ * localization, and safe-stop timing. Depends on unit and monetary libraries.
+ * Keep requirement wording and analysis calculations outside this package.
+ */
 package DesignLimits {
   private import MonetaryUnits::*;
   private import ISQ::*;

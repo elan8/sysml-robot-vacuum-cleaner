@@ -1,3 +1,9 @@
+/*
+ * Owns software-facing data contracts and producer/consumer ownership for
+ * commands, status, telemetry, maps, hazards, diagnostics, and app messages.
+ * Depends on shared architecture items and software library concepts. Keep PCB
+ * connector records in ElectricalInterfaces.
+ */
 package InterfaceControl {
   private import ArchitectureCommon::*;
   private import SoftwareCore::*;

@@ -1,3 +1,8 @@
+/*
+ * Owns verification cases and evidence intent for system requirements. Depends
+ * on system requirements and architecture. Keep requirement text and analysis
+ * calculations in their dedicated packages.
+ */
 package Verification {
   private import SystemRequirements::*;
   private import Architecture::*;

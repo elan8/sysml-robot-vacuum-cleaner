@@ -1,3 +1,8 @@
+/*
+ * Owns the full-workspace import hub for demo and bootstrap loading. Depends on
+ * every project package that should load as part of the canonical model. Keep
+ * engineering content in the imported packages.
+ */
 package AutonomousFloorCleaningRobotDemo {
   private import RequirementManagement::*;
   private import MonetaryUnits::*;

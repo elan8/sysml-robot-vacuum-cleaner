@@ -1,3 +1,9 @@
+/*
+ * Owns product assemblies, physical ports, firmware suite parts, physical
+ * connections, and mass/BOM/power roll-ups. Depends on shared items, physical
+ * protocols, behavior, software, compute, and unit libraries. Keep PCB metadata,
+ * software contracts, and allocation links in their dedicated packages.
+ */
 package PhysicalArchitecture {
   private import ArchitectureCommon::*;
   private import PhysicalProtocols::*;
@@ -18,6 +24,7 @@ package PhysicalArchitecture {
     attribute bomCost : MonetaryAmount;
   }
 
+  // Drive module and wheel-actuation hardware.
   part def BrushlessDriveMotor {
     doc /*
       Wye-connected BLDC wheel motor: three phase windings driven by an inverter
@@ -77,6 +84,7 @@ package PhysicalArchitecture {
     connect bumperSwitches.hazardOut to bumperHazardOut;
   }
 
+  // Cleaning head hardware and dust-bin sensing.
   part def BrushMotor {
     attribute ratedPower : PowerValue = 8 [W];
     port powerIn : PowerRailPort;
@@ -134,6 +142,7 @@ package PhysicalArchitecture {
     connect sideBrushMotor.faultOut to faultOut;
   }
 
+  // Sensor hardware and navigation/perception software elements.
   part def TimeOfFlightRangeSensor {
     attribute rangeMm : LengthValue = 1200 [mm];
     port observationOut : SensorDataPort;
@@ -219,6 +228,7 @@ package PhysicalArchitecture {
     connect cliffSensorRearRight.cliffOut to cliffHazardOut;
   }
 
+  // Battery, regulation, charging, and docking hardware.
   part def LithiumIonBatteryPack {
     attribute cellConfiguration : String = "4S2P";
     attribute nominalCapacity : ElectricChargeValue = 12500 [mAh];
@@ -226,7 +236,7 @@ package PhysicalArchitecture {
     port packOut : PowerRailPort;
   }
   part def BatteryManagementSystem {
-    doc /* Limits charge current and cell temperature (55 °C maximum) within the safe operating area. */
+    doc /* Limits charge current and cell temperature (55 degC maximum) within the safe operating area. */
     attribute maxChargeCurrent : ElectricCurrentValue = 2.0 [A];
     attribute maxCellTemperature : ThermodynamicTemperatureValue = 328.15 [K];
     port smbusPort : ~I2cPort;
@@ -286,6 +296,7 @@ package PhysicalArchitecture {
     connect beaconReceiver.statusOut to dockStatusOut;
   }
 
+  // Main electronics, MCU peripherals, and deployable firmware suite.
   part def MicrocontrollerUnit :> Microcontroller {
     attribute core : String = "Arm Cortex-M33";
     attribute clockFrequency : FrequencyValue = 120000000 [Hz];
@@ -402,6 +413,7 @@ package PhysicalArchitecture {
     connect mainControlPcb.boardThermalSensor.hazardOut to hazardIn;
   }
 
+  // Human-machine interface and app interaction boundary.
   part def PushButton {
     port commandOut : GpioPort;
   }
@@ -429,6 +441,7 @@ package PhysicalArchitecture {
     connect homeButton.commandOut to userCommandOut;
   }
 
+  // Top-level robot assembly and physical interconnections.
   part def ChassisAssembly :> PhysicalAssembly {
     doc /* Structural shell, wheel mounts, and assembly hardware. */
     attribute :>> powerDrawW = 0 [W];

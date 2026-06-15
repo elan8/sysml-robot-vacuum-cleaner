@@ -1,3 +1,9 @@
+/*
+ * Owns shared mission items, commands, telemetry, map data, and cyberphysical
+ * ports used across functional and physical architecture. Depends only on
+ * scalar values. Keep subsystem decomposition and implementation contracts in
+ * their dedicated packages.
+ */
 package ArchitectureCommon {
   private import ScalarValues::*;
 

@@ -1,3 +1,8 @@
+/*
+ * Owns stakeholder-level user needs with requirement metadata. Depends on
+ * requirement and modeling metadata libraries. Keep derived system requirements
+ * and solution details in downstream packages.
+ */
 package StakeholderNeeds {
   private import RequirementMetadata::*;
   private import ModelingMetadata::*;

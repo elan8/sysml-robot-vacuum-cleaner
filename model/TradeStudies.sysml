@@ -1,3 +1,8 @@
+/*
+ * Owns selected and deferred product trade options with rationale. Depends on
+ * requirements, physical architecture, analyses, and scalar values. Keep the
+ * realized baseline structure in PhysicalArchitecture and allocation packages.
+ */
 package TradeStudies {
   private import SystemRequirements::*;
   private import PhysicalArchitecture::*;

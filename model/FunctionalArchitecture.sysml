@@ -1,3 +1,9 @@
+/*
+ * Owns capability action definitions, operating composition, mission actions,
+ * and direct requirement satisfaction by functions. Depends on shared
+ * architecture items and system requirements. Keep physical realization and task
+ * timing in allocation and implementation packages.
+ */
 package FunctionalArchitecture {
   private import ArchitectureCommon::*;
   private import SystemRequirements::*;

@@ -1,3 +1,9 @@
+/*
+ * Owns external actors, home environment, dock/app/cloud context, and boundary
+ * interactions around the robot. Depends on shared architecture, realized
+ * architecture, physical protocols, and scalar values. Keep internal robot
+ * decomposition in architecture packages.
+ */
 package ProductContext {
   private import ArchitectureCommon::*;
   private import PhysicalArchitecture::*;

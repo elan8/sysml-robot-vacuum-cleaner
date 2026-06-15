@@ -1,3 +1,9 @@
+/*
+ * Owns quantitative analysis cases for mass, power, cost, energy, localization,
+ * coverage, and safety timing. Depends on architecture, design limits, and unit
+ * libraries. Keep requirements text and verification procedures in their
+ * dedicated packages.
+ */
 package AnalysisCases {
   private import Architecture::*;
   private import MonetaryUnits::*;

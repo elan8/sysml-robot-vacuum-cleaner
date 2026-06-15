@@ -1,3 +1,8 @@
+/*
+ * Owns scenario-level use cases over the robot, user, dock, and environment.
+ * Depends on architecture, functional actions, and product context. Keep
+ * reusable capability definitions in FunctionalArchitecture.
+ */
 package OperationalScenarios {
   private import Architecture::*;
   private import FunctionalArchitecture::*;
