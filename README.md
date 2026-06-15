@@ -1,5 +1,7 @@
 # Autonomous Floor Cleaning Robot (SysML v2)
 
+![Autonomous floor cleaning robot in action](docs/assets/robot-vacuum-hero.png)
+
 Canonical SysML v2 model for an autonomous floor-cleaning robot. The model is used as a Babel42 bootstrap demo, Spec42 validation corpus, and teaching example for requirements traceability, subsystem architecture, behavior, verification, and analysis.
 
 The workspace currently keeps one top-level package per `.sysml` file under [`model/`](model/) so `private import PackageName::*` resolves consistently across tools.
