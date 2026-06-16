@@ -31,7 +31,7 @@ It demonstrates how requirements, functional architecture, physical architecture
 
 ## Validation
 
-This model was build and validated using Spec42.
+This model was built and validated using Spec42.
 Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). Pull requests are also validated by the Spec42 GitHub Action in this repository.
 
 ## What Is Modeled

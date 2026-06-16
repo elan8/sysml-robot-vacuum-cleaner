@@ -26,15 +26,15 @@ The CI workflow is defined in `.github/workflows/validate.yml` and runs on `push
 It uses:
 
 ```yaml
-uses: elan8/spec42@v0.30.0
+uses: elan8/spec42@v0.31.0
 with:
   path: model
   format: sarif
-  warnings-as-errors: true
+  warnings-as-errors: false
   upload-sarif: true
 ```
 
-Warnings fail CI because this repository is intended to remain a clean validation corpus.
+Warnings are reported in CI and should be resolved before release because this repository is intended to remain a clean validation corpus.
 
 ## Parameters
 
