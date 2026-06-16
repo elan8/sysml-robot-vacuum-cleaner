@@ -34,6 +34,12 @@ It demonstrates how requirements, functional architecture, physical architecture
 This model was built and validated using Spec42.
 Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). Pull requests are also validated by the Spec42 GitHub Action in this repository.
 
+## Tool and Library Requirements
+
+The model imports packages from the SysML v2 standard library and from the Elan8 domain libraries, including the electronics-focused KPAR packages published in [`elan8/sysml-domain-libraries`](https://github.com/elan8/sysml-domain-libraries).
+
+Spec42 resolves the required libraries in its validation workflow. If you open or validate this repository with another SysML v2 tool, make sure that tool has access to both the SysML v2 standard library KPAR and the Elan8 domain-library KPARs, or configure equivalent library search paths before loading `model/`.
+
 ## What Is Modeled
 
 - Stakeholder needs, derived system requirements, verification cases, and analysis evidence.
