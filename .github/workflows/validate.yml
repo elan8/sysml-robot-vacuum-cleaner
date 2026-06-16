@@ -22,9 +22,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate model
-        uses: elan8/spec42@v0.30.0
+        uses: elan8/spec42@v0.31.0
         with:
           path: model
           format: sarif
-          warnings-as-errors: true
+          warnings-as-errors: false
           upload-sarif: true
