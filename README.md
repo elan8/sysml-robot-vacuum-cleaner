@@ -80,22 +80,6 @@ The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and r
 16. [`Verification.sysml`](model/Verification.sysml) and [`AnalysisCases.sysml`](model/AnalysisCases.sysml) - V&V and engineering margins
 17. [`AutonomousFloorCleaningRobotDemo.sysml`](model/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
-## Useful Views
-
-The [`ModelViews.sysml`](model/ModelViews.sysml) package defines three first-class SysML v2 views focused on core systems-engineering workflows:
-
-- `productStructure` — robot part tree (`GeneralView`, part usages only)
-- `functionalArchitecture` — functional decomposition; actions as functions (`GeneralView`)
-- `requirementsTraceability` — needs, requirements, verification, and linked design (`GeneralView` + traceability filters)
-
-With Spec42 diagram export support:
-
-```powershell
-spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
-spec42 diagrams export model --selected-view functionalArchitecture --format svg --output target/diagrams
-spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
-```
-
 ## More Documentation
 
 - [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) - model layers, package map, and engineering threads.
