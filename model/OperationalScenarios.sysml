@@ -15,7 +15,7 @@ package OperationalScenarios {
   part def HomeEnvironment;
 
   use case def RunAutonomousCleaningMission {
-    subject robotSystem : AutonomousFloorCleaningRobotSystem;
+    subject robotSystem : CleaningRobotSystemOfInterest;
     actor homeowner : Homeowner;
     actor home : HomeEnvironment;
     objective {

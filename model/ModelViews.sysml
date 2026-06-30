@@ -51,7 +51,7 @@ package ModelViews {
   // Product breakdown
   view productStructure : GeneralView {
     satisfy productStructurePerspective;
-    expose Architecture::robot;
+    expose Architecture::robotSystem;
     filter @SysML::PartUsage;
   }
 

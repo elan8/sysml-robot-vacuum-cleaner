@@ -10,8 +10,12 @@ package Verification {
   private import SystemRequirements::*;
   private import Architecture::*;
 
-  action def RecordModelAnalysisEvidence;
-  action def RunPhysicalTest;
+  action def RecordModelAnalysisEvidence {
+    doc /* Capture the output of a model-based analysis case as traceable verification evidence. */
+  }
+  action def RunPhysicalTest {
+    doc /* Execute a physical test procedure on a robot unit and record pass/fail evidence. */
+  }
 
   verification verifyCleaningCoverage {
     doc /* Confirm at least 90% reachable floor coverage in the standard rectangular test room. */

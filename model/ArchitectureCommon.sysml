@@ -70,7 +70,13 @@ package ArchitectureCommon {
   port def MissionStatusPort {
     out item status;
   }
-  port def OdometryPort;
-  port def HazardPort;
-  port def TelemetryPort;
+  port def OdometryPort {
+    out item odometry : PoseEstimate;
+  }
+  port def HazardPort {
+    out item hazard : HazardEvent;
+  }
+  port def TelemetryPort {
+    out item telemetry : BatteryTelemetry;
+  }
 }

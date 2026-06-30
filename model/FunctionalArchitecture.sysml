@@ -122,15 +122,44 @@ package FunctionalArchitecture {
 
   action operateCleaningRobot : OperateCleaningRobot;
 
-  action def StartMission;
-  action def BuildMap;
-  action def PlanCoveragePath;
-  action def CleanReachableArea;
-  action def AvoidDynamicObstacle;
-  action def RecoverFromStall;
-  action def ReturnToDock;
-  action def ChargeBattery;
-  action def ReportMissionStatus;
+  action def StartMission {
+    doc /* Initialise mission state, verify self-test, and begin map acquisition. */
+  }
+  action def BuildMap {
+    doc /* Execute SLAM to construct or load the room-scale occupancy map. */
+    out map : OccupancyGrid;
+  }
+  action def PlanCoveragePath {
+    doc /* Compute a boustrophedon or spiral coverage path over the known free space. */
+    in map : OccupancyGrid;
+    out driveCommand : DriveCommand;
+  }
+  action def CleanReachableArea {
+    doc /* Drive the planned path while actuating brushes and vacuum until the area is covered or the bin is full. */
+    in driveCommand : DriveCommand;
+    out status : MissionStatus;
+  }
+  action def AvoidDynamicObstacle {
+    doc /* Detect and circumnavigate a newly appeared obstacle; resume coverage path afterwards. */
+    in obstacleIn : ObstacleObservation;
+    out driveCommand : DriveCommand;
+  }
+  action def RecoverFromStall {
+    doc /* Detect wheel stall within 2 s, execute bounded reverse-and-turn maneuver, and resume or safe-stop. */
+    out status : MissionStatus;
+  }
+  action def ReturnToDock {
+    doc /* Home on dock IR beacon and navigate to the docking station. */
+    out dockStatus : MissionStatus;
+  }
+  action def ChargeBattery {
+    doc /* Initiate and supervise safe charging until the battery reaches the full-charge threshold. */
+    out telemetry : BatteryTelemetry;
+  }
+  action def ReportMissionStatus {
+    doc /* Publish mission summary (coverage, faults, maintenance needs) to the mobile app. */
+    in status : MissionStatus;
+  }
 
   action def AutonomousCleaningMission {
     action startMission : StartMission;

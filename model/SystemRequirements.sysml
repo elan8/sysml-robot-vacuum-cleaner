@@ -112,83 +112,83 @@ package SystemRequirements {
     doc /* The robot shall notify the user when dust-bin emptying or routine cleaning-head maintenance is needed. */
   }
 
-  #derivation connection {
+  #derivation connection cleanAtLeastEighty_from_cleanLargeAreas {
     end #original ::> cleanLargeAreas;
     end #derive ::> cleanAtLeastEighty;
   }
-  #derivation connection {
+  #derivation connection returnToDock_from_reliableDocking {
     end #original ::> reliableDocking;
     end #derive ::> returnToDock;
   }
-  #derivation connection {
+  #derivation connection avoidObstacles_from_operateSafely {
     end #original ::> operateSafely;
     end #derive ::> avoidObstacles;
   }
-  #derivation connection {
+  #derivation connection detectDustBin_from_cleanLargeAreas {
     end #original ::> cleanLargeAreas;
     end #derive ::> detectDustBin;
   }
-  #derivation connection {
+  #derivation connection keepNoise_from_quietCleaning {
     end #original ::> quietCleaning;
     end #derive ::> keepNoise;
   }
-  #derivation connection {
+  #derivation connection coverFloor_from_cleanLargeAreas {
     end #original ::> cleanLargeAreas;
     end #derive ::> coverFloor;
   }
-  #derivation connection {
+  #derivation connection reportCleaningStatus_from_missionFeedback {
     end #original ::> missionFeedback;
     end #derive ::> reportCleaningStatus;
   }
-  #derivation connection {
+  #derivation connection limitBomCost_from_affordableProduct {
     end #original ::> affordableProduct;
     end #derive ::> limitBomCost;
   }
-  #derivation connection {
+  #derivation connection limitTotalMass_from_portableDesign {
     end #original ::> portableDesign;
     end #derive ::> limitTotalMass;
   }
-  #derivation connection {
+  #derivation connection detectCliffs_from_protectHomes {
     end #original ::> protectHomes;
     end #derive ::> detectCliffs;
   }
-  #derivation connection {
+  #derivation connection localizeReliably_from_adaptToHomes {
     end #original ::> adaptToHomes;
     end #derive ::> localizeReliably;
   }
-  #derivation connection {
+  #derivation connection supportRoomScaleSlam_from_adaptToHomes {
     end #original ::> adaptToHomes;
     end #derive ::> supportRoomScaleSlam;
   }
-  #derivation connection {
+  #derivation connection updateCoverageMap_from_adaptToHomes {
     end #original ::> adaptToHomes;
     end #derive ::> updateCoverageMap;
   }
-  #derivation connection {
+  #derivation connection recoverFromStall_from_tolerateFaults {
     end #original ::> tolerateFaults;
     end #derive ::> recoverFromStall;
   }
-  #derivation connection {
+  #derivation connection protectMapPrivacy_from_respectPrivacy {
     end #original ::> respectPrivacy;
     end #derive ::> protectMapPrivacy;
   }
-  #derivation connection {
+  #derivation connection chargeSafely_from_maintainBatteryHealth {
     end #original ::> maintainBatteryHealth;
     end #derive ::> chargeSafely;
   }
-  #derivation connection {
+  #derivation connection superviseHazards_from_protectHomes {
     end #original ::> protectHomes;
     end #derive ::> superviseHazards;
   }
-  #derivation connection {
+  #derivation connection emptyBinWithoutTools_from_easyToEmpty {
     end #original ::> easyToEmpty;
     end #derive ::> emptyBinWithoutTools;
   }
-  #derivation connection {
+  #derivation connection detectBinRemovedOrMissing_from_easyToEmpty {
     end #original ::> easyToEmpty;
     end #derive ::> detectBinRemovedOrMissing;
   }
-  #derivation connection {
+  #derivation connection notifyMaintenanceNeeded_from_easyToEmpty {
     end #original ::> easyToEmpty;
     end #derive ::> notifyMaintenanceNeeded;
   }

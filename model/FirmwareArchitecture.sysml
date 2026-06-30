@@ -10,7 +10,6 @@
 package FirmwareArchitecture {
   private import ArchitectureCommon::*;
   private import InterfaceControl::*;
-  private import PhysicalArchitecture::*;
   private import SoftwareCore::*;
   private import ScalarValues::*;
 
@@ -179,8 +178,6 @@ package FirmwareArchitecture {
 
   // Concrete task architecture used by allocation and view packages.
   part def FirmwareTaskArchitecture {
-    ref firmwareSuite : RobotFirmwareSuite;
-    ref mcu : MicrocontrollerUnit;
     part scheduler : SchedulerModel {
       attribute :>> tickPeriodMs = 1.0;
       attribute :>> schedulingPolicy = "fixed-priority cooperative with bounded interrupt service";

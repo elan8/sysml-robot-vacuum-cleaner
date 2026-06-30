@@ -11,6 +11,7 @@ package PhysicalArchitecture {
   private import ArchitectureCommon::*;
   private import PhysicalProtocols::*;
   private import BehaviorStates::*;
+  private import FirmwareArchitecture::*;
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;
@@ -398,7 +399,7 @@ package PhysicalArchitecture {
     port lidarSerialIn : UartPort;
     port bmsBusIn : I2cPort;
     port encoderIn : QuadratureEncoderPort;
-    port telemetryIn : TelemetryPort;
+    port telemetryIn : ~TelemetryPort;
     port dockStatusIn : GpioPort;
     port hazardIn : GpioPort;
     port statusOut : MissionStatusPort;
@@ -461,6 +462,8 @@ package PhysicalArchitecture {
     part powerModule : PowerModule;
     part dockInterface : DockInterfaceModule;
     part hmi : HumanMachineInterface;
+    part firmwareTasks : FirmwareTaskArchitecture;
+
     connect powerModule.mainPowerOut to cleaningHead.powerIn;
     connect powerModule.mainPowerOut to sensorAssembly.powerIn;
     connect powerModule.mainPowerOut to mainElectronics.powerIn;
@@ -485,5 +488,38 @@ package PhysicalArchitecture {
     connect driveModule.bumperHazardOut to mainElectronics.hazardIn;
     connect cleaningHead.faultOut to mainElectronics.hazardIn;
     connect powerModule.hazardOut to mainElectronics.hazardIn;
+
+    // Firmware task ownership by deployable software module.
+    allocate firmwareTasks.missionController to mainElectronics.robotFirmware.applicationFirmware;
+    allocate firmwareTasks.motorControl to mainElectronics.robotFirmware.applicationFirmware;
+    allocate firmwareTasks.cleaningControl to mainElectronics.robotFirmware.applicationFirmware;
+    allocate firmwareTasks.appProtocol to mainElectronics.robotFirmware.applicationFirmware;
+    allocate firmwareTasks.diagnostics to mainElectronics.robotFirmware.applicationFirmware;
+    allocate firmwareTasks.storage to mainElectronics.robotFirmware.applicationFirmware;
+    allocate firmwareTasks.safetySupervisor to mainElectronics.robotFirmware.safetySupervisor;
+    allocate firmwareTasks.batteryManager to mainElectronics.robotFirmware.safetySupervisor;
+    allocate firmwareTasks.sensorAcquisition to mainElectronics.robotFirmware.mapProcessing;
+    allocate firmwareTasks.slam to mainElectronics.robotFirmware.mapProcessing;
+    allocate firmwareTasks.localization to mainElectronics.robotFirmware.localizationEstimator;
+    allocate firmwareTasks.coveragePlanner to mainElectronics.robotFirmware.coveragePlanner;
+
+    // Firmware task and module deployment to the MCU execution node.
+    allocate mainElectronics.robotFirmware.applicationFirmware to mainElectronics.mainControlPcb.mcu;
+    allocate mainElectronics.robotFirmware.safetySupervisor to mainElectronics.mainControlPcb.mcu;
+    allocate mainElectronics.robotFirmware.mapProcessing to mainElectronics.mainControlPcb.mcu;
+    allocate mainElectronics.robotFirmware.localizationEstimator to mainElectronics.mainControlPcb.mcu;
+    allocate mainElectronics.robotFirmware.coveragePlanner to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.missionController to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.safetySupervisor to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.motorControl to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.sensorAcquisition to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.localization to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.slam to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.coveragePlanner to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.batteryManager to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.cleaningControl to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.appProtocol to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.diagnostics to mainElectronics.mainControlPcb.mcu;
+    allocate firmwareTasks.storage to mainElectronics.mainControlPcb.mcu;
   }
 }
