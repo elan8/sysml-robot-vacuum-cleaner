@@ -19,8 +19,7 @@ These conventions keep the SysML model readable and maintainable while preservin
 
 - Requirements packages own requirement intent and derivation. They should not own implementation structure.
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.
-- `PhysicalArchitecture` owns product assemblies, physical ports, firmware suite parts, and roll-up values. It should not own connector metadata tables or software message schemas.
-- `ElectricalInterfaces` owns implementation-facing PCB interface-control records.
+- `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes on ports, firmware suite parts, and roll-up values. It should not own software message schemas.
 - `InterfaceControl` owns software message contracts and producer/consumer ownership.
 - `FirmwareArchitecture` owns task timing, task criticality, scheduler assumptions, and task-to-module allocation surfaces.
 - Assurance packages own evidence, hazards, analyses, trade rationale, and verification intent.

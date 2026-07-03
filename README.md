@@ -67,18 +67,17 @@ The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and r
 3. [`FunctionalArchitecture.sysml`](model/FunctionalArchitecture.sysml) - capabilities and functional composition
 4. [`PhysicalProtocols.sysml`](model/PhysicalProtocols.sysml) - electronics library imports and product bus aliases
 5. [`ProductContext.sysml`](model/ProductContext.sysml) - external actors and context boundary
-6. [`ElectricalInterfaces.sysml`](model/ElectricalInterfaces.sysml) - PCB harness and connector records
-7. [`InterfaceControl.sysml`](model/InterfaceControl.sysml) - software message contracts
-8. [`FirmwareArchitecture.sysml`](model/FirmwareArchitecture.sysml) - firmware tasks and scheduler timing
-9. [`PhysicalArchitecture.sysml`](model/PhysicalArchitecture.sysml) - product assemblies and typed physical connections
-10. [`ArchitectureAllocations.sysml`](model/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
-11. [`Architecture.sysml`](model/Architecture.sysml) - public architecture hub and system-level satisfy links
-12. [`BehaviorStates.sysml`](model/BehaviorStates.sysml) - mission lifecycle states
-13. [`OperationalScenarios.sysml`](model/OperationalScenarios.sysml) - nominal and recovery mission flows
-14. [`SafetyAnalysis.sysml`](model/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/TradeStudies.sysml) - hazards and design rationale
-15. [`ModelViews.sysml`](model/ModelViews.sysml) - stakeholder views
-16. [`Verification.sysml`](model/Verification.sysml) and [`AnalysisCases.sysml`](model/AnalysisCases.sysml) - V&V and engineering margins
-17. [`AutonomousFloorCleaningRobotDemo.sysml`](model/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
+6. [`InterfaceControl.sysml`](model/InterfaceControl.sysml) - software message contracts
+7. [`FirmwareArchitecture.sysml`](model/FirmwareArchitecture.sysml) - firmware tasks and scheduler timing
+8. [`PhysicalArchitecture.sysml`](model/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
+9. [`ArchitectureAllocations.sysml`](model/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
+10. [`Architecture.sysml`](model/Architecture.sysml) - public architecture hub and system-level satisfy links
+11. [`BehaviorStates.sysml`](model/BehaviorStates.sysml) - mission lifecycle states
+12. [`OperationalScenarios.sysml`](model/OperationalScenarios.sysml) - nominal and recovery mission flows
+13. [`SafetyAnalysis.sysml`](model/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/TradeStudies.sysml) - hazards and design rationale
+14. [`ModelViews.sysml`](model/ModelViews.sysml) - stakeholder views
+15. [`Verification.sysml`](model/Verification.sysml) and [`AnalysisCases.sysml`](model/AnalysisCases.sysml) - V&V and engineering margins
+16. [`AutonomousFloorCleaningRobotDemo.sysml`](model/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
 ## More Documentation
 

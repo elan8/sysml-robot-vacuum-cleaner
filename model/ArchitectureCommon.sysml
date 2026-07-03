@@ -10,6 +10,12 @@
 package ArchitectureCommon {
   private import ScalarValues::*;
 
+  // Shared closed-set vocabulary used by mission items across the model.
+  enum def Severity { info; warning; fault; safetyCritical; }
+  enum def HazardKind { cliff; bumper; lift; overcurrent; thermal; stall; privacy; }
+  enum def VacuumPowerMode { eco; standard; max; off; }
+  enum def UserCommandKind { start; pause; resume; home; emptyBinConfirmed; consentChanged; }
+
   item def OccupancyGrid {
     attribute cellSizeMm : Real;
     attribute cleanedCellPercent : Real;
@@ -30,8 +36,8 @@ package ArchitectureCommon {
     attribute confidencePercent : Real;
   }
   item def HazardEvent {
-    attribute hazardKind : String;
-    attribute severity : String;
+    attribute hazardKind : HazardKind;
+    attribute severity : Severity;
     attribute detectedWithinMs : Real;
     attribute safeStopRequired : Boolean;
   }
@@ -42,7 +48,7 @@ package ArchitectureCommon {
   }
   item def CleaningCommand {
     attribute brushEnabled : Boolean;
-    attribute vacuumPowerMode : String;
+    attribute vacuumPowerMode : VacuumPowerMode;
     attribute requestedPowerW : Real;
   }
   item def MissionStatus {
@@ -51,7 +57,7 @@ package ArchitectureCommon {
     attribute userAttentionRequired : Boolean;
   }
   item def UserCommand {
-    attribute commandKind : String;
+    attribute commandKind : UserCommandKind;
     attribute cloudBackupConsent : Boolean;
   }
   item def BatteryTelemetry {

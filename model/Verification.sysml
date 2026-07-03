@@ -199,7 +199,7 @@ package Verification {
   }
 
   verification verifyElectricalInterfaceControl {
-    doc /* Confirm PCB harnesses, power rails, bus speeds, addresses, and fault polarities match the interface-control model. */
+    doc /* Confirm PCB harness port docs, power rails, bus speeds, addresses, and fault polarities match the schematic. */
     subject robot : AutonomousFloorCleaningRobot;
     objective {
       verify requirement superviseHazards;

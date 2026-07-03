@@ -5,7 +5,8 @@
  * Owns product assemblies, physical ports, firmware suite parts, physical
  * connections, and mass/BOM/power roll-ups. Depends on shared items, physical
  * protocols, behavior, software, compute, and unit libraries. Keep PCB metadata,
- * software contracts, and allocation links in their dedicated packages.
+ * software contracts, and allocation links in their dedicated packages. Harness
+ * connector ICD notes live in doc on the corresponding ports.
  */
 package PhysicalArchitecture {
   private import ArchitectureCommon::*;
@@ -72,7 +73,12 @@ package PhysicalArchitecture {
     attribute :>> bomCost = 100 [EUR];
     port phaseLeftIn : ThreePhaseMotorPort;
     port phaseRightIn : ThreePhaseMotorPort;
-    port encoderOut : QuadratureEncoderPort;
+    port leftEncoderOut : QuadratureEncoderPort {
+      doc /* Left wheel quadrature channel; independent line to the motion controller. */
+    }
+    port rightEncoderOut : QuadratureEncoderPort {
+      doc /* Right wheel quadrature channel; independent line to the motion controller. */
+    }
     port bumperHazardOut : GpioPort;
     part leftMotor : BrushlessDriveMotor;
     part rightMotor : BrushlessDriveMotor;
@@ -83,8 +89,8 @@ package PhysicalArchitecture {
     part bumperSwitches : BumperSwitchArray;
     connect leftMotor.phaseIn to phaseLeftIn;
     connect rightMotor.phaseIn to phaseRightIn;
-    connect leftEncoder.odometryOut to encoderOut;
-    connect rightEncoder.odometryOut to encoderOut;
+    connect leftEncoder.odometryOut to leftEncoderOut;
+    connect rightEncoder.odometryOut to rightEncoderOut;
     connect bumperSwitches.hazardOut to bumperHazardOut;
   }
 
@@ -147,7 +153,7 @@ package PhysicalArchitecture {
   }
 
   // Sensor hardware and navigation/perception software elements.
-  part def TimeOfFlightRangeSensor {
+  part def TimeOfFlightRangeSensor :> I2cBusSlaveNode {
     attribute rangeMm : LengthValue = 1200 [mm];
     port observationOut : SensorDataPort;
   }
@@ -155,7 +161,7 @@ package PhysicalArchitecture {
     attribute triggerHeightMm : LengthValue = 50 [mm];
     port cliffOut : GpioPort;
   }
-  part def InertialMeasurementUnit {
+  part def InertialMeasurementUnit :> I2cBusSlaveNode {
     attribute axisCount : Integer = 6;
     port poseOut : OdometryPort;
   }
@@ -200,16 +206,34 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 7 [W];
     attribute :>> massKg = 0.34 [kg];
     attribute :>> bomCost = 58 [EUR];
-    port powerIn : PowerRailPort;
-    port sensorBusOut : I2cPort;
-    port lidarSerialOut : UartPort;
-    port cliffHazardOut : GpioPort;
+    port powerIn : PowerRailPort {
+      doc /*
+        Sensor LRU power from main battery rail via harness J_SENSOR_PWR segment;
+        shares return with sensor bus ground at the keyed connector.
+      */
+    }
+    port sensorBusOut : I2cPort {
+      doc /*
+        Sensor harness mate to main PCB J_SENSOR_I2C (6-pin JST-GH).
+        3.3 V logic at 400 kHz; SDA/SCL open-drain with 3.3 V pull-ups.
+        Addresses: front ToF 0x29, left ToF 0x2A, right ToF 0x2B, IMU 0x68.
+      */
+    }
+    port lidarSerialOut : UartPort {
+      doc /*
+        LiDAR harness mate to main PCB J_LIDAR (6-pin JST-GH).
+        5 V sensor power, 3.3 V UART at 1 Mbps target; MCU TX/RX cross to module.
+        Signals: MCU_LIDAR_TX, LIDAR_MCU_RX, LIDAR_5V (sensor power below 500 mA).
+      */
+    }
+    port cliffHazardOut : GpioPort {
+      doc /*
+        Cliff sensor hazard lines; fail-safe active-low where supported.
+        Aggregated with other safety GPIO at main electronics hazardIn.
+      */
+    }
     part sensorI2c : SensorI2cBus;
     part lidarSerial : LidarSerialBus;
-    part frontTofNode : I2cBusSlaveNode;
-    part leftWallTofNode : I2cBusSlaveNode;
-    part rightWallTofNode : I2cBusSlaveNode;
-    part imuNode : I2cBusSlaveNode;
     part frontTofSensor : TimeOfFlightRangeSensor;
     part leftWallTofSensor : TimeOfFlightRangeSensor;
     part rightWallTofSensor : TimeOfFlightRangeSensor;
@@ -222,10 +246,10 @@ package PhysicalArchitecture {
     connect sensorBusOut to sensorI2c.hostBackplane;
     connect lidarSerialOut to lidarSerial.mcu;
     connect lidar.scanOut to lidarSerial.lidarModule;
-    connect frontTofNode.busPort to sensorI2c.frontTof;
-    connect leftWallTofNode.busPort to sensorI2c.leftWallTof;
-    connect rightWallTofNode.busPort to sensorI2c.rightWallTof;
-    connect imuNode.busPort to sensorI2c.imu;
+    connect frontTofSensor.busPort to sensorI2c.frontTof;
+    connect leftWallTofSensor.busPort to sensorI2c.leftWallTof;
+    connect rightWallTofSensor.busPort to sensorI2c.rightWallTof;
+    connect imu.busPort to sensorI2c.imu;
     connect cliffSensorFrontLeft.cliffOut to cliffHazardOut;
     connect cliffSensorFrontRight.cliffOut to cliffHazardOut;
     connect cliffSensorRearLeft.cliffOut to cliffHazardOut;
@@ -259,10 +283,26 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 8 [W];
     attribute :>> massKg = 0.72 [kg];
     attribute :>> bomCost = 68 [EUR];
-    port mainPowerOut : PowerRailPort;
-    port bmsBusOut : I2cPort;
+    port mainPowerOut : PowerRailPort {
+      doc /*
+        Battery and dock power entry (J_POWER, 6-pin).
+        Rails: 14.4 V battery, switched motor rail, 5 V regulated, 3.3 V logic, charger input.
+        Separate high-current motor return from logic return until star point.
+      */
+    }
+    port bmsBusOut : I2cPort {
+      doc /*
+        BMS harness mate to main PCB J_BMS (5-pin board-to-wire).
+        SMBus at 100 kHz, 3.3 V logic plus pack reference; BMS address 0x16.
+        SMBus SDA/SCL, alert/fault GPIO, pack reference, ground.
+      */
+    }
     port telemetryOut : TelemetryPort;
-    port hazardOut : GpioPort;
+    port hazardOut : GpioPort {
+      doc /*
+        BMS fault/alert output; active-low alert convention where supported.
+      */
+    }
     part batteryPack : LithiumIonBatteryPack;
     part bms : BatteryManagementSystem;
     part bmsSmbus : BmsSmbusBus;
@@ -316,12 +356,45 @@ package PhysicalArchitecture {
       Software deployment to mcu uses allocate (ArchitectureAllocations); peripheral I/O uses connect.
     */
     attribute layerCount : Integer = 4;
-    port leftMotorPhaseOut : ThreePhaseMotorPort;
-    port rightMotorPhaseOut : ThreePhaseMotorPort;
-    port sensorBusHarness : I2cPort;
-    port lidarUartHarness : UartPort;
-    port bmsBusHarness : I2cPort;
-    port mcuUartOut : UartPort;
+    port leftMotorPhaseOut : ThreePhaseMotorPort {
+      doc /*
+        Left wheel motor phase harness (U/V/W) from onboard inverter;
+        part of J_MOTOR_PWM motor/actuator net group (20 kHz PWM target).
+      */
+    }
+    port rightMotorPhaseOut : ThreePhaseMotorPort {
+      doc /*
+        Right wheel motor phase harness (U/V/W) from onboard inverter;
+        part of J_MOTOR_PWM motor/actuator net group (20 kHz PWM target).
+      */
+    }
+    port sensorBusHarness : I2cPort {
+      doc /*
+        J_SENSOR_I2C, 6-pin JST-GH, 3.3 V logic at 400 kHz.
+        SDA (SENSOR_I2C_SDA, open-drain bidirectional), SCL (SENSOR_I2C_SCL, open-drain clock),
+        sensor power, ground, keyed harness.
+        Addresses: front ToF 0x29, left ToF 0x2A, right ToF 0x2B, IMU 0x68.
+      */
+    }
+    port lidarUartHarness : UartPort {
+      doc /*
+        J_LIDAR, 6-pin JST-GH; 5 V sensor power plus 3.3 V logic at 1 Mbps UART target (UART2_LIDAR).
+        MCU_LIDAR_TX to LiDAR RX, LIDAR_MCU_RX from LiDAR TX; idle-high UART.
+        LIDAR_5V positive supply; optional motor-sync or health GPIO.
+      */
+    }
+    port bmsBusHarness : I2cPort {
+      doc /*
+        J_BMS, 5-pin board-to-wire; SMBus at 100 kHz, BMS address 0x16.
+        3.3 V logic plus pack reference; SDA/SCL, alert/fault GPIO, ground.
+      */
+    }
+    port mcuUartOut : UartPort {
+      doc /*
+        U_WIFI_BLE wireless module (soldered castellated pads, 6-pin, 3.3 V logic, 1 Mbps UART1).
+        MCU TX/RX cross to wireless RX/TX; optional wake/reset GPIO.
+      */
+    }
     part mcu : MicrocontrollerUnit {
       port sensorI2c : I2cPort;
       port lidarUart : UartPort;
@@ -331,7 +404,12 @@ package PhysicalArchitecture {
     }
     part mcuI2cMaster : I2cBusMasterNode;
     part wirelessModule : RobotWirelessModule;
-    part flashSpi : FlashSpiBus;
+    part flashSpi : FlashSpiBus {
+      doc /*
+        U_FLASH on-board SOIC/QSPI footprint (8-pin); SPI mode 0 at 24 MHz, 3.3 V logic.
+        CS (FLASH_CS0), SCK, MISO, MOSI; WP/HOLD pulled inactive.
+      */
+    }
     part flashNode : SpiBusSlaveNode;
     part flash : NonVolatileMemory;
     part leftMotorDriver : MotorDriverIC;
@@ -379,6 +457,22 @@ package PhysicalArchitecture {
     part coveragePlanner : CoveragePlannerSoftware;
   }
 
+  part def SafetyGpioHarness {
+    doc /*
+      J_SAFETY passive wire bundle: each port is an independent fault line routed
+      to the safety supervisor GPIO block. Fail-safe active-low where supported.
+    */
+    port cliffIn : GpioPort;
+    port bumperIn : GpioPort;
+    port cleaningFaultIn : GpioPort;
+    port bmsAlertIn : GpioPort;
+    port motorFaultLeftIn : GpioPort;
+    port motorFaultRightIn : GpioPort;
+    port liftIn : GpioPort;
+    port thermalIn : GpioPort;
+    port toSupervisor : GpioPort;
+  }
+
   part def MainElectronicsAssembly :> PhysicalAssembly {
     doc /*
       Compute LRU: main PCB, motor drivers, and all deployed navigation/perception/control firmware.
@@ -389,32 +483,68 @@ package PhysicalArchitecture {
     attribute :>> powerDrawW = 9 [W];
     attribute :>> massKg = 0.28 [kg];
     attribute :>> bomCost = 48 [EUR];
-    port powerIn : PowerRailPort;
-    port leftMotorPhaseOut : ThreePhaseMotorPort;
-    port rightMotorPhaseOut : ThreePhaseMotorPort;
-    port mainBrushPwmOut : PwmPort;
-    port sideBrushPwmOut : PwmPort;
-    port vacuumPwmOut : PwmPort;
-    port sensorBusIn : I2cPort;
-    port lidarSerialIn : UartPort;
-    port bmsBusIn : I2cPort;
-    port encoderIn : QuadratureEncoderPort;
+    port powerIn : PowerRailPort {
+      doc /*
+        Main electronics power from battery module (J_POWER segment).
+        14.4 V battery, 5 V regulated, 3.3 V logic; charger input on dock path.
+      */
+    }
+    port leftMotorPhaseOut : ThreePhaseMotorPort {
+      doc /* Left drive motor harness to drive module; 14.4 V switched motor rail. */
+    }
+    port rightMotorPhaseOut : ThreePhaseMotorPort {
+      doc /* Right drive motor harness to drive module; 14.4 V switched motor rail. */
+    }
+    port mainBrushPwmOut : PwmPort {
+      doc /*
+        Main brush PWM harness (J_MOTOR_PWM group); 3.3 V control, 20 kHz PWM target.
+        Fault GPIO returns to safety supervisor via hazardIn.
+      */
+    }
+    port sideBrushPwmOut : PwmPort {
+      doc /* Side brush PWM harness (J_MOTOR_PWM group); 3.3 V control, 20 kHz PWM target. */
+    }
+    port vacuumPwmOut : PwmPort {
+      doc /* Vacuum fan PWM harness (J_MOTOR_PWM group); 3.3 V control, 20 kHz PWM target. */
+    }
+    port sensorBusIn : I2cPort {
+      doc /* Sensor assembly harness; see mainControlPcb.sensorBusHarness for J_SENSOR_I2C ICD. */
+    }
+    port lidarSerialIn : UartPort {
+      doc /* Sensor assembly LiDAR harness; see mainControlPcb.lidarUartHarness for J_LIDAR ICD. */
+    }
+    port bmsBusIn : I2cPort {
+      doc /* Power module BMS harness; see mainControlPcb.bmsBusHarness for J_BMS ICD. */
+    }
+    port leftEncoderIn : QuadratureEncoderPort {
+      doc /* Left wheel quadrature channel from the drive module. */
+    }
+    port rightEncoderIn : QuadratureEncoderPort {
+      doc /* Right wheel quadrature channel from the drive module. */
+    }
     port telemetryIn : ~TelemetryPort;
     port dockStatusIn : GpioPort;
-    port hazardIn : GpioPort;
+    port hazardIn : GpioPort {
+      doc /*
+        Safety supervisor GPIO input block; fed by safetyGpioHarness.toSupervisor.
+        Sampled at 10 ms safety period.
+      */
+    }
     port statusOut : MissionStatusPort;
     port userCommandIn : GpioPort;
     part mainControlPcb : MainControlPcb;
     part robotFirmware : RobotFirmwareSuite;
+    part safetyGpioHarness : SafetyGpioHarness;
     connect sensorBusIn to mainControlPcb.sensorBusHarness;
     connect lidarSerialIn to mainControlPcb.lidarUartHarness;
     connect bmsBusIn to mainControlPcb.bmsBusHarness;
     connect mainControlPcb.leftMotorPhaseOut to leftMotorPhaseOut;
     connect mainControlPcb.rightMotorPhaseOut to rightMotorPhaseOut;
-    connect mainControlPcb.leftMotorDriver.faultOut to hazardIn;
-    connect mainControlPcb.rightMotorDriver.faultOut to hazardIn;
-    connect mainControlPcb.liftSensorInput.hazardOut to hazardIn;
-    connect mainControlPcb.boardThermalSensor.hazardOut to hazardIn;
+    connect mainControlPcb.leftMotorDriver.faultOut to safetyGpioHarness.motorFaultLeftIn;
+    connect mainControlPcb.rightMotorDriver.faultOut to safetyGpioHarness.motorFaultRightIn;
+    connect mainControlPcb.liftSensorInput.hazardOut to safetyGpioHarness.liftIn;
+    connect mainControlPcb.boardThermalSensor.hazardOut to safetyGpioHarness.thermalIn;
+    connect safetyGpioHarness.toSupervisor to hazardIn;
   }
 
   // Human-machine interface and app interaction boundary.
@@ -473,7 +603,8 @@ package PhysicalArchitecture {
     connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.rightMotorDriver.powerIn;
     connect mainElectronics.leftMotorPhaseOut to driveModule.phaseLeftIn;
     connect mainElectronics.rightMotorPhaseOut to driveModule.phaseRightIn;
-    connect driveModule.encoderOut to mainElectronics.encoderIn;
+    connect driveModule.leftEncoderOut to mainElectronics.leftEncoderIn;
+    connect driveModule.rightEncoderOut to mainElectronics.rightEncoderIn;
     connect sensorAssembly.sensorBusOut to mainElectronics.sensorBusIn;
     connect sensorAssembly.lidarSerialOut to mainElectronics.lidarSerialIn;
     connect powerModule.bmsBusOut to mainElectronics.bmsBusIn;
@@ -484,10 +615,10 @@ package PhysicalArchitecture {
     connect mainElectronics.statusOut to hmi.statusIn;
     connect hmi.userCommandOut to mainElectronics.userCommandIn;
     connect dockInterface.dockStatusOut to mainElectronics.dockStatusIn;
-    connect sensorAssembly.cliffHazardOut to mainElectronics.hazardIn;
-    connect driveModule.bumperHazardOut to mainElectronics.hazardIn;
-    connect cleaningHead.faultOut to mainElectronics.hazardIn;
-    connect powerModule.hazardOut to mainElectronics.hazardIn;
+    connect sensorAssembly.cliffHazardOut to mainElectronics.safetyGpioHarness.cliffIn;
+    connect driveModule.bumperHazardOut to mainElectronics.safetyGpioHarness.bumperIn;
+    connect cleaningHead.faultOut to mainElectronics.safetyGpioHarness.cleaningFaultIn;
+    connect powerModule.hazardOut to mainElectronics.safetyGpioHarness.bmsAlertIn;
 
     // Firmware task ownership by deployable software module.
     allocate firmwareTasks.missionController to mainElectronics.robotFirmware.applicationFirmware;

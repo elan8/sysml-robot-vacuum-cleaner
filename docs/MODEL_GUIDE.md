@@ -15,7 +15,7 @@ Use this tour when evaluating the model as a high-end SysML v2 example:
 2. Read `FunctionalArchitecture` for capability actions and mission-level behavior.
 3. Read `PhysicalArchitecture` for product assemblies, typed ports, harnesses, firmware suite parts, and mass/BOM/power roll-ups.
 4. Read `ArchitectureAllocations` to follow capability-to-LRU, software-to-MCU, scenario-action, and firmware-task allocations.
-5. Read `ElectricalInterfaces`, `InterfaceControl`, and `FirmwareArchitecture` as the implementation handoff layer.
+5. Read `InterfaceControl` and `FirmwareArchitecture` as the implementation handoff layer for software contracts and task timing.
 6. Read `SafetyAnalysis`, `TradeStudies`, `Verification`, and `AnalysisCases` for assurance, rationale, and engineering margins.
 7. Finish in `ModelViews` to see curated stakeholder slices over the same source model.
 
@@ -28,7 +28,7 @@ The model is intentionally layered from product intent to implementation evidenc
 | Requirements | `StakeholderNeeds`, `SystemRequirements`, `DesignLimits` | User needs, derived system requirements, and shared numeric limits. |
 | Context | `ProductContext`, `OperationalScenarios` | External actors, home environment, dock, app/cloud, and mission flows. |
 | Architecture | `ArchitectureCommon`, `PhysicalProtocols`, `FunctionalArchitecture`, `PhysicalArchitecture`, `ArchitectureAllocations`, `Architecture` | Functional capabilities, product assemblies, typed interfaces, and allocation links. |
-| Implementation | `ElectricalInterfaces`, `InterfaceControl`, `FirmwareArchitecture` | PCB interface control, software contracts, firmware tasks, and scheduler assumptions. |
+| Implementation | `InterfaceControl`, `FirmwareArchitecture` | Software message contracts, firmware tasks, and scheduler assumptions. Harness ICD notes live on `PhysicalArchitecture` ports. |
 | Assurance | `SafetyAnalysis`, `TradeStudies`, `Verification`, `AnalysisCases` | Hazards, mitigations, trade rationale, verification cases, and engineering margins. |
 | Views | `ModelViews` | Stakeholder-facing slices of the model. |
 | Root | `AutonomousFloorCleaningRobotDemo` | Import hub for loading the full workspace. |
@@ -53,10 +53,9 @@ The model is intentionally layered from product intent to implementation evidenc
 | `PhysicalProtocols` | Product-specific bus aliases and domain electronics imports. | Electronics, bus, wireless, and software domain libraries. |
 | `ProductContext` | External systems and residential cleaning context. | Architecture and protocol packages. |
 | `FunctionalArchitecture` | Capability `action def`s and mission actions. | `ArchitectureCommon`, `SystemRequirements`. |
-| `PhysicalArchitecture` | Product assemblies, physical harnesses, firmware suite, and roll-ups. | Common items, protocols, behavior, software, compute, units. |
+| `PhysicalArchitecture` | Product assemblies, physical harnesses, harness port ICD docs, firmware suite, and roll-ups. | Common items, protocols, behavior, software, compute, units. |
 | `ArchitectureAllocations` | Function, action, firmware, and MCU allocation links. | Functional, physical, firmware, software, compute packages. |
 | `Architecture` | Public architecture import hub and `robot` part. | Architecture packages and system requirements. |
-| `ElectricalInterfaces` | PCB connector, signal, rail, bus, and fault records. | Board/electronics libraries, protocols, physical architecture. |
 | `InterfaceControl` | Software-facing message contracts and producer/consumer ownership. | Common items and software library. |
 | `FirmwareArchitecture` | Firmware task definitions, scheduler model, and task architecture instance. | Common items, contracts, physical architecture, software library. |
 | `BehaviorStates` | Operating lifecycle and detailed behavior fragments. | None beyond SysML basics. |
