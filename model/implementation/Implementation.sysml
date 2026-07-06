@@ -12,6 +12,7 @@ package Implementation {
   public import SoftwareImplementation::*;
   public import ElectronicsInterfaceControl::*;
   public import ElectronicsImplementation::*;
+  public import ElectronicsComponentSelection::*;
   public import ElectronicsVerification::*;
   private import Views::*;
   private import ScalarValues::*;
@@ -24,6 +25,7 @@ package Implementation {
     halBinding;
     electricalInterface;
     electronicsWorkPackage;
+    electronicsComponentSelection;
     railBudget;
     electronicsBringUp;
     crossDisciplineIntegration;
@@ -47,6 +49,7 @@ package Implementation {
       FirmwareArchitecture owns task timing and flows, SoftwareImplementation
       owns software handoff details, ElectronicsInterfaceControl owns electrical
       contracts, ElectronicsImplementation owns PCB/harness work packages, and
+      ElectronicsComponentSelection owns component candidates, while
       ElectronicsVerification owns electronics bring-up intent.
     */
 
@@ -55,11 +58,13 @@ package Implementation {
     attribute softwareImplementationPackage = "SoftwareImplementation";
     attribute electronicsInterfaceControlPackage = "ElectronicsInterfaceControl";
     attribute electronicsImplementationPackage = "ElectronicsImplementation";
+    attribute electronicsComponentSelectionPackage = "ElectronicsComponentSelection";
     attribute electronicsVerificationPackage = "ElectronicsVerification";
     attribute authoritativeRuntimeInstance = "FirmwareArchitecture::firmwareTaskArchitecture";
     attribute authoritativeSoftwareHandoffInstance = "SoftwareImplementation::softwareHandoff";
     attribute authoritativeElectronicsHandoffInstance = "ElectronicsImplementation::electronicsHandoff";
     attribute authoritativeElectronicsInterfaceBaseline = "ElectronicsInterfaceControl::electronicsInterfaceBaseline";
+    attribute authoritativeComponentSelectionBaseline = "ElectronicsComponentSelection::electronicsComponentSelectionBaseline";
 
     part contractStory : ImplementationTraceRecord {
       attribute :>> concern = ImplementationConcernKind::messageContract;
@@ -125,6 +130,14 @@ package Implementation {
       attribute :>> extractionHint = "Extract RailBudgetRecord usages and compare loadFeaturePaths against PhysicalArchitecture power connections.";
     }
 
+    part electronicsComponentSelectionStory : ImplementationTraceRecord {
+      attribute :>> concern = ImplementationConcernKind::electronicsComponentSelection;
+      attribute :>> sourceElementPath = "ElectronicsComponentSelection::electronicsComponentSelectionBaseline.*";
+      attribute :>> relatedElementPaths = "PhysicalArchitecture features; ElectronicsInterfaceControl contracts; ElectronicsImplementation work packages";
+      attribute :>> engineerQuestionAnswered = "Welke concrete componentkandidaten, MPNs, footprints, kernspecs, kosten en selectie-rationale horen bij de electronics baseline?";
+      attribute :>> extractionHint = "Extract ComponentCandidate usages, join relatedContractRefs to ElectronicsInterfaceContract.contractId, and flag candidates whose selectionStatus is not approvedForPrototype or baselineCandidate.";
+    }
+
     part electronicsBringUpStory : ImplementationTraceRecord {
       attribute :>> concern = ImplementationConcernKind::electronicsBringUp;
       attribute :>> sourceElementPath = "ElectronicsVerification::electronicsVerificationPlan.*";
@@ -164,6 +177,7 @@ package Implementation {
     expose Implementation::implementationBaseline;
     expose ElectronicsInterfaceControl::electronicsInterfaceBaseline;
     expose ElectronicsImplementation::electronicsHandoff;
+    expose ElectronicsComponentSelection::electronicsComponentSelectionBaseline;
     expose ElectronicsVerification::electronicsVerificationPlan;
     filter @SysML::PartUsage;
   }
@@ -174,6 +188,7 @@ package Implementation {
     expose SoftwareImplementation::*;
     expose ElectronicsInterfaceControl::*;
     expose ElectronicsImplementation::*;
+    expose ElectronicsComponentSelection::*;
     expose ElectronicsVerification::*;
     filter @SysML::PartUsage or @SysML::ConnectionUsage;
   }
@@ -183,6 +198,7 @@ package Implementation {
     expose SoftwareImplementation::softwareHandoff;
     expose ElectronicsInterfaceControl::electronicsInterfaceBaseline;
     expose ElectronicsImplementation::electronicsHandoff;
+    expose ElectronicsComponentSelection::electronicsComponentSelectionBaseline;
     expose FirmwareArchitecture::firmwareTaskArchitecture;
     filter @SysML::PartUsage or @SysML::ConnectionUsage;
   }

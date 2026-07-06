@@ -26,7 +26,7 @@ It demonstrates how requirements, functional architecture, physical architecture
 - Requirements-to-architecture-to-verification traceability across needs, system requirements, design elements, verification cases, and analyses.
 - Functional and physical decomposition with explicit allocation layers.
 - Implementation-facing interface control for PCB harnesses, software message contracts, firmware tasks, scheduler timing, and MCU deployment.
-- An implementation hub tying software contracts, firmware runtime/resource constraints, electronics interfaces, PCB/harness work packages, queue policies, HAL bindings, rail budgets, bring-up tests, timing budgets, and verification scope into one extractable story.
+- An implementation hub tying software contracts, firmware runtime/resource constraints, electronics interfaces, PCB/harness work packages, component candidates, queue policies, HAL bindings, rail budgets, bring-up tests, timing budgets, and verification scope into one extractable story.
 - Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
 - First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
 
@@ -74,16 +74,17 @@ The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits
 9. [`SoftwareImplementation.sysml`](model/implementation/SoftwareImplementation.sysml) - engineer-facing software implementation records, queue contracts, HAL bindings, message field rules, and test intent
 10. [`ElectronicsInterfaceControl.sysml`](model/implementation/ElectronicsInterfaceControl.sysml) - electronics connector, signal, rail, bus, and harness contracts
 11. [`ElectronicsImplementation.sysml`](model/implementation/ElectronicsImplementation.sysml) - PCB/harness work packages, rail budgets, layout constraints, and manufacturing notes
-12. [`ElectronicsVerification.sysml`](model/implementation/ElectronicsVerification.sysml) - electronics bring-up, fault-injection, and manufacturing test checklist
-13. [`PhysicalArchitecture.sysml`](model/architecture/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
-14. [`ArchitectureAllocations.sysml`](model/architecture/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
-15. [`Architecture.sysml`](model/architecture/Architecture.sysml) - public architecture hub and system-level satisfy links
-16. [`BehaviorStates.sysml`](model/behavior/BehaviorStates.sysml) - mission lifecycle states
-17. [`OperationalScenarios.sysml`](model/context/OperationalScenarios.sysml) - nominal and recovery mission flows
-18. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - hazards and design rationale
-19. [`ModelViews.sysml`](model/views/ModelViews.sysml) - stakeholder views
-20. [`Verification.sysml`](model/assurance/Verification.sysml) and [`AnalysisCases.sysml`](model/assurance/AnalysisCases.sysml) - V&V and engineering margins
-21. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
+12. [`ElectronicsComponentSelection.sysml`](model/implementation/ElectronicsComponentSelection.sysml) - baseline component candidates, MPNs, footprints, key specs, cost targets, and selection rationale
+13. [`ElectronicsVerification.sysml`](model/implementation/ElectronicsVerification.sysml) - electronics bring-up, fault-injection, and manufacturing test checklist
+14. [`PhysicalArchitecture.sysml`](model/architecture/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
+15. [`ArchitectureAllocations.sysml`](model/architecture/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
+16. [`Architecture.sysml`](model/architecture/Architecture.sysml) - public architecture hub and system-level satisfy links
+17. [`BehaviorStates.sysml`](model/behavior/BehaviorStates.sysml) - mission lifecycle states
+18. [`OperationalScenarios.sysml`](model/context/OperationalScenarios.sysml) - nominal and recovery mission flows
+19. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - hazards and design rationale
+20. [`ModelViews.sysml`](model/views/ModelViews.sysml) - stakeholder views
+21. [`Verification.sysml`](model/assurance/Verification.sysml) and [`AnalysisCases.sysml`](model/assurance/AnalysisCases.sysml) - V&V and engineering margins
+22. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
 ## More Documentation
 
@@ -97,6 +98,7 @@ The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits
 - The robot architecture is realistic enough for MBSE demonstration, but it is not a complete commercial robot-vacuum design.
 - Generated documentation imagery is illustrative and not a product rendering from a manufactured device.
 - The model uses subfolders for navigation only; SysML package names remain the semantic ownership boundary.
+- Electronics component selections are baseline candidates and require final datasheet, lifecycle, compliance, and availability checks before production BOM release.
 
 ## Contributing
 

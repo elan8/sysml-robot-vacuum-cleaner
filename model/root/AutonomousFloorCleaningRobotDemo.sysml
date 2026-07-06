@@ -31,6 +31,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import SoftwareImplementation::*;
   private import ElectronicsInterfaceControl::*;
   private import ElectronicsImplementation::*;
+  private import ElectronicsComponentSelection::*;
   private import ElectronicsVerification::*;
   private import Implementation::*;
 }

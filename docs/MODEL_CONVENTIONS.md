@@ -25,8 +25,9 @@ These conventions keep the SysML model readable and maintainable while preservin
 - `SoftwareImplementation` owns implementation-facing software records derived from firmware, interface, physical, requirements, and verification packages. It should not redefine primary architecture facts or project-management status.
 - `ElectronicsInterfaceControl` owns electronics-facing connector, signal, rail, bus, harness, and test-point contracts. It should reference physical ports rather than redefining physical parts.
 - `ElectronicsImplementation` owns electronics handoff records for PCB/harness work packages, schematic/layout constraints, rail budgets, bring-up scope, and manufacturing notes. It should not redefine product structure.
+- `ElectronicsComponentSelection` owns baseline component candidates, MPNs, footprints, key specs, cost targets, lifecycle status, and selection rationale. It should mark candidates that still need datasheet, lifecycle, compliance, or availability checks.
 - `ElectronicsVerification` owns electronics bring-up and discipline-specific verification steps. System-level verification intent remains in `Verification`.
-- `Implementation` owns the implementation-layer hub, trace records, and engineer-facing views that compose software, electronics, firmware, and handoff facts. It should not own payload schemas, task timing, electrical contracts, or work-package details.
+- `Implementation` owns the implementation-layer hub, trace records, and engineer-facing views that compose software, electronics, firmware, component-selection, and handoff facts. It should not own payload schemas, task timing, electrical contracts, component specs, or work-package details.
 - Assurance packages own evidence, hazards, analyses, trade rationale, and verification intent.
 - `ModelViews` owns stakeholder slices only; do not put primary engineering facts there.
 
