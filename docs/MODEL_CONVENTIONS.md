@@ -13,13 +13,16 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Keep package names stable; file moves should not rename packages.
 - Treat `AutonomousFloorCleaningRobotDemo` as the full-workspace import hub.
 - Treat `Architecture` as the public architecture hub for downstream packages that need the realized robot type.
+- Treat `Strata` as the lightweight method library for ownership, maturity, extractability, and handoff rules.
 - Use `model/` subfolders only as navigation aids; SysML package ownership remains independent of file paths.
 
 ## Package Ownership
 
+- `Strata` owns way-of-working concepts, metadata definitions, completeness rules, and extraction rules. It should not own product-specific engineering facts.
 - Requirements packages own requirement intent and derivation. They should not own implementation structure.
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.
 - `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes on ports, firmware suite parts, and roll-up values. It should not own software message schemas.
+- `ProductVariants` owns product-line variation definitions, selected/deferred variant option records, and SKU configuration baselines. It should not duplicate trade rationale or realized architecture details.
 - `InterfaceControl` owns software message contracts and producer/consumer ownership.
 - `FirmwareArchitecture` owns task timing, task criticality, scheduler assumptions, startup phase, state ownership, error handling, resource/WCET budgets, and task-to-module allocation surfaces.
 - `SoftwareImplementation` owns implementation-facing software records derived from firmware, interface, physical, requirements, and verification packages. It should not redefine primary architecture facts or project-management status.
@@ -54,9 +57,18 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Do not comment trivial attributes whose names and values are self-explanatory.
 - Add rationale near non-obvious tradeoffs, package boundaries, allocations, and safety assumptions.
 
+## Strata Metadata
+
+- Use native SysML v2 relationships first; use Strata method metadata for ownership, maturity, extraction, and external references.
+- Prefer tagging package entry points, handoff baselines, source-of-truth records, and view/report roots over tagging every small feature.
+- Do not encode requirements, allocations, interfaces, or verification links only as metadata when native SysML relationships are available.
+- Keep extraction-oriented string paths as compatibility bridges only where current tooling cannot resolve the intended feature path.
+
 ## Deferred Options
 
 - Keep deferred product tiers visible when they explain a trade study or future variant.
+- Model product-line choices in `ProductVariants` using native SysML v2 `variation` and `variant` definitions first, then add lightweight records for selection status and extraction.
+- Keep trade rationale in `TradeStudies`; keep the actual selected structure in architecture and implementation packages.
 - Mark deferred implementation elements explicitly with attributes such as `selectedForBaseline = false` or text values such as `deferred flagship`.
 - Do not allocate deferred options into the baseline operational path unless the model intentionally changes product selection.
 

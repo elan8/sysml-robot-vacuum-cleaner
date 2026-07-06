@@ -9,6 +9,7 @@
 package TradeStudies {
   private import SystemRequirements::*;
   private import PhysicalArchitecture::*;
+  private import ProductVariants::*;
   private import AnalysisCases::*;
   private import ScalarValues::*;
 

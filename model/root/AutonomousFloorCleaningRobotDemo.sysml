@@ -7,6 +7,7 @@
  * engineering content in the imported packages.
  */
 package AutonomousFloorCleaningRobotDemo {
+  private import Strata::*;
   private import RequirementManagement::*;
   private import MonetaryUnits::*;
   private import DesignLimits::*;
@@ -21,6 +22,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import PhysicalArchitecture::*;
   private import ArchitectureAllocations::*;
   private import Architecture::*;
+  private import ProductVariants::*;
   private import OperationalScenarios::*;
   private import ModelViews::*;
   private import ProductContext::*;
