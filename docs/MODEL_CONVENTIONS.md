@@ -22,6 +22,7 @@ These conventions keep the SysML model readable and maintainable while preservin
 - `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes on ports, firmware suite parts, and roll-up values. It should not own software message schemas.
 - `InterfaceControl` owns software message contracts and producer/consumer ownership.
 - `FirmwareArchitecture` owns task timing, task criticality, scheduler assumptions, and task-to-module allocation surfaces.
+- `SoftwareImplementation` owns implementation-facing software handoff records derived from firmware, interface, physical, requirements, and verification packages. It should not redefine primary architecture facts.
 - Assurance packages own evidence, hazards, analyses, trade rationale, and verification intent.
 - `ModelViews` owns stakeholder slices only; do not put primary engineering facts there.
 

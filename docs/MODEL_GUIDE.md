@@ -15,7 +15,7 @@ Use this tour when evaluating the model as a high-end SysML v2 example:
 2. Read `FunctionalArchitecture` for capability actions and mission-level behavior.
 3. Read `PhysicalArchitecture` for product assemblies, typed ports, harnesses, firmware suite parts, and mass/BOM/power roll-ups.
 4. Read `ArchitectureAllocations` to follow capability-to-LRU, software-to-MCU, scenario-action, and firmware-task allocations.
-5. Read `InterfaceControl` and `FirmwareArchitecture` as the implementation handoff layer for software contracts and task timing.
+5. Read `InterfaceControl`, `FirmwareArchitecture`, and `SoftwareImplementation` as the implementation handoff layer for software contracts, task timing, implementation work packages, queues, and HAL bindings.
 6. Read `SafetyAnalysis`, `TradeStudies`, `Verification`, and `AnalysisCases` for assurance, rationale, and engineering margins.
 7. Finish in `ModelViews` to see curated stakeholder slices over the same source model.
 
@@ -28,7 +28,7 @@ The model is intentionally layered from product intent to implementation evidenc
 | Requirements | `StakeholderNeeds`, `SystemRequirements`, `DesignLimits` | User needs, derived system requirements, and shared numeric limits. |
 | Context | `ProductContext`, `OperationalScenarios` | External actors, home environment, dock, app/cloud, and mission flows. |
 | Architecture | `ArchitectureCommon`, `PhysicalProtocols`, `FunctionalArchitecture`, `PhysicalArchitecture`, `ArchitectureAllocations`, `Architecture` | Functional capabilities, product assemblies, typed interfaces, and allocation links. |
-| Implementation | `InterfaceControl`, `FirmwareArchitecture` | Software message contracts, firmware tasks, and scheduler assumptions. Harness ICD notes live on `PhysicalArchitecture` ports. |
+| Implementation | `InterfaceControl`, `FirmwareArchitecture`, `SoftwareImplementation` | Software message contracts, firmware tasks, scheduler assumptions, work-package records, queue policies, HAL bindings, test scope, and implementation budgets. Harness ICD notes live on `PhysicalArchitecture` ports. |
 | Assurance | `SafetyAnalysis`, `TradeStudies`, `Verification`, `AnalysisCases` | Hazards, mitigations, trade rationale, verification cases, and engineering margins. |
 | Views | `ModelViews` | Stakeholder-facing slices of the model. |
 | Root | `AutonomousFloorCleaningRobotDemo` | Import hub for loading the full workspace. |
@@ -39,7 +39,7 @@ The model is intentionally layered from product intent to implementation evidenc
 - Context to architecture: product context defines external interactions; architecture packages define the robot boundary and internal realization.
 - Function to realization: functional actions allocate to physical LRUs, firmware modules, and MCU execution targets.
 - Safety assurance: hazards link to mitigations, safety requirements, implementation elements, analyses, and verification cases.
-- Implementation handoff: electrical interfaces, software contracts, and firmware tasks provide a bridge from MBSE model to PCB and embedded-software work.
+- Implementation handoff: electrical interfaces, software contracts, firmware tasks, and software work-package records provide a bridge from MBSE model to PCB and embedded-software work.
 - Design rationale: trade studies record selected and deferred product options, including the privacy-conscious LiDAR SLAM baseline.
 
 ## Package Map
@@ -58,6 +58,7 @@ The model is intentionally layered from product intent to implementation evidenc
 | `Architecture` | Public architecture import hub and `robot` part. | Architecture packages and system requirements. |
 | `InterfaceControl` | Software-facing message contracts and producer/consumer ownership. | Common items and software library. |
 | `FirmwareArchitecture` | Firmware task definitions, scheduler model, and task architecture instance. | Common items, contracts, physical architecture, software library. |
+| `SoftwareImplementation` | Engineer-facing software work packages, queue contracts, message field rules, HAL bindings, test scope, and implementation budgets. | Firmware architecture, interface control, physical architecture, requirements, verification. |
 | `BehaviorStates` | Operating lifecycle and detailed behavior fragments. | None beyond SysML basics. |
 | `OperationalScenarios` | Scenario-level use cases over context and functional actions. | Architecture, functional architecture, product context. |
 | `SafetyAnalysis` | Hazards, mitigations, safety satisfaction, and safety evidence links. | Requirements, design, behavior, verification, analysis packages. |
@@ -73,7 +74,7 @@ Start with requirements and functional behavior before reading physical details.
 1. Requirements and design limits.
 2. Functional architecture and operational scenarios.
 3. Physical protocols and product context.
-4. Physical, electrical, interface-control, and firmware architecture.
+4. Physical, electrical, interface-control, firmware architecture, and software implementation handoff.
 5. Allocations and the `Architecture` hub.
 6. Behavior, safety, trade studies, verification, and analyses.
 7. Views for stakeholder-specific slices.

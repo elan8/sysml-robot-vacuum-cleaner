@@ -26,6 +26,7 @@ It demonstrates how requirements, functional architecture, physical architecture
 - Requirements-to-architecture-to-verification traceability across needs, system requirements, design elements, verification cases, and analyses.
 - Functional and physical decomposition with explicit allocation layers.
 - Implementation-facing interface control for PCB harnesses, software message contracts, firmware tasks, scheduler timing, and MCU deployment.
+- Software implementation handoff records for firmware task ownership, queue policies, message field rules, HAL bindings, timing budgets, and verification scope.
 - Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
 - First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
 
@@ -69,15 +70,16 @@ The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and r
 5. [`ProductContext.sysml`](model/ProductContext.sysml) - external actors and context boundary
 6. [`InterfaceControl.sysml`](model/InterfaceControl.sysml) - software message contracts
 7. [`FirmwareArchitecture.sysml`](model/FirmwareArchitecture.sysml) - firmware tasks and scheduler timing
-8. [`PhysicalArchitecture.sysml`](model/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
-9. [`ArchitectureAllocations.sysml`](model/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
-10. [`Architecture.sysml`](model/Architecture.sysml) - public architecture hub and system-level satisfy links
-11. [`BehaviorStates.sysml`](model/BehaviorStates.sysml) - mission lifecycle states
-12. [`OperationalScenarios.sysml`](model/OperationalScenarios.sysml) - nominal and recovery mission flows
-13. [`SafetyAnalysis.sysml`](model/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/TradeStudies.sysml) - hazards and design rationale
-14. [`ModelViews.sysml`](model/ModelViews.sysml) - stakeholder views
-15. [`Verification.sysml`](model/Verification.sysml) and [`AnalysisCases.sysml`](model/AnalysisCases.sysml) - V&V and engineering margins
-16. [`AutonomousFloorCleaningRobotDemo.sysml`](model/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
+8. [`SoftwareImplementation.sysml`](model/SoftwareImplementation.sysml) - engineer-facing software work packages, queue contracts, HAL bindings, test scope, and implementation budgets
+9. [`PhysicalArchitecture.sysml`](model/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
+10. [`ArchitectureAllocations.sysml`](model/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
+11. [`Architecture.sysml`](model/Architecture.sysml) - public architecture hub and system-level satisfy links
+12. [`BehaviorStates.sysml`](model/BehaviorStates.sysml) - mission lifecycle states
+13. [`OperationalScenarios.sysml`](model/OperationalScenarios.sysml) - nominal and recovery mission flows
+14. [`SafetyAnalysis.sysml`](model/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/TradeStudies.sysml) - hazards and design rationale
+15. [`ModelViews.sysml`](model/ModelViews.sysml) - stakeholder views
+16. [`Verification.sysml`](model/Verification.sysml) and [`AnalysisCases.sysml`](model/AnalysisCases.sysml) - V&V and engineering margins
+17. [`AutonomousFloorCleaningRobotDemo.sysml`](model/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
 ## More Documentation
 
