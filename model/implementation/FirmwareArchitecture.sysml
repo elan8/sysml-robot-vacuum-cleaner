@@ -28,6 +28,13 @@ package FirmwareArchitecture {
 
   enum def SchedulingPolicy { fixedPriorityCooperative; }
 
+  enum def StartupPhase {
+    bootSelfTest;
+    schedulerStart;
+    missionReady;
+    deferredStartup;
+  }
+
   // A firmware task exposes its data interface as directed item features so
   // producer/consumer relationships can be asserted with typed flows rather
   // than free-form strings. Concrete tasks redefine timing and criticality.
@@ -36,6 +43,12 @@ package FirmwareArchitecture {
     attribute period : DurationValue;
     attribute deadline : DurationValue;
     attribute criticality : TaskCriticality;
+    attribute startupPhase : StartupPhase;
+    attribute stateOwnedByTask : String;
+    attribute errorHandling : String;
+    attribute maxStackBytes : Integer;
+    attribute maxStaticRamBytes : Integer;
+    attribute wcetBudget : DurationValue;
   }
 
   part def SchedulerModel {
@@ -51,6 +64,12 @@ package FirmwareArchitecture {
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "RobotOperatingBehavior state mirror; authoritative mission state for app status.";
+    attribute :>> errorHandling = "On stale planner command, hold last safe command for one period then force stop; on hazard input, publish safe stop request in same activation.";
+    attribute :>> maxStackBytes = 2048;
+    attribute :>> maxStaticRamBytes = 4096;
+    attribute :>> wcetBudget = 8 [ms];
     action run {
       in item userCommandIn : UserCommand;
       in item batteryTelemetryIn : BatteryTelemetry;
@@ -67,6 +86,12 @@ package FirmwareArchitecture {
     attribute :>> period = 10 [ms];
     attribute :>> deadline = 10 [ms];
     attribute :>> criticality = TaskCriticality::safetyCritical;
+    attribute :>> startupPhase = StartupPhase::schedulerStart;
+    attribute :>> stateOwnedByTask = "latched fault state and safe-stop-clear debounce.";
+    attribute :>> errorHandling = "Fault input disagreement is treated as active fault; clear only after explicit safeStopCleared/service reset condition.";
+    attribute :>> maxStackBytes = 1536;
+    attribute :>> maxStaticRamBytes = 2048;
+    attribute :>> wcetBudget = 2 [ms];
     action run {
       in item hazardIn : HazardEvent;
       in item batteryTelemetryIn : BatteryTelemetry;
@@ -81,6 +106,12 @@ package FirmwareArchitecture {
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::controlCritical;
+    attribute :>> startupPhase = StartupPhase::schedulerStart;
+    attribute :>> stateOwnedByTask = "last command, stall timers, PWM ramp limiter.";
+    attribute :>> errorHandling = "Driver fault or encoder stall publishes HazardEvent and disables PWM until mission controller clears.";
+    attribute :>> maxStackBytes = 1536;
+    attribute :>> maxStaticRamBytes = 2048;
+    attribute :>> wcetBudget = 5 [ms];
     action run {
       in item driveCommandIn : DriveCommand;
       out item hazardOut : HazardEvent;
@@ -93,6 +124,12 @@ package FirmwareArchitecture {
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::controlCritical;
+    attribute :>> startupPhase = StartupPhase::schedulerStart;
+    attribute :>> stateOwnedByTask = "sensor health and last-good sample timestamps.";
+    attribute :>> errorHandling = "Missing LiDAR frame raises diagnostic; cliff sensor active-low fault raises safetyCritical hazard immediately.";
+    attribute :>> maxStackBytes = 3072;
+    attribute :>> maxStaticRamBytes = 12288;
+    attribute :>> wcetBudget = 12 [ms];
     action run {
       out item hazardOut : HazardEvent;
       out item lidarScanOut : LidarScanFrame;
@@ -105,6 +142,12 @@ package FirmwareArchitecture {
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "pose estimate, covariance/error estimate, degraded-localization flag.";
+    attribute :>> errorHandling = "On stale pose graph or LiDAR scan, degrade to wheel/IMU prediction and raise diagnostic after timeout.";
+    attribute :>> maxStackBytes = 3072;
+    attribute :>> maxStaticRamBytes = 16384;
+    attribute :>> wcetBudget = 12 [ms];
     action run {
       in item lidarScanIn : LidarScanFrame;
       in item poseGraphIn : PoseGraphUpdate;
@@ -117,6 +160,12 @@ package FirmwareArchitecture {
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "pose graph window, loop closure candidate state, map stability score.";
+    attribute :>> errorHandling = "If scan matching confidence drops below threshold, request localization degraded diagnostic and keep previous stable map.";
+    attribute :>> maxStackBytes = 4096;
+    attribute :>> maxStaticRamBytes = 49152;
+    attribute :>> wcetBudget = 35 [ms];
     action run {
       in item lidarScanIn : LidarScanFrame;
       in item poseIn : PoseEstimate;
@@ -131,6 +180,12 @@ package FirmwareArchitecture {
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::deferredFlagship;
+    attribute :>> startupPhase = StartupPhase::deferredStartup;
+    attribute :>> stateOwnedByTask = "deferred obstacle-classification state.";
+    attribute :>> errorHandling = "Deferred baseline task shall not affect safety or navigation command output.";
+    attribute :>> maxStackBytes = 4096;
+    attribute :>> maxStaticRamBytes = 32768;
+    attribute :>> wcetBudget = 80 [ms];
     action run {
       out item obstacleClassOut : ObstacleClassEvent;
     }
@@ -142,6 +197,12 @@ package FirmwareArchitecture {
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "coverage path cursor, replanning state, unreachable-cell marking.";
+    attribute :>> errorHandling = "If no safe local path exists, request obstacle recovery rather than emitting a forward command.";
+    attribute :>> maxStackBytes = 3072;
+    attribute :>> maxStaticRamBytes = 24576;
+    attribute :>> wcetBudget = 40 [ms];
     action run {
       in item poseIn : PoseEstimate;
       in item mapIn : OccupancyGrid;
@@ -155,6 +216,12 @@ package FirmwareArchitecture {
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::safetyCritical;
+    attribute :>> startupPhase = StartupPhase::schedulerStart;
+    attribute :>> stateOwnedByTask = "battery telemetry freshness, low-battery threshold state, BMS fault mirror.";
+    attribute :>> errorHandling = "BMS alert or stale telemetry emits HazardEvent and forces mission return or stop according to severity.";
+    attribute :>> maxStackBytes = 1536;
+    attribute :>> maxStaticRamBytes = 2048;
+    attribute :>> wcetBudget = 5 [ms];
     action run {
       out item batteryTelemetryOut : BatteryTelemetry;
       out item hazardOut : HazardEvent;
@@ -166,6 +233,12 @@ package FirmwareArchitecture {
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "brush/fan command state, dust-bin status debounce, cleaning actuator diagnostics.";
+    attribute :>> errorHandling = "Actuator fault or missing bin emits DiagnosticEvent and HazardEvent when motion could continue unsafely.";
+    attribute :>> maxStackBytes = 1536;
+    attribute :>> maxStaticRamBytes = 2048;
+    attribute :>> wcetBudget = 8 [ms];
     action run {
       in item cleaningCommandIn : CleaningCommand;
       out item diagnosticOut : DiagnosticEvent;
@@ -178,6 +251,12 @@ package FirmwareArchitecture {
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::userFacing;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "protocol version, consent state, session health.";
+    attribute :>> errorHandling = "Malformed command frame is dropped and diagnostic warning is emitted; consent changes are idempotent.";
+    attribute :>> maxStackBytes = 3072;
+    attribute :>> maxStaticRamBytes = 8192;
+    attribute :>> wcetBudget = 20 [ms];
     action run {
       in item appMessageIn : AppMessage;
       in item missionStatusIn : MissionStatus;
@@ -192,6 +271,12 @@ package FirmwareArchitecture {
     attribute :>> period = 500 [ms];
     attribute :>> deadline = 500 [ms];
     attribute :>> criticality = TaskCriticality::diagnostic;
+    attribute :>> startupPhase = StartupPhase::schedulerStart;
+    attribute :>> stateOwnedByTask = "diagnostic aggregation window and last published summary.";
+    attribute :>> errorHandling = "Dropped duplicate diagnostics are counted; safetyCritical diagnostics are never coalesced away.";
+    attribute :>> maxStackBytes = 1536;
+    attribute :>> maxStaticRamBytes = 4096;
+    attribute :>> wcetBudget = 10 [ms];
     action run {
       in item diagnosticIn : DiagnosticEvent;
       out item diagnosticSummaryOut : DiagnosticEvent;
@@ -203,6 +288,12 @@ package FirmwareArchitecture {
     attribute :>> period = 1000 [ms];
     attribute :>> deadline = 1000 [ms];
     attribute :>> criticality = TaskCriticality::privacyCritical;
+    attribute :>> startupPhase = StartupPhase::missionReady;
+    attribute :>> stateOwnedByTask = "wear-level cursor, map summary cache, privacy consent flag mirror.";
+    attribute :>> errorHandling = "On flash write failure, keep RAM cache, publish diagnostic and continue mission without cloud upload.";
+    attribute :>> maxStackBytes = 2048;
+    attribute :>> maxStaticRamBytes = 32768;
+    attribute :>> wcetBudget = 100 [ms];
     action run {
       in item mapUpdateIn : MapUpdate;
       in item userCommandIn : UserCommand;

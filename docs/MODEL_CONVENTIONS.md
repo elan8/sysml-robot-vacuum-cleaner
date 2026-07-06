@@ -21,8 +21,12 @@ These conventions keep the SysML model readable and maintainable while preservin
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.
 - `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes on ports, firmware suite parts, and roll-up values. It should not own software message schemas.
 - `InterfaceControl` owns software message contracts and producer/consumer ownership.
-- `FirmwareArchitecture` owns task timing, task criticality, scheduler assumptions, and task-to-module allocation surfaces.
-- `SoftwareImplementation` owns implementation-facing software handoff records derived from firmware, interface, physical, requirements, and verification packages. It should not redefine primary architecture facts.
+- `FirmwareArchitecture` owns task timing, task criticality, scheduler assumptions, startup phase, state ownership, error handling, resource/WCET budgets, and task-to-module allocation surfaces.
+- `SoftwareImplementation` owns implementation-facing software records derived from firmware, interface, physical, requirements, and verification packages. It should not redefine primary architecture facts or project-management status.
+- `ElectronicsInterfaceControl` owns electronics-facing connector, signal, rail, bus, harness, and test-point contracts. It should reference physical ports rather than redefining physical parts.
+- `ElectronicsImplementation` owns electronics handoff records for PCB/harness work packages, schematic/layout constraints, rail budgets, bring-up scope, and manufacturing notes. It should not redefine product structure.
+- `ElectronicsVerification` owns electronics bring-up and discipline-specific verification steps. System-level verification intent remains in `Verification`.
+- `Implementation` owns the implementation-layer hub, trace records, and engineer-facing views that compose software, electronics, firmware, and handoff facts. It should not own payload schemas, task timing, electrical contracts, or work-package details.
 - Assurance packages own evidence, hazards, analyses, trade rationale, and verification intent.
 - `ModelViews` owns stakeholder slices only; do not put primary engineering facts there.
 
