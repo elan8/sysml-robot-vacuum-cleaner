@@ -1,11 +1,11 @@
 /*
- * SPDX-FileCopyrightText: 2026 Elan8
- * SPDX-License-Identifier: MIT
- *
- * Owns stakeholder concerns, viewpoints, view definitions, expose filters, and
- * renderings. Depends on all packages that are sliced for presentation. Keep
- * primary engineering facts in their source packages rather than in views.
- */
+* SPDX-FileCopyrightText: 2026 Elan8
+* SPDX-License-Identifier: MIT
+*
+* Owns stakeholder concerns, viewpoints, view definitions, expose filters, and
+* renderings. Depends on all packages that are sliced for presentation. Keep
+* primary engineering facts in their source packages rather than in views.
+*/
 package ModelViews {
   private import Views::*;
   private import StakeholderNeeds::*;
@@ -69,4 +69,27 @@ package ModelViews {
     expose Verification::*;
     filter @SysML::RequirementUsage or @SysML::VerificationCase or @SysML::PartUsage or @SysML::ActionUsage;
   }
+
+  view connections : InterconnectionView {
+    expose Architecture::robotSystem;
+
+  }
+
+  view cleaningHead : InterconnectionView {
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot::cleaningHead;
+  }
+
+  view driveModule : InterconnectionView {
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot::driveModule;
+  }
+
+  view mainElectronics : InterconnectionView {
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot::mainElectronics;
+    
+  }
+
+  
+
+  
 }
+

@@ -16,7 +16,7 @@ package AnalysisCases {
   private import ScalarValues::*;
 
   analysis def TotalPowerConsumptionAnalysis {
-    attribute powerBudgetW : PowerValue = 75 [W];
+    attribute powerBudgetW : PowerValue = DesignLimits::maxTotalPowerDraw;
     attribute ecoModePowerW : PowerValue = 54 [W];
     attribute standardModePowerW : PowerValue = 73 [W];
     attribute maxModePowerW : PowerValue = 94 [W];
@@ -42,7 +42,7 @@ package AnalysisCases {
     }
   }
   analysis def ProductCostAnalysis {
-    attribute bomCostBudget : MonetaryAmount = 400 [EUR];
+    attribute bomCostBudget : MonetaryAmount = DesignLimits::bomCostBudget;
     attribute estimatedBomCost : MonetaryAmount = 397 [EUR];
     attribute bomCostMargin : MonetaryAmount = 3 [EUR];
     subject robot : AutonomousFloorCleaningRobot;
@@ -65,7 +65,7 @@ package AnalysisCases {
     }
   }
   analysis def TotalMassAnalysis {
-    attribute massBudget : MassValue = 5.0 [kg];
+    attribute massBudget : MassValue = DesignLimits::massBudget;
     attribute estimatedMass : MassValue = 4.95 [kg];
     attribute manufacturingMassAllowance : MassValue = 0.25 [kg];
     attribute designTargetMass : MassValue = 4.75 [kg];
@@ -93,7 +93,7 @@ package AnalysisCases {
   }
   analysis def MissionEnergyAnalysis {
     attribute missionChargeDraw : ElectricChargeValue = 9375 [mAh];
-    attribute chargeBudget : ElectricChargeValue = 12500 [mAh];
+    attribute chargeBudget : ElectricChargeValue = DesignLimits::batteryCapacityBudget;
     attribute reserveCharge : ElectricChargeValue = 1875 [mAh];
     attribute usableMissionBudget : ElectricChargeValue = 10625 [mAh];
     attribute missionChargeMargin : ElectricChargeValue = 1250 [mAh];
@@ -112,7 +112,7 @@ package AnalysisCases {
     attribute baselineTofImuLocalizationError : LengthValue = 180 [mm];
     attribute premiumLidarSlamLocalizationError : LengthValue = 95 [mm];
     attribute estimatedLocalizationError : LengthValue = 95 [mm];
-    attribute localizationErrorLimit : LengthValue = 150 [mm];
+    attribute localizationErrorLimit : LengthValue = DesignLimits::maxLocalizationError;
     subject robot : AutonomousFloorCleaningRobot;
     return ref localizationWithinLimit {
       return estimatedLocalizationError <= localizationErrorLimit;
@@ -129,7 +129,7 @@ package AnalysisCases {
   }
   analysis def SafetyReactionAnalysis {
     attribute measuredReactionTime : DurationValue = 90 [ms];
-    attribute reactionTimeLimit : DurationValue = 100 [ms];
+    attribute reactionTimeLimit : DurationValue = DesignLimits::maxSafeStopReactionTime;
     subject robot : AutonomousFloorCleaningRobot;
     return ref reactsWithinLimit {
       return measuredReactionTime <= reactionTimeLimit;
@@ -143,7 +143,7 @@ package AnalysisCases {
   }
   analysis def CoverageMapResolutionAnalysis {
     attribute cellSize : LengthValue = 100 [mm];
-    attribute cellSizeLimit : LengthValue = 100 [mm];
+    attribute cellSizeLimit : LengthValue = DesignLimits::maxCoverageGridCellSize;
     subject robot : AutonomousFloorCleaningRobot;
     return ref coverageGridWithinLimit {
       return cellSize <= cellSizeLimit;
