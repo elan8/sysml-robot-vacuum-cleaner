@@ -12,6 +12,8 @@ package FirmwareArchitecture {
   private import ArchitectureCommon::*;
   private import InterfaceControl::*;
   private import SoftwareCore::*;
+  private import ISQ::*;
+  private import SI::*;
   private import ScalarValues::*;
 
   enum def TaskCriticality {
@@ -31,13 +33,13 @@ package FirmwareArchitecture {
   // than free-form strings. Concrete tasks redefine timing and criticality.
   part def FirmwareTask :> SoftwareComponent {
     attribute taskName : String;
-    attribute periodMs : Real;
-    attribute deadlineMs : Real;
+    attribute period : DurationValue;
+    attribute deadline : DurationValue;
     attribute criticality : TaskCriticality;
   }
 
   part def SchedulerModel {
-    attribute tickPeriodMs : Real;
+    attribute tickPeriod : DurationValue;
     attribute schedulingPolicy : SchedulingPolicy;
     attribute overloadPolicy : String;
   }
@@ -46,8 +48,8 @@ package FirmwareArchitecture {
   // parameters; flows in FirmwareTaskArchitecture couple run.x to run.y.
   part def MissionControllerTask :> FirmwareTask {
     attribute :>> taskName = "MissionControllerTask";
-    attribute :>> periodMs = 50.0;
-    attribute :>> deadlineMs = 50.0;
+    attribute :>> period = 50 [ms];
+    attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     action run {
       in item userCommandIn : UserCommand;
@@ -62,8 +64,8 @@ package FirmwareArchitecture {
 
   part def SafetySupervisorTask :> FirmwareTask {
     attribute :>> taskName = "SafetySupervisorTask";
-    attribute :>> periodMs = 10.0;
-    attribute :>> deadlineMs = 10.0;
+    attribute :>> period = 10 [ms];
+    attribute :>> deadline = 10 [ms];
     attribute :>> criticality = TaskCriticality::safetyCritical;
     action run {
       in item hazardIn : HazardEvent;
@@ -76,8 +78,8 @@ package FirmwareArchitecture {
 
   part def MotorControlTask :> FirmwareTask {
     attribute :>> taskName = "MotorControlTask";
-    attribute :>> periodMs = 20.0;
-    attribute :>> deadlineMs = 20.0;
+    attribute :>> period = 20 [ms];
+    attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::controlCritical;
     action run {
       in item driveCommandIn : DriveCommand;
@@ -88,8 +90,8 @@ package FirmwareArchitecture {
 
   part def SensorAcquisitionTask :> FirmwareTask {
     attribute :>> taskName = "SensorAcquisitionTask";
-    attribute :>> periodMs = 20.0;
-    attribute :>> deadlineMs = 20.0;
+    attribute :>> period = 20 [ms];
+    attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::controlCritical;
     action run {
       out item hazardOut : HazardEvent;
@@ -100,8 +102,8 @@ package FirmwareArchitecture {
 
   part def LocalizationTask :> FirmwareTask {
     attribute :>> taskName = "LocalizationTask";
-    attribute :>> periodMs = 20.0;
-    attribute :>> deadlineMs = 20.0;
+    attribute :>> period = 20 [ms];
+    attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     action run {
       in item lidarScanIn : LidarScanFrame;
@@ -112,8 +114,8 @@ package FirmwareArchitecture {
 
   part def SlamTask :> FirmwareTask {
     attribute :>> taskName = "SlamTask";
-    attribute :>> periodMs = 50.0;
-    attribute :>> deadlineMs = 50.0;
+    attribute :>> period = 50 [ms];
+    attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     action run {
       in item lidarScanIn : LidarScanFrame;
@@ -126,8 +128,8 @@ package FirmwareArchitecture {
   // Deferred flagship vision path retained for trade-study traceability.
   part def ObstacleClassificationTask :> FirmwareTask {
     attribute :>> taskName = "ObstacleClassificationTask";
-    attribute :>> periodMs = 100.0;
-    attribute :>> deadlineMs = 100.0;
+    attribute :>> period = 100 [ms];
+    attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::deferredFlagship;
     action run {
       out item obstacleClassOut : ObstacleClassEvent;
@@ -137,8 +139,8 @@ package FirmwareArchitecture {
   // Planning, power, cleaning, app, diagnostic, and storage tasks.
   part def CoveragePlannerTask :> FirmwareTask {
     attribute :>> taskName = "CoveragePlannerTask";
-    attribute :>> periodMs = 100.0;
-    attribute :>> deadlineMs = 100.0;
+    attribute :>> period = 100 [ms];
+    attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     action run {
       in item poseIn : PoseEstimate;
@@ -150,8 +152,8 @@ package FirmwareArchitecture {
 
   part def BatteryManagerTask :> FirmwareTask {
     attribute :>> taskName = "BatteryManagerTask";
-    attribute :>> periodMs = 100.0;
-    attribute :>> deadlineMs = 100.0;
+    attribute :>> period = 100 [ms];
+    attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::safetyCritical;
     action run {
       out item batteryTelemetryOut : BatteryTelemetry;
@@ -161,8 +163,8 @@ package FirmwareArchitecture {
 
   part def CleaningControlTask :> FirmwareTask {
     attribute :>> taskName = "CleaningControlTask";
-    attribute :>> periodMs = 50.0;
-    attribute :>> deadlineMs = 50.0;
+    attribute :>> period = 50 [ms];
+    attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     action run {
       in item cleaningCommandIn : CleaningCommand;
@@ -173,8 +175,8 @@ package FirmwareArchitecture {
 
   part def AppProtocolTask :> FirmwareTask {
     attribute :>> taskName = "AppProtocolTask";
-    attribute :>> periodMs = 100.0;
-    attribute :>> deadlineMs = 100.0;
+    attribute :>> period = 100 [ms];
+    attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::userFacing;
     action run {
       in item appMessageIn : AppMessage;
@@ -187,8 +189,8 @@ package FirmwareArchitecture {
 
   part def DiagnosticsTask :> FirmwareTask {
     attribute :>> taskName = "DiagnosticsTask";
-    attribute :>> periodMs = 500.0;
-    attribute :>> deadlineMs = 500.0;
+    attribute :>> period = 500 [ms];
+    attribute :>> deadline = 500 [ms];
     attribute :>> criticality = TaskCriticality::diagnostic;
     action run {
       in item diagnosticIn : DiagnosticEvent;
@@ -198,8 +200,8 @@ package FirmwareArchitecture {
 
   part def StorageTask :> FirmwareTask {
     attribute :>> taskName = "StorageTask";
-    attribute :>> periodMs = 1000.0;
-    attribute :>> deadlineMs = 1000.0;
+    attribute :>> period = 1000 [ms];
+    attribute :>> deadline = 1000 [ms];
     attribute :>> criticality = TaskCriticality::privacyCritical;
     action run {
       in item mapUpdateIn : MapUpdate;
@@ -212,7 +214,7 @@ package FirmwareArchitecture {
   // Concrete task architecture used by allocation and view packages.
   part def FirmwareTaskArchitecture {
     part scheduler : SchedulerModel {
-      attribute :>> tickPeriodMs = 1.0;
+      attribute :>> tickPeriod = 1 [ms];
       attribute :>> schedulingPolicy = SchedulingPolicy::fixedPriorityCooperative;
       attribute :>> overloadPolicy = "drop noncritical app/status work before safety/control loops";
     }
@@ -258,6 +260,89 @@ package FirmwareArchitecture {
     flow storage.run.diagnosticOut to diagnostics.run.diagnosticIn;
     flow diagnostics.run.diagnosticSummaryOut to appProtocol.run.diagnosticIn;
     flow diagnostics.run.diagnosticSummaryOut to safetySupervisor.run.diagnosticIn;
+
+    // Interface-control contracts for the most important task-to-task payloads.
+    connection lidarScanToSlamContract : DataFlowContract {
+      attribute :>> producerFeature = "sensorAcquisition.run.lidarScanOut";
+      attribute :>> consumerFeature = "slam.run.lidarScanIn";
+      attribute :>> payloadType = "LidarScanFrame";
+      attribute :>> period = 20 [ms];
+      attribute :>> maxLatency = 50 [ms];
+      attribute :>> privacySensitive = false;
+      attribute :>> allowedValues = "scanRateHz nominal 10 Hz; includesRawImageData must be false";
+    }
+    connection lidarScanToLocalizationContract : DataFlowContract {
+      attribute :>> producerFeature = "sensorAcquisition.run.lidarScanOut";
+      attribute :>> consumerFeature = "localization.run.lidarScanIn";
+      attribute :>> payloadType = "LidarScanFrame";
+      attribute :>> period = 20 [ms];
+      attribute :>> maxLatency = 50 [ms];
+      attribute :>> privacySensitive = false;
+      attribute :>> allowedValues = "rangeSampleCount shall match selected LiDAR frame profile";
+    }
+    connection poseGraphToLocalizationContract : DataFlowContract {
+      attribute :>> producerFeature = "slam.run.poseGraphOut";
+      attribute :>> consumerFeature = "localization.run.poseGraphIn";
+      attribute :>> payloadType = "PoseGraphUpdate";
+      attribute :>> period = 50 [ms];
+      attribute :>> maxLatency = 100 [ms];
+      attribute :>> privacySensitive = true;
+      attribute :>> allowedValues = "mapStabilityScore range 0..100; no raw home map export";
+    }
+    connection mapUpdateToStorageContract : DataFlowContract {
+      attribute :>> producerFeature = "slam.run.mapUpdateOut";
+      attribute :>> consumerFeature = "storage.run.mapUpdateIn";
+      attribute :>> payloadType = "MapUpdate";
+      attribute :>> period = 50 [ms];
+      attribute :>> maxLatency = 1000 [ms];
+      attribute :>> privacySensitive = true;
+      attribute :>> allowedValues = "includesRawHomeMap may be true only for local storage";
+    }
+    connection plannerCommandToMissionContract : DataFlowContract {
+      attribute :>> producerFeature = "coveragePlanner.run.plannerCommandOut";
+      attribute :>> consumerFeature = "missionController.run.plannerCommandIn";
+      attribute :>> payloadType = "DriveCommand";
+      attribute :>> period = 100 [ms];
+      attribute :>> maxLatency = 100 [ms];
+      attribute :>> privacySensitive = false;
+      attribute :>> allowedValues = "forceStop false unless planner escalates obstacle recovery";
+    }
+    connection hazardToSafetyContract : DataFlowContract {
+      attribute :>> producerFeature = "sensorAcquisition.run.hazardOut";
+      attribute :>> consumerFeature = "safetySupervisor.run.hazardIn";
+      attribute :>> payloadType = "HazardEvent";
+      attribute :>> period = 20 [ms];
+      attribute :>> maxLatency = 100 [ms];
+      attribute :>> privacySensitive = false;
+      attribute :>> allowedValues = "severity safetyCritical requires safeStopRequired true";
+    }
+    connection missionStatusToAppContract : DataFlowContract {
+      attribute :>> producerFeature = "missionController.run.missionStatusOut";
+      attribute :>> consumerFeature = "appProtocol.run.missionStatusIn";
+      attribute :>> payloadType = "MissionStatus";
+      attribute :>> period = 100 [ms];
+      attribute :>> maxLatency = 500 [ms];
+      attribute :>> privacySensitive = false;
+      attribute :>> allowedValues = "stateName shall match public mission lifecycle vocabulary";
+    }
+    connection appCommandToMissionContract : DataFlowContract {
+      attribute :>> producerFeature = "appProtocol.run.userCommandOut";
+      attribute :>> consumerFeature = "missionController.run.userCommandIn";
+      attribute :>> payloadType = "UserCommand";
+      attribute :>> period = 100 [ms];
+      attribute :>> maxLatency = 250 [ms];
+      attribute :>> privacySensitive = true;
+      attribute :>> allowedValues = "cloudBackupConsent changes require explicit consent command";
+    }
+    connection diagnosticSummaryToAppContract : DataFlowContract {
+      attribute :>> producerFeature = "diagnostics.run.diagnosticSummaryOut";
+      attribute :>> consumerFeature = "appProtocol.run.diagnosticIn";
+      attribute :>> payloadType = "DiagnosticEvent";
+      attribute :>> period = 500 [ms];
+      attribute :>> maxLatency = 1000 [ms];
+      attribute :>> privacySensitive = false;
+      attribute :>> allowedValues = "severity info, warning, fault, or safetyCritical";
+    }
   }
 
   part firmwareTaskArchitecture : FirmwareTaskArchitecture;

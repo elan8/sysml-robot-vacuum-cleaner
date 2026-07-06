@@ -12,6 +12,8 @@
 package InterfaceControl {
   private import ArchitectureCommon::*;
   private import SoftwareCore::*;
+  private import ISQ::*;
+  private import SI::*;
   private import ScalarValues::*;
 
   // Message-layer enumerations (shared mission enums live in ArchitectureCommon).
@@ -60,11 +62,17 @@ package InterfaceControl {
   // ownership by firmware tasks is asserted in FirmwareArchitecture via flows.
   connection def DataFlowContract {
     doc /*
-      Typed software data contract. The payload end references the item def
-      that flows; allowedValues captures contract constraints that are not yet
-      expressible as an enum or range.
+      Typed software data contract. producerFeature and consumerFeature name
+      the concrete firmware features bound by FirmwareArchitecture flows.
+      allowedValues captures contract constraints that are not yet expressible
+      as an enum or range.
     */
-    end payload : DataType;
+    attribute producerFeature : String;
+    attribute consumerFeature : String;
+    attribute payloadType : String;
+    attribute period : DurationValue;
+    attribute maxLatency : DurationValue;
+    attribute privacySensitive : Boolean;
     attribute allowedValues : String;
   }
 }
