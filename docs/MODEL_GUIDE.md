@@ -33,6 +33,22 @@ The model is intentionally layered from product intent to implementation evidenc
 | Views | `ModelViews` | Stakeholder-facing slices of the model. |
 | Root | `AutonomousFloorCleaningRobotDemo` | Import hub for loading the full workspace. |
 
+## Folder Layout
+
+The `model/` directory mirrors the layer structure for navigation. The folder names do not define SysML namespaces; each file still owns exactly one top-level package.
+
+```text
+model/
+  root/
+  requirements/
+  context/
+  architecture/
+  implementation/
+  behavior/
+  assurance/
+  views/
+```
+
 ## Engineering Threads
 
 - Needs to evidence: stakeholder needs derive system requirements, which are satisfied by design elements and verified by cases or analyses.
@@ -79,20 +95,6 @@ Start with requirements and functional behavior before reading physical details.
 6. Behavior, safety, trade studies, verification, and analyses.
 7. Views for stakeholder-specific slices.
 
-## Future Folder Structure
+## Folder Changes
 
-The repository currently keeps a flat `model/` directory for maximum compatibility. If recursive workspace loading remains stable across Spec42 and Babel42, use this grouping without changing package names:
-
-```text
-model/
-  root/
-  requirements/
-  context/
-  architecture/
-  implementation/
-  behavior/
-  assurance/
-  views/
-```
-
-Validate immediately after any move. If import resolution or demo bootstrapping regresses, keep the flat layout and rely on package headers plus this guide.
+Validate immediately after moving model files. If import resolution or demo bootstrapping regresses in a tool, keep package names stable and fix the tool configuration rather than renaming packages to match paths.

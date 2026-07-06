@@ -13,7 +13,7 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Keep package names stable; file moves should not rename packages.
 - Treat `AutonomousFloorCleaningRobotDemo` as the full-workspace import hub.
 - Treat `Architecture` as the public architecture hub for downstream packages that need the realized robot type.
-- Keep the `model/` directory flat until Spec42 and Babel42 recursive loading are verified after any proposed move.
+- Use `model/` subfolders only as navigation aids; SysML package ownership remains independent of file paths.
 
 ## Package Ownership
 

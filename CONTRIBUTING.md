@@ -16,7 +16,7 @@ Thanks for helping improve this SysML v2 showcase.
   powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
   ```
 
-- Keep the flat `model/` layout unless a PR explicitly validates and motivates a folder move.
+- Keep the layered `model/` folder layout unless a PR explicitly validates and motivates a structural change.
 - Preserve package ownership boundaries from `docs/MODEL_CONVENTIONS.md`.
 - Avoid unrelated formatting churn in model files.
 - Add or update documentation when changing package ownership, imports, views, validation behavior, or generated assets.

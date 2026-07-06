@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 
 SysML v2 model for an autonomous floor-cleaning robot. The model is used as an example for requirements traceability, subsystem architecture, behavior, verification, and analysis.
 
-The workspace currently keeps one top-level package per `.sysml` file under [`model/`](model/) so `private import PackageName::*` resolves consistently across tools.
+The workspace keeps one top-level package per `.sysml` file under [`model/`](model/), grouped by engineering layer. Package names remain independent of file paths so `private import PackageName::*` resolves consistently across tools.
 
 ## Why This Exists
 
@@ -59,27 +59,27 @@ Spec42 resolves the required libraries in its validation workflow. If you open o
 | Localization error limit | 150 mm                                |
 | Safe-stop reaction limit | 100 ms                                |
 
-The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and referenced by system requirements and analysis cases.
+The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits.sysml) and referenced by system requirements and analysis cases.
 
 ## Suggested Reading Order
 
-1. [`StakeholderNeeds.sysml`](model/StakeholderNeeds.sysml) - user needs
-2. [`SystemRequirements.sysml`](model/SystemRequirements.sysml) - derived system requirements
-3. [`FunctionalArchitecture.sysml`](model/FunctionalArchitecture.sysml) - capabilities and functional composition
-4. [`PhysicalProtocols.sysml`](model/PhysicalProtocols.sysml) - electronics library imports and product bus aliases
-5. [`ProductContext.sysml`](model/ProductContext.sysml) - external actors and context boundary
-6. [`InterfaceControl.sysml`](model/InterfaceControl.sysml) - software message contracts
-7. [`FirmwareArchitecture.sysml`](model/FirmwareArchitecture.sysml) - firmware tasks and scheduler timing
-8. [`SoftwareImplementation.sysml`](model/SoftwareImplementation.sysml) - engineer-facing software work packages, queue contracts, HAL bindings, test scope, and implementation budgets
-9. [`PhysicalArchitecture.sysml`](model/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
-10. [`ArchitectureAllocations.sysml`](model/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
-11. [`Architecture.sysml`](model/Architecture.sysml) - public architecture hub and system-level satisfy links
-12. [`BehaviorStates.sysml`](model/BehaviorStates.sysml) - mission lifecycle states
-13. [`OperationalScenarios.sysml`](model/OperationalScenarios.sysml) - nominal and recovery mission flows
-14. [`SafetyAnalysis.sysml`](model/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/TradeStudies.sysml) - hazards and design rationale
-15. [`ModelViews.sysml`](model/ModelViews.sysml) - stakeholder views
-16. [`Verification.sysml`](model/Verification.sysml) and [`AnalysisCases.sysml`](model/AnalysisCases.sysml) - V&V and engineering margins
-17. [`AutonomousFloorCleaningRobotDemo.sysml`](model/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
+1. [`StakeholderNeeds.sysml`](model/requirements/StakeholderNeeds.sysml) - user needs
+2. [`SystemRequirements.sysml`](model/requirements/SystemRequirements.sysml) - derived system requirements
+3. [`FunctionalArchitecture.sysml`](model/architecture/FunctionalArchitecture.sysml) - capabilities and functional composition
+4. [`PhysicalProtocols.sysml`](model/architecture/PhysicalProtocols.sysml) - electronics library imports and product bus aliases
+5. [`ProductContext.sysml`](model/context/ProductContext.sysml) - external actors and context boundary
+6. [`InterfaceControl.sysml`](model/implementation/InterfaceControl.sysml) - software message contracts
+7. [`FirmwareArchitecture.sysml`](model/implementation/FirmwareArchitecture.sysml) - firmware tasks and scheduler timing
+8. [`SoftwareImplementation.sysml`](model/implementation/SoftwareImplementation.sysml) - engineer-facing software work packages, queue contracts, HAL bindings, test scope, and implementation budgets
+9. [`PhysicalArchitecture.sysml`](model/architecture/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
+10. [`ArchitectureAllocations.sysml`](model/architecture/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
+11. [`Architecture.sysml`](model/architecture/Architecture.sysml) - public architecture hub and system-level satisfy links
+12. [`BehaviorStates.sysml`](model/behavior/BehaviorStates.sysml) - mission lifecycle states
+13. [`OperationalScenarios.sysml`](model/context/OperationalScenarios.sysml) - nominal and recovery mission flows
+14. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - hazards and design rationale
+15. [`ModelViews.sysml`](model/views/ModelViews.sysml) - stakeholder views
+16. [`Verification.sysml`](model/assurance/Verification.sysml) and [`AnalysisCases.sysml`](model/assurance/AnalysisCases.sysml) - V&V and engineering margins
+17. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
 ## More Documentation
 
@@ -92,7 +92,7 @@ The limits are defined in [`DesignLimits.sysml`](model/DesignLimits.sysml) and r
 - This is an engineering-grade showcase and validation corpus, not a certified product design or regulatory compliance package.
 - The robot architecture is realistic enough for MBSE demonstration, but it is not a complete commercial robot-vacuum design.
 - Generated documentation imagery is illustrative and not a product rendering from a manufactured device.
-- The model currently keeps a flat `model/` folder for broad tool compatibility; a folder split should be validated as a separate change.
+- The model uses subfolders for navigation only; SysML package names remain the semantic ownership boundary.
 
 ## Contributing
 
