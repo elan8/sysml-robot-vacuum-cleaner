@@ -21,16 +21,15 @@ These conventions keep the SysML model readable and maintainable while preservin
 - `Strata` owns way-of-working concepts, metadata definitions, completeness rules, and extraction rules. It should not own product-specific engineering facts.
 - Requirements packages own requirement intent and derivation. They should not own implementation structure.
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.
-- `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes on ports, firmware suite parts, and roll-up values. It should not own software message schemas.
+- `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes on ports, the `firmwareTasks` and `robotFirmware` instances, task/module/MCU allocations, and roll-up values. It should not own software message schemas.
 - `ProductVariants` owns product-line variation definitions, selected/deferred variant option records, and SKU configuration baselines. It should not duplicate trade rationale or realized architecture details.
 - `InterfaceControl` owns software message contracts and producer/consumer ownership.
-- `FirmwareArchitecture` owns task timing, task criticality, scheduler assumptions, startup phase, state ownership, error handling, resource/WCET budgets, and task-to-module allocation surfaces.
+- `FirmwareArchitecture` owns firmware task definitions, scheduler model, task architecture structure, flows, and interface-control contracts. The authoritative `firmwareTasks` instance lives on `AutonomousFloorCleaningRobot` in `PhysicalArchitecture`.
 - `SoftwareImplementation` owns implementation-facing software records derived from firmware, interface, physical, requirements, and verification packages. It should not redefine primary architecture facts or project-management status.
 - `ElectronicsInterfaceControl` owns electronics-facing connector, signal, rail, bus, harness, and test-point contracts. It should reference physical ports rather than redefining physical parts.
-- `ElectronicsImplementation` owns electronics handoff records for PCB/harness work packages, schematic/layout constraints, rail budgets, bring-up scope, and manufacturing notes. It should not redefine product structure.
+- `ElectronicsImplementation` owns electronics handoff records for PCB/harness work packages, schematic/layout constraints, and rail budgets. It should not redefine product structure.
 - `ElectronicsComponentSelection` owns baseline component candidates, MPNs, footprints, key specs, cost targets, lifecycle status, and selection rationale. It should mark candidates that still need datasheet, lifecycle, compliance, or availability checks.
-- `ElectronicsVerification` owns electronics bring-up and discipline-specific verification steps. System-level verification intent remains in `Verification`.
-- `Implementation` owns the implementation-layer hub, trace records, and engineer-facing views that compose software, electronics, firmware, component-selection, and handoff facts. It should not own payload schemas, task timing, electrical contracts, component specs, or work-package details.
+- `Implementation` owns engineer-facing views that compose software, electronics, firmware, component-selection, and handoff facts. It should not own payload schemas, task timing, electrical contracts, component specs, or work-package details.
 - Assurance packages own evidence, hazards, analyses, trade rationale, and verification intent.
 - `ModelViews` owns stakeholder slices only; do not put primary engineering facts there.
 

@@ -160,8 +160,8 @@ package Strata {
       attribute :>> ruleId = "E8-CPS-EE-HANDOFF-001";
       attribute :>> appliesToArtifact = ArtifactKind::electronicsImplementationHandoff;
       attribute :>> expectation = CompletionExpectationKind::required;
-      attribute :>> requiredFact = "Each electronics work package has owning board/harness, interface contracts, rail budgets, layout constraints, component candidates, bring-up checks, manufacturing notes, and verification refs.";
-      attribute :>> validationHint = "Join ElectronicsWorkPackage records with ElectronicsInterfaceContract, RailBudgetRecord, ComponentCandidate, and ElectronicsVerificationStep usages.";
+      attribute :>> requiredFact = "Each electronics work package has owning board/harness, interface contracts, rail budgets, layout constraints, component candidates, and verification refs.";
+      attribute :>> validationHint = "Join ElectronicsWorkPackage records with ElectronicsInterfaceContract, RailBudgetRecord, and ComponentCandidate usages.";
     }
 
     part componentSelectionCompleteness : MethodCompletenessRule {
@@ -184,10 +184,10 @@ package Strata {
     part electronicsHandoffExtraction : MethodExtractionRule {
       attribute :>> ruleId = "E8-CPS-EXTRACT-EE-001";
       attribute :>> artifactKind = ArtifactKind::electronicsImplementationHandoff;
-      attribute :>> sourcePackage = "Implementation, ElectronicsInterfaceControl, ElectronicsImplementation, ElectronicsComponentSelection, ElectronicsVerification";
+      attribute :>> sourcePackage = "Implementation, ElectronicsInterfaceControl, ElectronicsImplementation, ElectronicsComponentSelection";
       attribute :>> primaryElementKind = "ElectronicsWorkPackage";
       attribute :>> joinHint = "Group by owningBoardOrHarness; join interfaceContractRefs, railFeaturePath, relatedContractRefs, workPackageRefs, and verification refs.";
-      attribute :>> outputIntent = "Generate electronics work-package cards, connector/rail tables, component-candidate sheets, and bring-up checklists.";
+      attribute :>> outputIntent = "Generate electronics work-package cards, connector/rail tables, and component-candidate sheets.";
     }
   }
 

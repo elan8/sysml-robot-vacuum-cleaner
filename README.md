@@ -29,7 +29,7 @@ The repository also includes Strata, a lightweight SysML v2 way of working for c
 - Functional and physical decomposition with explicit allocation layers.
 - Product-line variant modeling for navigation sensor suites, cleaning performance, battery pack, safety monitor, connectivity, privacy mode, dock options, and SKU baselines.
 - Implementation-facing interface control for PCB harnesses, software message contracts, firmware tasks, scheduler timing, and MCU deployment.
-- An implementation hub tying software contracts, firmware runtime/resource constraints, electronics interfaces, PCB/harness work packages, component candidates, queue policies, HAL bindings, rail budgets, bring-up tests, timing budgets, and verification scope into one extractable story.
+- An implementation layer tying software contracts, firmware runtime/resource constraints, electronics interfaces, PCB/harness work packages, component candidates, queue policies, HAL bindings, rail budgets, timing budgets, and verification scope together.
 - A lightweight `Strata` package that separates native SysML v2 engineering semantics from metadata used for ownership, maturity, extraction, and external lifecycle references.
 - Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
 - First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
@@ -73,24 +73,23 @@ The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits
 4. [`FunctionalArchitecture.sysml`](model/architecture/FunctionalArchitecture.sysml) - capabilities and functional composition
 5. [`PhysicalProtocols.sysml`](model/architecture/PhysicalProtocols.sysml) - electronics library imports and product bus aliases
 6. [`ProductContext.sysml`](model/context/ProductContext.sysml) - external actors and context boundary
-7. [`Implementation.sysml`](model/implementation/Implementation.sysml) - software/electronics implementation hub
+7. [`Implementation.sysml`](model/implementation/Implementation.sysml) - software and electronics engineer handoff views
 8. [`InterfaceControl.sysml`](model/implementation/InterfaceControl.sysml) - software message contracts
 9. [`FirmwareArchitecture.sysml`](model/implementation/FirmwareArchitecture.sysml) - firmware tasks and scheduler timing
 10. [`SoftwareImplementation.sysml`](model/implementation/SoftwareImplementation.sysml) - engineer-facing software implementation records, queue contracts, HAL bindings, message field rules, and test intent
 11. [`ElectronicsInterfaceControl.sysml`](model/implementation/ElectronicsInterfaceControl.sysml) - electronics connector, signal, rail, bus, and harness contracts
-12. [`ElectronicsImplementation.sysml`](model/implementation/ElectronicsImplementation.sysml) - PCB/harness work packages, rail budgets, layout constraints, and manufacturing notes
+12. [`ElectronicsImplementation.sysml`](model/implementation/ElectronicsImplementation.sysml) - PCB/harness work packages, rail budgets, and layout constraints
 13. [`ElectronicsComponentSelection.sysml`](model/implementation/ElectronicsComponentSelection.sysml) - baseline component candidates, MPNs, footprints, key specs, cost targets, and selection rationale
-14. [`ElectronicsVerification.sysml`](model/implementation/ElectronicsVerification.sysml) - electronics bring-up, fault-injection, and manufacturing test checklist
-15. [`PhysicalArchitecture.sysml`](model/architecture/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
-16. [`ProductVariants.sysml`](model/variants/ProductVariants.sysml) - native SysML variation choices, variant option records, and SKU configuration baselines
-17. [`ArchitectureAllocations.sysml`](model/architecture/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
-18. [`Architecture.sysml`](model/architecture/Architecture.sysml) - public architecture hub and system-level satisfy links
-19. [`BehaviorStates.sysml`](model/behavior/BehaviorStates.sysml) - mission lifecycle states
-20. [`OperationalScenarios.sysml`](model/context/OperationalScenarios.sysml) - nominal and recovery mission flows
-21. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - hazards and design rationale
-22. [`ModelViews.sysml`](model/views/ModelViews.sysml) - stakeholder views
-23. [`Verification.sysml`](model/assurance/Verification.sysml) and [`AnalysisCases.sysml`](model/assurance/AnalysisCases.sysml) - V&V and engineering margins
-24. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
+14. [`PhysicalArchitecture.sysml`](model/architecture/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, and harness port ICD notes
+15. [`ProductVariants.sysml`](model/variants/ProductVariants.sysml) - native SysML variation choices, variant option records, and SKU configuration baselines
+16. [`ArchitectureAllocations.sysml`](model/architecture/ArchitectureAllocations.sysml) - function, scenario, firmware, and MCU allocations
+17. [`Architecture.sysml`](model/architecture/Architecture.sysml) - public architecture hub and system-level satisfy links
+18. [`BehaviorStates.sysml`](model/behavior/BehaviorStates.sysml) - mission lifecycle states
+19. [`OperationalScenarios.sysml`](model/context/OperationalScenarios.sysml) - nominal and recovery mission flows
+20. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - hazards and design rationale
+21. [`ModelViews.sysml`](model/views/ModelViews.sysml) - stakeholder views
+22. [`Verification.sysml`](model/assurance/Verification.sysml) and [`AnalysisCases.sysml`](model/assurance/AnalysisCases.sysml) - V&V and engineering margins
+23. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
 ## More Documentation
 

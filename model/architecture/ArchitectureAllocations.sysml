@@ -5,11 +5,18 @@
  * Owns generic allocation definition types reusable across the model.
  * The system-of-interest definition (CleaningRobotSystemOfInterest) and all
  * allocation links have moved to Architecture.sysml so they sit alongside
- * the architecture hub that gives them context.
+ * the architecture hub that gives them context. Task-to-module and
+ * software-to-MCU allocation defs are consumed by PhysicalArchitecture.
  */
 package ArchitectureAllocations {
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
+  private import FirmwareArchitecture::*;
+
+  allocation def TaskToSoftwareModule {
+    end task : FirmwareTask;
+    end softwareModule : ExecutableComponent;
+  }
 
   allocation def SoftwareToComputeNode {
     end software : ExecutableComponent;

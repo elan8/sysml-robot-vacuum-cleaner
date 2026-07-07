@@ -54,13 +54,17 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
 
 ## Diagram Smoke Checks
 
-Run these after changing `ModelViews`, view exposure paths, or file layout:
+Run these after changing `ModelViews`, `Implementation`, view exposure paths, or file layout:
 
 ```powershell
-spec42 diagrams export model --selected-view productStructure --format svg --output target/diagrams
-spec42 diagrams export model --selected-view functionalArchitecture --format svg --output target/diagrams
+spec42 diagrams export model --selected-view robotLruInterconnection --format svg --output target/diagrams
+spec42 diagrams export model --selected-view firmwareTaskArchitecture --format svg --output target/diagrams
+spec42 diagrams export model --selected-view firmwareDeployment --format svg --output target/diagrams
 spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
+spec42 diagrams export model --selected-view electronicsWorkPackages --format svg --output target/diagrams
 ```
+
+`InterconnectionView` exports (`robotLruInterconnection`, `firmwareTaskArchitecture`, `firmwareDeployment`) render reliably in Spec42 SVG. Robot-level harness `connect` statements target LRU boundary ports on `mainElectronics` (no cross-boundary pierce into PCB or harness internals). Spec42 may still expand composite LRU internals in `robotLruInterconnection`; use firmware views for readable software diagrams.
 
 ## Expected Result
 
@@ -70,7 +74,7 @@ The robot-vacuum corpus should validate with:
 - `0 warnings`
 - `0 information` diagnostics
 
-The three `ModelViews` catalog views use only normative SysML v2 standard view types (`GeneralView`). Requirement traceability is a filtered `GeneralView` specialization per §9.2.20.2.3; Spec42 applies traceability projection when filters reference requirement or verification kinds.
+The `ModelViews` catalog covers robot LRU interconnection, firmware task architecture, firmware deployment, and requirements traceability. Electronics work-package handoff lives in `Implementation`.
 
 ## Known Notes
 

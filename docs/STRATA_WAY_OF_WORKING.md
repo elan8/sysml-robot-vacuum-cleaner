@@ -87,8 +87,8 @@ Model cyber-physical systems in this order:
 4. Define physical and logical architecture as parts, ports, item definitions, and connections.
 5. Allocate functions to physical parts, software tasks, electronics functions, or deployment targets.
 6. Define interface-control records for software messages, electrical connectors, rails, buses, and harnesses.
-7. Define implementation handoff packages for software, firmware, electronics, components, and manufacturing.
-8. Define verification cases, analysis cases, bring-up checks, and evidence intent.
+7. Define implementation handoff packages for software, firmware, electronics, and components.
+8. Define verification cases, analysis cases, and evidence intent.
 9. Define views for stakeholder questions rather than creating diagram-specific source packages.
 
 ## Software Handoff Contract
@@ -112,19 +112,18 @@ An electronics engineer should be able to extract:
 - connector, signal, rail, bus, harness, and test-point contracts;
 - voltage, current, timing, protocol, safety, EMC, and protection constraints;
 - component candidates with manufacturer, MPN, package, footprint, critical specs, cost target, lifecycle/compliance status, and datasheet review status;
-- bring-up, fault-injection, manufacturing, and verification checks.
+- verification references to system-level cases.
 
-In this repository those facts are composed through `Implementation`, `ElectronicsInterfaceControl`, `ElectronicsImplementation`, `ElectronicsComponentSelection`, and `ElectronicsVerification`.
+In this repository those facts are composed through `Implementation`, `ElectronicsInterfaceControl`, `ElectronicsImplementation`, and `ElectronicsComponentSelection`.
 
 ## Extraction Rules
 
-Tooling should treat `Implementation` as the main implementation entry point. It should then use method rules from `Strata` and package-specific trace records to discover engineering facts.
+Tooling should treat `Implementation` views as the main implementation entry point. It should then use method rules from `Strata` and package-specific handoff records to discover engineering facts.
 
 Recommended extraction behavior:
 
 - Extract `MethodCompletenessRule` usages from `Strata` to learn required facts per artifact kind.
 - Extract `MethodExtractionRule` usages to find source packages, primary element kinds, join hints, and output intent.
-- Extract implementation trace records from `Implementation` for project-specific paths and joins.
 - Prefer native SysML relationships and typed features when available.
 - Use string paths only as compatibility bridges where the current tool cannot resolve the intended feature path.
 - Report unresolved references as model hygiene findings rather than silently dropping them.
@@ -137,7 +136,7 @@ A model following this way of working should pass these checks:
 - every requirement has a subject and a verification or analysis path;
 - every handoff package has an implementation hub or view that exposes it;
 - every software task is linked to runtime, interface, requirement, verification, and test-intent facts;
-- every electronics work package is linked to interface, rail, component, and bring-up facts;
+- every electronics work package is linked to interface, rail, component, and verification facts;
 - every component candidate has selection status and known review gaps;
 - every source-of-truth element is distinguishable from derived views and external references.
 

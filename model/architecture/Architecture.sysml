@@ -42,15 +42,15 @@ package Architecture {
     allocate operate.locomotion to physical.driveModule;
     allocate operate.cleaning to physical.cleaningHead;
     allocate operate.perception to physical.sensorAssembly;
-    allocate operate.perception to physical.mainElectronics.robotFirmware.mapProcessing;
-    allocate operate.navigation to physical.mainElectronics.robotFirmware.localizationEstimator;
-    allocate operate.navigation to physical.mainElectronics.robotFirmware.coveragePlanner;
+    allocate operate.perception to physical.robotFirmware.mapProcessing;
+    allocate operate.navigation to physical.robotFirmware.localizationEstimator;
+    allocate operate.navigation to physical.robotFirmware.coveragePlanner;
     allocate operate.powerManagement to physical.powerModule;
     allocate operate.docking to physical.dockInterface;
-    allocate operate.missionControl to physical.mainElectronics.robotFirmware.applicationFirmware;
-    allocate operate.safetySupervision to physical.mainElectronics.robotFirmware.safetySupervisor;
+    allocate operate.missionControl to physical.robotFirmware.applicationFirmware;
+    allocate operate.safetySupervision to physical.robotFirmware.safetySupervisor;
     allocate operate.userInteraction to physical.hmi;
-    allocate operate.userInteraction to physical.mainElectronics.robotFirmware.applicationFirmware;
+    allocate operate.userInteraction to physical.robotFirmware.applicationFirmware;
 
     // Scenario action ownership by operational capability.
     allocate startMission to operate.missionControl;

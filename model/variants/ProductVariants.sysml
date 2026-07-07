@@ -125,7 +125,7 @@ package ProductVariants {
       attribute :>> selectedModelElementPaths = "ProductVariants::NavigationSensorSuiteChoice::lidarSlamSuite; PhysicalArchitecture::AutonomousFloorCleaningRobot.sensorAssembly; ElectronicsComponentSelection::electronicsComponentSelectionBaseline.lidarModuleCandidate";
       attribute :>> changedImplementationPaths = "InterfaceControl::lidarScanContract; FirmwareArchitecture::sensorAcquisition; FirmwareArchitecture::localization; FirmwareArchitecture::slam; ElectronicsInterfaceControl::electronicsInterfaceBaseline.lidarUart";
       attribute :>> requirementRefs = "localizeReliably; updateCoverageMap; protectMapPrivacy";
-      attribute :>> verificationRefs = "Verification::verifyLocalizationPerformance; Verification::verifyCoverageMapping; ElectronicsVerification::electronicsVerificationPlan.lidarUartBringUp";
+      attribute :>> verificationRefs = "Verification::verifyLocalizationPerformance; Verification::verifyCoverageMapping; Verification::verifyElectricalInterfaceControl";
       attribute :>> rationaleRef = "TradeStudies::sensorLidarUpgrade";
     }
 
@@ -187,10 +187,10 @@ package ProductVariants {
       attribute :>> tierApplicability = ProductTier::standard;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "same-MCU safety supervisor";
-      attribute :>> selectedModelElementPaths = "ProductVariants::SafetyMonitorChoice::sameMcuSafetySupervisor; PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.safetySupervisor; TradeStudies::sameMcuSafetySupervisor";
+      attribute :>> selectedModelElementPaths = "ProductVariants::SafetyMonitorChoice::sameMcuSafetySupervisor; PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.safetySupervisor; TradeStudies::sameMcuSafetySupervisor";
       attribute :>> changedImplementationPaths = "FirmwareArchitecture::safetySupervisor; SoftwareImplementation::safetySupervisorImplementation; SafetyAnalysis hazard mitigations";
       attribute :>> requirementRefs = "superviseHazards; detectCliffs; detectBinRemovedOrMissing";
-      attribute :>> verificationRefs = "Verification::verifyHazardSupervision; ElectronicsVerification fault injection checks";
+      attribute :>> verificationRefs = "Verification::verifyHazardSupervision; Verification::verifyElectricalInterfaceControl";
       attribute :>> rationaleRef = "TradeStudies::sameMcuSafetySupervisor";
     }
 
@@ -242,7 +242,7 @@ package ProductVariants {
       attribute :>> selectedOptions = "VAR-NAV-PREMIUM-LIDAR; VAR-CLEAN-STANDARD; VAR-BATT-4S2P-12500; VAR-SAFE-SAME-MCU; VAR-PRIVACY-LOCAL-ONLY; VAR-CONN-WIFI-BLE-LOCAL; VAR-DOCK-BEACON-CHARGE";
       attribute :>> excludedOptions = "VAR-NAV-ENTRY-TOF-IMU; VAR-NAV-FLAGSHIP-AI-VISION; VAR-CLEAN-HIGH-SUCTION";
       attribute :>> implementationImpactSummary = "Use LiDAR UART, sensor I2C, local map storage, standard fan power budget, same-MCU safety supervision, 4S2P pack and beacon charging dock.";
-      attribute :>> verificationImpactSummary = "Run localization, coverage mapping, privacy, charging safety, hazard supervision, app status and LiDAR/electronics bring-up verification.";
+      attribute :>> verificationImpactSummary = "Run localization, coverage mapping, privacy, charging safety, hazard supervision, app status, and electrical interface verification.";
     }
 
     part entryCostOptimizedCandidate : VariantConfiguration {

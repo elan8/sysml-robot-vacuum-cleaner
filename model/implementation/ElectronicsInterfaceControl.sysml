@@ -134,7 +134,7 @@ package ElectronicsInterfaceControl {
     part safetyGpioHarness : ElectronicsInterfaceContract {
       attribute :>> contractId = "EIC-J_SAFETY_GPIO";
       attribute :>> physicalFeaturePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.safetyGpioHarness";
-      attribute :>> matingFeaturePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.sensorAssembly.cliffHazardOut and powerModule.hazardOut";
+      attribute :>> matingFeaturePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.cliffHazardIn, bumperHazardIn, cleaningFaultIn, bmsAlertIn";
       attribute :>> interfaceKind = ElectricalInterfaceKind::gpioFaultLine;
       attribute :>> connectorRef = "J_SAFETY_GPIO internal net group";
       attribute :>> signalDirection = SignalDirection::activeLowFaultToMcu;

@@ -2,94 +2,85 @@
 * SPDX-FileCopyrightText: 2026 Elan8
 * SPDX-License-Identifier: MIT
 *
-* Owns stakeholder concerns, viewpoints, view definitions, expose filters, and
-* renderings. Depends on all packages that are sliced for presentation. Keep
-* primary engineering facts in their source packages rather than in views.
+* Stakeholder views tuned for Spec42 diagram export. Robot LRU interconnection
+* uses boundary ports on mainElectronics so views do not expand PCB internals.
 */
 package ModelViews {
   private import Views::*;
   private import StakeholderNeeds::*;
   private import SystemRequirements::*;
-  private import FunctionalArchitecture::*;
   private import Architecture::*;
+  private import PhysicalArchitecture::*;
   private import Verification::*;
 
   part def StakeholderRole;
 
-  part systemsEngineer : StakeholderRole;
   part productOwner : StakeholderRole;
   part verificationEngineer : StakeholderRole;
-
-  concern productBreakdown {
-    subject;
-    stakeholder :>> systemsEngineer;
-  }
-
-  concern missionBehavior {
-    subject;
-    stakeholder :>> systemsEngineer;
-  }
+  part firmwareEngineer : StakeholderRole;
+  part systemsEngineer : StakeholderRole;
 
   concern requirementCoverage {
+    doc /* How do needs, requirements, design, and verification connect? */
     subject;
     stakeholder :>> productOwner;
     stakeholder :>> verificationEngineer;
   }
 
-  viewpoint productStructurePerspective {
-    frame productBreakdown;
+  concern firmwareRuntime {
+    doc /* How are firmware tasks coupled and deployed to modules and the MCU? */
+    subject;
+    stakeholder :>> firmwareEngineer;
+    stakeholder :>> systemsEngineer;
   }
 
-  viewpoint behaviorPerspective {
-    frame missionBehavior;
+  concern productIntegration {
+    doc /* How are robot LRUs interconnected at the harness level? */
+    subject;
+    stakeholder :>> systemsEngineer;
   }
 
   viewpoint traceabilityPerspective {
     frame requirementCoverage;
   }
 
-  // Product breakdown
-  view productStructure : GeneralView {
-    satisfy productStructurePerspective;
-    expose Architecture::robotSystem;
-    filter @SysML::PartUsage;
+  viewpoint firmwareRuntimePerspective {
+    frame firmwareRuntime;
   }
 
-  // Functional decomposition
-  view functionalArchitecture : GeneralView {
-    satisfy behaviorPerspective;
-    expose FunctionalArchitecture::OperateCleaningRobot;
+  viewpoint productIntegrationPerspective {
+    frame productIntegration;
   }
 
-  // Requirements traceability
+  view firmwareTaskArchitecture : InterconnectionView {
+    satisfy firmwareRuntimePerspective;
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks;
+  }
+
+  view firmwareDeployment : InterconnectionView {
+    satisfy firmwareRuntimePerspective;
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks;
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware;
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.mainControlPcb.mcu;
+  }
+
+  view robotLruInterconnection : InterconnectionView {
+    satisfy productIntegrationPerspective;
+    expose Architecture::robotSystem.physical.chassis;
+    expose Architecture::robotSystem.physical.driveModule;
+    expose Architecture::robotSystem.physical.cleaningHead;
+    expose Architecture::robotSystem.physical.sensorAssembly;
+    expose Architecture::robotSystem.physical.mainElectronics;
+    expose Architecture::robotSystem.physical.powerModule;
+    expose Architecture::robotSystem.physical.dockInterface;
+    expose Architecture::robotSystem.physical.hmi;
+  }
+
   view requirementsTraceability : GeneralView {
     satisfy traceabilityPerspective;
     expose StakeholderNeeds::*;
     expose SystemRequirements::*;
     expose Verification::*;
-    filter @SysML::RequirementUsage or @SysML::VerificationCase or @SysML::PartUsage or @SysML::ActionUsage;
+    expose Architecture::robotSystem.physical;
   }
-
-  view connections : InterconnectionView {
-    expose Architecture::robotSystem;
-
-  }
-
-  view cleaningHead : InterconnectionView {
-    expose PhysicalArchitecture::AutonomousFloorCleaningRobot::cleaningHead;
-  }
-
-  view driveModule : InterconnectionView {
-    expose PhysicalArchitecture::AutonomousFloorCleaningRobot::driveModule;
-  }
-
-  view mainElectronics : InterconnectionView {
-    expose PhysicalArchitecture::AutonomousFloorCleaningRobot::mainElectronics;
-    
-  }
-
-  
-
-  
 }
-

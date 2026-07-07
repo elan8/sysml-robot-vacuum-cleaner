@@ -302,7 +302,8 @@ package FirmwareArchitecture {
     }
   }
 
-  // Concrete task architecture used by allocation and view packages.
+  // Task architecture definition; the authoritative instance lives on
+  // AutonomousFloorCleaningRobot.firmwareTasks in PhysicalArchitecture.
   part def FirmwareTaskArchitecture {
     part scheduler : SchedulerModel {
       attribute :>> tickPeriod = 1 [ms];
@@ -435,6 +436,4 @@ package FirmwareArchitecture {
       attribute :>> allowedValues = "severity info, warning, fault, or safetyCritical";
     }
   }
-
-  part firmwareTaskArchitecture : FirmwareTaskArchitecture;
 }

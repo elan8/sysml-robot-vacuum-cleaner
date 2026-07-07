@@ -46,8 +46,6 @@ package ElectronicsImplementation {
     attribute layoutConstraints : String;
     attribute bomSelectionNotes : String;
     attribute testPointScope : String;
-    attribute bringUpScope : String;
-    attribute manufacturingNotes : String;
     attribute maxBoardAreaMm2 : Real;
     attribute powerDissipationBudget : PowerValue;
   }
@@ -83,8 +81,6 @@ package ElectronicsImplementation {
       attribute :>> layoutConstraints = "Partition motor driver currents from MCU/sensor ground; star point at J_POWER; keep LiDAR UART and I2C away from phase routes.";
       attribute :>> bomSelectionNotes = "Select MCU with enough timers for dual BLDC PWM, quadrature inputs, UART2 LiDAR, I2C sensors/BMS, SPI flash, and wireless UART.";
       attribute :>> testPointScope = "BAT_14V4, SYS_5V, LOGIC_3V3, SDA, SCL, LIDAR_TX/RX, driver faults, safety GPIO, SWD/debug.";
-      attribute :>> bringUpScope = "Power rails first, MCU clock/debug, sensor bus scan, LiDAR UART frame, motor driver disabled fault checks, wireless UART loopback.";
-      attribute :>> manufacturingNotes = "Program bootloader and run boundary scan/factory IO test before enclosure integration.";
       attribute :>> maxBoardAreaMm2 = 7200.0;
       attribute :>> powerDissipationBudget = 4.0 [W];
     }
@@ -102,8 +98,6 @@ package ElectronicsImplementation {
       attribute :>> layoutConstraints = "Current-rated paths for battery and motor rail; thermal relief for regulators; charger input isolated from user-accessible contacts.";
       attribute :>> bomSelectionNotes = "Select buck regulators and protection devices for 14.4 V pack, motor peaks, and safe dock charging.";
       attribute :>> testPointScope = "Battery voltage, charger input, regulator outputs, BMS alert, charge current sense.";
-      attribute :>> bringUpScope = "Current-limited bench supply, regulator no-load/load tests, charger handshake, BMS alert injection.";
-      attribute :>> manufacturingNotes = "Require polarity check and fuse/protection validation before battery connection.";
       attribute :>> maxBoardAreaMm2 = 4200.0;
       attribute :>> powerDissipationBudget = 5.0 [W];
     }
@@ -121,8 +115,6 @@ package ElectronicsImplementation {
       attribute :>> layoutConstraints = "Maintain LiDAR UART signal integrity and separate cliff safety lines from motor noise.";
       attribute :>> bomSelectionNotes = "Choose ToF sensors with configurable I2C addresses or address-isolation strategy.";
       attribute :>> testPointScope = "Sensor I2C, LiDAR 5 V, LiDAR UART, each cliff active-low line.";
-      attribute :>> bringUpScope = "I2C address scan, LiDAR frame capture, cliff line active-low injection, IMU WHOAMI.";
-      attribute :>> manufacturingNotes = "Harness keying and connector labels must prevent sensor/LiDAR swap.";
       attribute :>> maxBoardAreaMm2 = 3000.0;
       attribute :>> powerDissipationBudget = 2.0 [W];
     }
@@ -140,8 +132,6 @@ package ElectronicsImplementation {
       attribute :>> layoutConstraints = "Wide copper for phase currents, compact gate loops, thermal copper for driver ICs, clear separation from sensor IO.";
       attribute :>> bomSelectionNotes = "Select gate driver/inverter with fault output and current sense compatible with 3 A peak.";
       attribute :>> testPointScope = "Driver enable, PWM commands, fault outputs, current sense; no small-signal probing on phase nodes during normal run.";
-      attribute :>> bringUpScope = "Driver disabled power-up, fault injection, low-duty unloaded spin, stall-current trip validation.";
-      attribute :>> manufacturingNotes = "Factory motor test shall start with current limit and wheel fixture.";
       attribute :>> maxBoardAreaMm2 = 2400.0;
       attribute :>> powerDissipationBudget = 3.5 [W];
     }
@@ -159,8 +149,6 @@ package ElectronicsImplementation {
       attribute :>> layoutConstraints = "Respect antenna keepout; keep flash SPI short and away from motor driver edges.";
       attribute :>> bomSelectionNotes = "Wireless module shall support local app link without requiring raw map upload.";
       attribute :>> testPointScope = "Wireless UART, module reset/enable, flash CS/SCK/MOSI/MISO.";
-      attribute :>> bringUpScope = "UART loopback, wireless module boot, flash JEDEC ID, privacy-preserving map summary path.";
-      attribute :>> manufacturingNotes = "Factory programming access must not expose user map data.";
       attribute :>> maxBoardAreaMm2 = 1800.0;
       attribute :>> powerDissipationBudget = 1.2 [W];
     }

@@ -90,8 +90,8 @@ package SoftwareImplementation {
   part def SoftwareHandoffPackage {
     doc /*
       Engineer-facing software implementation record package. The path
-      attributes refer to semantic source elements in FirmwareArchitecture,
-      InterfaceControl, PhysicalArchitecture, SystemRequirements, and
+      attributes refer to semantic source elements in PhysicalArchitecture,
+      FirmwareArchitecture, InterfaceControl, SystemRequirements, and
       Verification. Runtime facts such as startup phase, state ownership,
       error handling, stack/RAM, and WCET are owned by the firmware task
       definitions.
@@ -99,8 +99,8 @@ package SoftwareImplementation {
 
     // Firmware task implementation records.
     part missionControllerImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.missionController";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.applicationFirmware";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.missionController";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.applicationFirmware";
       attribute :>> requirementRefs = "reportCleaningStatus, recoverFromStall, superviseHazards, returnToDock";
       attribute :>> verificationRefs = "verifyFirmwareSchedulerTiming, verifyStallRecovery, verifyDockingSuccess, verifyProtocolContracts";
       attribute :>> mainResponsibility = "Mission state arbitration, command fan-out, low-battery return, bin/stall escalation, mission status publication.";
@@ -110,8 +110,8 @@ package SoftwareImplementation {
     }
 
     part safetySupervisorImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.safetySupervisor";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.safetySupervisor";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.safetySupervisor";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.safetySupervisor";
       attribute :>> requirementRefs = "superviseHazards, detectCliffs, chargeSafely";
       attribute :>> verificationRefs = "verifyCliffDetection, verifyLiftOvercurrentThermalHazards, verifyFirmwareSchedulerTiming";
       attribute :>> mainResponsibility = "Aggregate hazards and diagnostics, latch safety-critical faults, command force stop within safe-stop budget.";
@@ -121,8 +121,8 @@ package SoftwareImplementation {
     }
 
     part sensorAcquisitionImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.sensorAcquisition";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.mapProcessing";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.sensorAcquisition";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.mapProcessing";
       attribute :>> requirementRefs = "avoidObstacles, detectCliffs, supportRoomScaleSlam";
       attribute :>> verificationRefs = "verifyObstacleAvoidance, verifyCliffDetection, verifyRoomScaleSlam, verifyElectricalInterfaceControl";
       attribute :>> mainResponsibility = "Poll ToF, cliff, IMU and LiDAR drivers; publish HazardEvent, LidarScanFrame and obstacle observations.";
@@ -132,8 +132,8 @@ package SoftwareImplementation {
     }
 
     part slamImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.slam";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.mapProcessing";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.slam";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.mapProcessing";
       attribute :>> requirementRefs = "supportRoomScaleSlam, updateCoverageMap, localizeReliably";
       attribute :>> verificationRefs = "verifyRoomScaleSlam, verifyCoverageMap, verifyLocalizationAccuracy";
       attribute :>> mainResponsibility = "Maintain pose graph and local occupancy-grid updates from LiDAR and fused pose input.";
@@ -143,8 +143,8 @@ package SoftwareImplementation {
     }
 
     part localizationImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.localization";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.localizationEstimator";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.localization";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.localizationEstimator";
       attribute :>> requirementRefs = "localizeReliably, supportRoomScaleSlam";
       attribute :>> verificationRefs = "verifyLocalizationAccuracy, verifyRoomScaleSlam, verifyFirmwareSchedulerTiming";
       attribute :>> mainResponsibility = "Fuse wheel odometry, IMU, LiDAR scan features, and pose-graph corrections into PoseEstimate.";
@@ -154,8 +154,8 @@ package SoftwareImplementation {
     }
 
     part coveragePlannerImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.coveragePlanner";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.coveragePlanner";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.coveragePlanner";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.coveragePlanner";
       attribute :>> requirementRefs = "coverFloor, updateCoverageMap, cleanAtLeastEighty";
       attribute :>> verificationRefs = "verifyCleaningCoverage, verifyCoverageMap, verifyRoomScaleSlam";
       attribute :>> mainResponsibility = "Convert pose and map updates into drive commands and cleaned/unreachable/unknown map updates.";
@@ -165,8 +165,8 @@ package SoftwareImplementation {
     }
 
     part motorControlImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.motorControl";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.applicationFirmware";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.motorControl";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.applicationFirmware";
       attribute :>> requirementRefs = "avoidObstacles, recoverFromStall, superviseHazards";
       attribute :>> verificationRefs = "verifyStallRecovery, verifyLiftOvercurrentThermalHazards, verifyFirmwareSchedulerTiming";
       attribute :>> mainResponsibility = "Translate DriveCommand into PWM outputs, monitor encoders and driver faults, publish motion hazards.";
@@ -176,8 +176,8 @@ package SoftwareImplementation {
     }
 
     part appProtocolImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.appProtocol";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.applicationFirmware";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.appProtocol";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.applicationFirmware";
       attribute :>> requirementRefs = "reportCleaningStatus, protectMapPrivacy, notifyMaintenanceNeeded";
       attribute :>> verificationRefs = "verifyProtocolContracts, verifyPrivacyControls, verifyFirmwareSchedulerTiming";
       attribute :>> mainResponsibility = "Encode/decode app protocol, publish user commands, expose mission and diagnostic summaries.";
@@ -187,8 +187,8 @@ package SoftwareImplementation {
     }
 
     part storageImplementation : SoftwareImplementationRecord {
-      attribute :>> taskPath = "FirmwareArchitecture::firmwareTaskArchitecture.storage";
-      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.robotFirmware.applicationFirmware";
+      attribute :>> taskPath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks.storage";
+      attribute :>> owningModulePath = "PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.applicationFirmware";
       attribute :>> requirementRefs = "protectMapPrivacy, updateCoverageMap, notifyMaintenanceNeeded";
       attribute :>> verificationRefs = "verifyPrivacyControls, verifyCoverageMap, verifyProtocolContracts";
       attribute :>> mainResponsibility = "Persist local map updates, diagnostics and maintenance state to external flash.";

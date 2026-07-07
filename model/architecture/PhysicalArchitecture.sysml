@@ -13,6 +13,7 @@ package PhysicalArchitecture {
   private import PhysicalProtocols::*;
   private import BehaviorStates::*;
   private import FirmwareArchitecture::*;
+  private import ArchitectureAllocations::*;
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;
@@ -229,7 +230,7 @@ package PhysicalArchitecture {
     port cliffHazardOut : GpioPort {
       doc /*
         Cliff sensor hazard lines; fail-safe active-low where supported.
-        Aggregated with other safety GPIO at main electronics hazardIn.
+        Routed to mainElectronics.cliffHazardIn at the robot integration boundary.
       */
     }
     part sensorI2c : SensorI2cBus;
@@ -475,7 +476,9 @@ package PhysicalArchitecture {
 
   part def MainElectronicsAssembly :> PhysicalAssembly {
     doc /*
-      Compute LRU: main PCB, motor drivers, and all deployed navigation/perception/control firmware.
+      Compute LRU: main PCB, motor-driver section, safety GPIO harness, and
+      external harness ports. Deployable firmware and task architecture live at
+      the robot level and allocate to mainControlPcb.mcu.
     */
     attribute controlLoopPeriod : DurationValue = 50 [ms];
     attribute hazardReactionTime : DurationValue = 100 [ms];
@@ -530,16 +533,33 @@ package PhysicalArchitecture {
         Sampled at 10 ms safety period.
       */
     }
+    port cliffHazardIn : GpioPort {
+      doc /* Cliff sensor hazard lines from sensor assembly; routed to safety GPIO harness. */
+    }
+    port bumperHazardIn : GpioPort {
+      doc /* Bumper hazard line from drive module; routed to safety GPIO harness. */
+    }
+    port cleaningFaultIn : GpioPort {
+      doc /* Cleaning-head fault line; routed to safety GPIO harness. */
+    }
+    port bmsAlertIn : GpioPort {
+      doc /* BMS alert line from power module; routed to safety GPIO harness. */
+    }
     port statusOut : MissionStatusPort;
     port userCommandIn : GpioPort;
     part mainControlPcb : MainControlPcb;
-    part robotFirmware : RobotFirmwareSuite;
     part safetyGpioHarness : SafetyGpioHarness;
+    connect powerIn to mainControlPcb.leftMotorDriver.powerIn;
+    connect powerIn to mainControlPcb.rightMotorDriver.powerIn;
     connect sensorBusIn to mainControlPcb.sensorBusHarness;
     connect lidarSerialIn to mainControlPcb.lidarUartHarness;
     connect bmsBusIn to mainControlPcb.bmsBusHarness;
     connect mainControlPcb.leftMotorPhaseOut to leftMotorPhaseOut;
     connect mainControlPcb.rightMotorPhaseOut to rightMotorPhaseOut;
+    connect cliffHazardIn to safetyGpioHarness.cliffIn;
+    connect bumperHazardIn to safetyGpioHarness.bumperIn;
+    connect cleaningFaultIn to safetyGpioHarness.cleaningFaultIn;
+    connect bmsAlertIn to safetyGpioHarness.bmsAlertIn;
     connect mainControlPcb.leftMotorDriver.faultOut to safetyGpioHarness.motorFaultLeftIn;
     connect mainControlPcb.rightMotorDriver.faultOut to safetyGpioHarness.motorFaultRightIn;
     connect mainControlPcb.liftSensorInput.hazardOut to safetyGpioHarness.liftIn;
@@ -592,6 +612,7 @@ package PhysicalArchitecture {
     part powerModule : PowerModule;
     part dockInterface : DockInterfaceModule;
     part hmi : HumanMachineInterface;
+    part robotFirmware : RobotFirmwareSuite;
     part firmwareTasks : FirmwareTaskArchitecture;
 
     connect powerModule.mainPowerOut to cleaningHead.powerIn;
@@ -599,8 +620,6 @@ package PhysicalArchitecture {
     connect powerModule.mainPowerOut to mainElectronics.powerIn;
     connect powerModule.mainPowerOut to dockInterface.powerIn;
     connect powerModule.mainPowerOut to hmi.powerIn;
-    connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.leftMotorDriver.powerIn;
-    connect powerModule.mainPowerOut to mainElectronics.mainControlPcb.rightMotorDriver.powerIn;
     connect mainElectronics.leftMotorPhaseOut to driveModule.phaseLeftIn;
     connect mainElectronics.rightMotorPhaseOut to driveModule.phaseRightIn;
     connect driveModule.leftEncoderOut to mainElectronics.leftEncoderIn;
@@ -615,31 +634,31 @@ package PhysicalArchitecture {
     connect mainElectronics.statusOut to hmi.statusIn;
     connect hmi.userCommandOut to mainElectronics.userCommandIn;
     connect dockInterface.dockStatusOut to mainElectronics.dockStatusIn;
-    connect sensorAssembly.cliffHazardOut to mainElectronics.safetyGpioHarness.cliffIn;
-    connect driveModule.bumperHazardOut to mainElectronics.safetyGpioHarness.bumperIn;
-    connect cleaningHead.faultOut to mainElectronics.safetyGpioHarness.cleaningFaultIn;
-    connect powerModule.hazardOut to mainElectronics.safetyGpioHarness.bmsAlertIn;
+    connect sensorAssembly.cliffHazardOut to mainElectronics.cliffHazardIn;
+    connect driveModule.bumperHazardOut to mainElectronics.bumperHazardIn;
+    connect cleaningHead.faultOut to mainElectronics.cleaningFaultIn;
+    connect powerModule.hazardOut to mainElectronics.bmsAlertIn;
 
     // Firmware task ownership by deployable software module.
-    allocate firmwareTasks.missionController to mainElectronics.robotFirmware.applicationFirmware;
-    allocate firmwareTasks.motorControl to mainElectronics.robotFirmware.applicationFirmware;
-    allocate firmwareTasks.cleaningControl to mainElectronics.robotFirmware.applicationFirmware;
-    allocate firmwareTasks.appProtocol to mainElectronics.robotFirmware.applicationFirmware;
-    allocate firmwareTasks.diagnostics to mainElectronics.robotFirmware.applicationFirmware;
-    allocate firmwareTasks.storage to mainElectronics.robotFirmware.applicationFirmware;
-    allocate firmwareTasks.safetySupervisor to mainElectronics.robotFirmware.safetySupervisor;
-    allocate firmwareTasks.batteryManager to mainElectronics.robotFirmware.safetySupervisor;
-    allocate firmwareTasks.sensorAcquisition to mainElectronics.robotFirmware.mapProcessing;
-    allocate firmwareTasks.slam to mainElectronics.robotFirmware.mapProcessing;
-    allocate firmwareTasks.localization to mainElectronics.robotFirmware.localizationEstimator;
-    allocate firmwareTasks.coveragePlanner to mainElectronics.robotFirmware.coveragePlanner;
+    allocate firmwareTasks.missionController to robotFirmware.applicationFirmware;
+    allocate firmwareTasks.motorControl to robotFirmware.applicationFirmware;
+    allocate firmwareTasks.cleaningControl to robotFirmware.applicationFirmware;
+    allocate firmwareTasks.appProtocol to robotFirmware.applicationFirmware;
+    allocate firmwareTasks.diagnostics to robotFirmware.applicationFirmware;
+    allocate firmwareTasks.storage to robotFirmware.applicationFirmware;
+    allocate firmwareTasks.safetySupervisor to robotFirmware.safetySupervisor;
+    allocate firmwareTasks.batteryManager to robotFirmware.safetySupervisor;
+    allocate firmwareTasks.sensorAcquisition to robotFirmware.mapProcessing;
+    allocate firmwareTasks.slam to robotFirmware.mapProcessing;
+    allocate firmwareTasks.localization to robotFirmware.localizationEstimator;
+    allocate firmwareTasks.coveragePlanner to robotFirmware.coveragePlanner;
 
-    // Firmware task and module deployment to the MCU execution node.
-    allocate mainElectronics.robotFirmware.applicationFirmware to mainElectronics.mainControlPcb.mcu;
-    allocate mainElectronics.robotFirmware.safetySupervisor to mainElectronics.mainControlPcb.mcu;
-    allocate mainElectronics.robotFirmware.mapProcessing to mainElectronics.mainControlPcb.mcu;
-    allocate mainElectronics.robotFirmware.localizationEstimator to mainElectronics.mainControlPcb.mcu;
-    allocate mainElectronics.robotFirmware.coveragePlanner to mainElectronics.mainControlPcb.mcu;
+    // Deployable software modules and firmware tasks on the MCU execution node.
+    allocate robotFirmware.applicationFirmware to mainElectronics.mainControlPcb.mcu;
+    allocate robotFirmware.safetySupervisor to mainElectronics.mainControlPcb.mcu;
+    allocate robotFirmware.mapProcessing to mainElectronics.mainControlPcb.mcu;
+    allocate robotFirmware.localizationEstimator to mainElectronics.mainControlPcb.mcu;
+    allocate robotFirmware.coveragePlanner to mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.missionController to mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.safetySupervisor to mainElectronics.mainControlPcb.mcu;
     allocate firmwareTasks.motorControl to mainElectronics.mainControlPcb.mcu;
