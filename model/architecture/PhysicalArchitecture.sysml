@@ -653,23 +653,11 @@ package PhysicalArchitecture {
     allocate firmwareTasks.localization to robotFirmware.localizationEstimator;
     allocate firmwareTasks.coveragePlanner to robotFirmware.coveragePlanner;
 
-    // Deployable software modules and firmware tasks on the MCU execution node.
+    // Deployable software modules on the MCU execution node.
     allocate robotFirmware.applicationFirmware to mainElectronics.mainControlPcb.mcu;
     allocate robotFirmware.safetySupervisor to mainElectronics.mainControlPcb.mcu;
     allocate robotFirmware.mapProcessing to mainElectronics.mainControlPcb.mcu;
     allocate robotFirmware.localizationEstimator to mainElectronics.mainControlPcb.mcu;
     allocate robotFirmware.coveragePlanner to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.missionController to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.safetySupervisor to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.motorControl to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.sensorAcquisition to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.localization to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.slam to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.coveragePlanner to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.batteryManager to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.cleaningControl to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.appProtocol to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.diagnostics to mainElectronics.mainControlPcb.mcu;
-    allocate firmwareTasks.storage to mainElectronics.mainControlPcb.mcu;
   }
 }

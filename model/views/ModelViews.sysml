@@ -52,19 +52,31 @@ package ModelViews {
     frame productIntegration;
   }
 
-  view firmwareTaskArchitecture : InterconnectionView {
-    satisfy firmwareRuntimePerspective;
-    expose PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks;
+  concern productArchitecture {
+    doc /* How is the robot product broken down into major assemblies and software? */
+    subject;
+    stakeholder :>> systemsEngineer;
+    stakeholder :>> productOwner;
   }
 
-  view firmwareDeployment : InterconnectionView {
+  viewpoint productArchitecturePerspective {
+    frame productArchitecture;
+  }
+
+  view productDecomposition : GeneralView {
+    satisfy productArchitecturePerspective;
+    expose Architecture::robotSystem.physical;
+    filter @PartUsage;
+  }
+
+  view firmwareDeployment : GeneralView {
     satisfy firmwareRuntimePerspective;
     expose PhysicalArchitecture::AutonomousFloorCleaningRobot.firmwareTasks;
     expose PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware;
     expose PhysicalArchitecture::AutonomousFloorCleaningRobot.mainElectronics.mainControlPcb.mcu;
   }
 
-  view robotLruInterconnection : InterconnectionView {
+  view interconnections : InterconnectionView {
     satisfy productIntegrationPerspective;
     expose Architecture::robotSystem.physical.chassis;
     expose Architecture::robotSystem.physical.driveModule;
