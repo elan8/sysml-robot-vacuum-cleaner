@@ -12,6 +12,7 @@ package FirmwareArchitecture {
   private import ArchitectureCommon::*;
   private import InterfaceControl::*;
   private import SoftwareCore::*;
+  private import VacuumCleanerQuantitiesAndUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

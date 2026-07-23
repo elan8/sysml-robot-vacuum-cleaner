@@ -17,6 +17,7 @@ package PhysicalArchitecture {
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;
+  private import VacuumCleanerQuantitiesAndUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

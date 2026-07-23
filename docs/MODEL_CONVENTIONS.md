@@ -18,6 +18,7 @@ These conventions keep the SysML model readable and maintainable while preservin
 
 ## Package Ownership
 
+- `VacuumCleanerQuantitiesAndUnits` owns project-specific measurement-unit declarations and their standard-library-based conversions. It should not duplicate units already declared by the loaded OMG libraries.
 - `Strata` owns way-of-working concepts, metadata definitions, completeness rules, and extraction rules. It should not own product-specific engineering facts.
 - Requirements packages own requirement intent and derivation. They should not own implementation structure.
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.

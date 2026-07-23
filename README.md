@@ -43,6 +43,8 @@ Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). Pull
 
 The model imports packages from the SysML v2 standard library and from the Elan8 domain libraries, including the electronics-focused KPAR packages published in [`elan8/sysml-domain-libraries`](https://github.com/elan8/sysml-domain-libraries).
 
+Project-specific measurement units are declared in [`VacuumCleanerQuantitiesAndUnits.sysml`](model/libraries/VacuumCleanerQuantitiesAndUnits.sysml). The `Ah`, `mAh`, and `ms` symbols are explicit model elements rather than tool-provided shorthand.
+
 Spec42 resolves the required libraries in its validation workflow. If you open or validate this repository with another SysML v2 tool, make sure that tool has access to both the SysML v2 standard library KPAR and the Elan8 domain-library KPARs, or configure equivalent library search paths before loading `model/`.
 
 ## What Is Modeled

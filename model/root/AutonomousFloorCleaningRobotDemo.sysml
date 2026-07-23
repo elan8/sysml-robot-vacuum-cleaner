@@ -10,6 +10,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import Strata::*;
   private import RequirementManagement::*;
   private import MonetaryUnits::*;
+  private import VacuumCleanerQuantitiesAndUnits::*;
   private import DesignLimits::*;
   private import StakeholderNeeds::*;
   private import SystemRequirements::*;

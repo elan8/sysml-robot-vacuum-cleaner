@@ -16,6 +16,7 @@ package SoftwareImplementation {
   private import PhysicalArchitecture::*;
   private import SystemRequirements::*;
   private import Verification::*;
+  private import VacuumCleanerQuantitiesAndUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

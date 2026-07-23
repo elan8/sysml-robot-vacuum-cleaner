@@ -8,6 +8,7 @@
  */
 package DesignLimits {
   private import MonetaryUnits::*;
+  private import VacuumCleanerQuantitiesAndUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

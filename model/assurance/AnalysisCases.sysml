@@ -10,6 +10,7 @@
 package AnalysisCases {
   private import Architecture::*;
   private import MonetaryUnits::*;
+  private import VacuumCleanerQuantitiesAndUnits::*;
   private import DesignLimits::*;
   private import ISQ::*;
   private import SI::*;

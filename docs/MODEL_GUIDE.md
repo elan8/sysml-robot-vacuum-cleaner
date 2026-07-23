@@ -27,6 +27,7 @@ The model is intentionally layered from product intent to implementation evidenc
 
 | Layer | Main packages | Purpose |
 | --- | --- | --- |
+| Libraries | `VacuumCleanerQuantitiesAndUnits` | Project-specific measurement units declared in terms of the OMG quantities-and-units library. |
 | Method | `Strata` | Way-of-working concepts, ownership and maturity metadata, completeness rules, and extraction rules for CPS and software-only models. |
 | Requirements | `StakeholderNeeds`, `SystemRequirements`, `DesignLimits` | User needs, derived system requirements, and shared numeric limits. |
 | Context | `ProductContext`, `OperationalScenarios` | External actors, home environment, dock, app/cloud, and mission flows. |
@@ -44,6 +45,7 @@ The `model/` directory mirrors the layer structure for navigation. The folder na
 ```text
 model/
   root/
+  libraries/
   method/
   requirements/
   context/
@@ -69,6 +71,7 @@ model/
 
 | Package | Owns | Key dependencies |
 | --- | --- | --- |
+| `VacuumCleanerQuantitiesAndUnits` | Project-specific `Ah` and `mAh` electric-charge units and the `ms` duration unit. | OMG measurement references, ISQ, SI, and SI prefixes. |
 | `Strata` | Lightweight method metadata, artifact kinds, completeness rules, and extraction rules. | Scalar values. |
 | `StakeholderNeeds` | User-facing needs with requirement metadata. | Requirement and modeling metadata libraries. |
 | `SystemRequirements` | Derived system requirements and derivation links. | `StakeholderNeeds`, metadata libraries. |
