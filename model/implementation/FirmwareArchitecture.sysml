@@ -29,6 +29,12 @@ package FirmwareArchitecture {
 
   enum def SchedulingPolicy { fixedPriorityCooperative; }
 
+  enum def QueueDiscipline {
+    overwriteLatest;
+    fifoDropOldest;
+    fifoDropNewest;
+  }
+
   enum def StartupPhase {
     bootSelfTest;
     schedulerStart;
@@ -40,16 +46,47 @@ package FirmwareArchitecture {
   // producer/consumer relationships can be asserted with typed flows rather
   // than free-form strings. Concrete tasks redefine timing and criticality.
   part def FirmwareTask :> SoftwareComponent {
-    attribute taskName : String;
     attribute period : DurationValue;
     attribute deadline : DurationValue;
     attribute criticality : TaskCriticality;
     attribute startupPhase : StartupPhase;
-    attribute stateOwnedByTask : String;
-    attribute errorHandling : String;
     attribute maxStackBytes : Integer;
     attribute maxStaticRamBytes : Integer;
     attribute wcetBudget : DurationValue;
+  }
+
+  part def SoftwareQueue {
+    attribute depth : Natural;
+    attribute discipline : QueueDiscipline;
+    attribute maxAge : DurationValue;
+  }
+
+  part def HazardEventQueue :> SoftwareQueue {
+    action transfer {
+      in item enqueue : HazardEvent;
+      out item dequeue : HazardEvent;
+    }
+  }
+
+  part def UserCommandQueue :> SoftwareQueue {
+    action transfer {
+      in item enqueue : UserCommand;
+      out item dequeue : UserCommand;
+    }
+  }
+
+  part def DriveCommandQueue :> SoftwareQueue {
+    action transfer {
+      in item enqueue : DriveCommand;
+      out item dequeue : DriveCommand;
+    }
+  }
+
+  part def MapUpdateQueue :> SoftwareQueue {
+    action transfer {
+      in item enqueue : MapUpdate;
+      out item dequeue : MapUpdate;
+    }
   }
 
   part def SchedulerModel {
@@ -61,13 +98,16 @@ package FirmwareArchitecture {
   // Each task part owns a run action that declares typed directed item
   // parameters; flows in FirmwareTaskArchitecture couple run.x to run.y.
   part def MissionControllerTask :> FirmwareTask {
-    attribute :>> taskName = "MissionControllerTask";
+    doc /*
+      Owns the authoritative mission-state mirror, command arbitration,
+      low-battery return, bin/stall escalation, and mission-status publication.
+      Safe-stop commands take priority over planner commands. Stale planner
+      input is held for one period and then converted to a forced stop.
+    */
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "RobotOperatingBehavior state mirror; authoritative mission state for app status.";
-    attribute :>> errorHandling = "On stale planner command, hold last safe command for one period then force stop; on hazard input, publish safe stop request in same activation.";
     attribute :>> maxStackBytes = 2048;
     attribute :>> maxStaticRamBytes = 4096;
     attribute :>> wcetBudget = 8 [ms];
@@ -83,13 +123,15 @@ package FirmwareArchitecture {
   }
 
   part def SafetySupervisorTask :> FirmwareTask {
-    attribute :>> taskName = "SafetySupervisorTask";
+    doc /*
+      Aggregates hazards and diagnostics, owns latched fault and clear-debounce
+      state, and commands a forced stop within the safe-stop budget. Input
+      disagreement is treated as an active fault.
+    */
     attribute :>> period = 10 [ms];
     attribute :>> deadline = 10 [ms];
     attribute :>> criticality = TaskCriticality::safetyCritical;
     attribute :>> startupPhase = StartupPhase::schedulerStart;
-    attribute :>> stateOwnedByTask = "latched fault state and safe-stop-clear debounce.";
-    attribute :>> errorHandling = "Fault input disagreement is treated as active fault; clear only after explicit safeStopCleared/service reset condition.";
     attribute :>> maxStackBytes = 1536;
     attribute :>> maxStaticRamBytes = 2048;
     attribute :>> wcetBudget = 2 [ms];
@@ -103,13 +145,15 @@ package FirmwareArchitecture {
   }
 
   part def MotorControlTask :> FirmwareTask {
-    attribute :>> taskName = "MotorControlTask";
+    doc /*
+      Translates drive commands into PWM behavior, owns command/ramp/stall
+      state, monitors encoders and driver faults, and publishes motion hazards.
+      Forced stop overrides ramping; driver faults disable PWM until cleared.
+    */
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::controlCritical;
     attribute :>> startupPhase = StartupPhase::schedulerStart;
-    attribute :>> stateOwnedByTask = "last command, stall timers, PWM ramp limiter.";
-    attribute :>> errorHandling = "Driver fault or encoder stall publishes HazardEvent and disables PWM until mission controller clears.";
     attribute :>> maxStackBytes = 1536;
     attribute :>> maxStaticRamBytes = 2048;
     attribute :>> wcetBudget = 5 [ms];
@@ -121,13 +165,15 @@ package FirmwareArchitecture {
   }
 
   part def SensorAcquisitionTask :> FirmwareTask {
-    attribute :>> taskName = "SensorAcquisitionTask";
+    doc /*
+      Polls ToF, cliff, IMU, and LiDAR inputs; owns sensor-health and last-good
+      timestamps; and publishes hazards, scans, and obstacle observations.
+      Safety GPIO is sampled before noncritical sensor reads.
+    */
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::controlCritical;
     attribute :>> startupPhase = StartupPhase::schedulerStart;
-    attribute :>> stateOwnedByTask = "sensor health and last-good sample timestamps.";
-    attribute :>> errorHandling = "Missing LiDAR frame raises diagnostic; cliff sensor active-low fault raises safetyCritical hazard immediately.";
     attribute :>> maxStackBytes = 3072;
     attribute :>> maxStaticRamBytes = 12288;
     attribute :>> wcetBudget = 12 [ms];
@@ -139,13 +185,15 @@ package FirmwareArchitecture {
   }
 
   part def LocalizationTask :> FirmwareTask {
-    attribute :>> taskName = "LocalizationTask";
+    doc /*
+      Fuses odometry, IMU, LiDAR, and pose-graph corrections into the pose
+      estimate. Owns estimator error/degraded state and falls back to
+      wheel/IMU prediction when scan or pose-graph input becomes stale.
+    */
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "pose estimate, covariance/error estimate, degraded-localization flag.";
-    attribute :>> errorHandling = "On stale pose graph or LiDAR scan, degrade to wheel/IMU prediction and raise diagnostic after timeout.";
     attribute :>> maxStackBytes = 3072;
     attribute :>> maxStaticRamBytes = 16384;
     attribute :>> wcetBudget = 12 [ms];
@@ -157,13 +205,15 @@ package FirmwareArchitecture {
   }
 
   part def SlamTask :> FirmwareTask {
-    attribute :>> taskName = "SlamTask";
+    doc /*
+      Maintains the pose-graph window and local occupancy-grid updates using
+      2D scan matching. Publishes compact pose/map updates and retains the last
+      stable map when matching confidence is insufficient.
+    */
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "pose graph window, loop closure candidate state, map stability score.";
-    attribute :>> errorHandling = "If scan matching confidence drops below threshold, request localization degraded diagnostic and keep previous stable map.";
     attribute :>> maxStackBytes = 4096;
     attribute :>> maxStaticRamBytes = 49152;
     attribute :>> wcetBudget = 35 [ms];
@@ -177,13 +227,14 @@ package FirmwareArchitecture {
 
   // Deferred flagship vision path retained for trade-study traceability.
   part def ObstacleClassificationTask :> FirmwareTask {
-    attribute :>> taskName = "ObstacleClassificationTask";
+    doc /*
+      Deferred flagship classifier. Its state and outputs are isolated from the
+      selected baseline and shall not affect safety or navigation commands.
+    */
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::deferredFlagship;
     attribute :>> startupPhase = StartupPhase::deferredStartup;
-    attribute :>> stateOwnedByTask = "deferred obstacle-classification state.";
-    attribute :>> errorHandling = "Deferred baseline task shall not affect safety or navigation command output.";
     attribute :>> maxStackBytes = 4096;
     attribute :>> maxStaticRamBytes = 32768;
     attribute :>> wcetBudget = 80 [ms];
@@ -194,13 +245,15 @@ package FirmwareArchitecture {
 
   // Planning, power, cleaning, app, diagnostic, and storage tasks.
   part def CoveragePlannerTask :> FirmwareTask {
-    attribute :>> taskName = "CoveragePlannerTask";
+    doc /*
+      Converts pose and map updates into coverage commands and cell-state
+      updates. Owns path/replanning state and requests recovery rather than
+      emitting a forward command when no safe local path exists.
+    */
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "coverage path cursor, replanning state, unreachable-cell marking.";
-    attribute :>> errorHandling = "If no safe local path exists, request obstacle recovery rather than emitting a forward command.";
     attribute :>> maxStackBytes = 3072;
     attribute :>> maxStaticRamBytes = 24576;
     attribute :>> wcetBudget = 40 [ms];
@@ -213,13 +266,15 @@ package FirmwareArchitecture {
   }
 
   part def BatteryManagerTask :> FirmwareTask {
-    attribute :>> taskName = "BatteryManagerTask";
+    doc /*
+      Owns battery telemetry freshness, low-battery threshold, and BMS fault
+      state. Stale telemetry or a BMS alert publishes a hazard and requests
+      mission return or stop according to severity.
+    */
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::safetyCritical;
     attribute :>> startupPhase = StartupPhase::schedulerStart;
-    attribute :>> stateOwnedByTask = "battery telemetry freshness, low-battery threshold state, BMS fault mirror.";
-    attribute :>> errorHandling = "BMS alert or stale telemetry emits HazardEvent and forces mission return or stop according to severity.";
     attribute :>> maxStackBytes = 1536;
     attribute :>> maxStaticRamBytes = 2048;
     attribute :>> wcetBudget = 5 [ms];
@@ -230,13 +285,15 @@ package FirmwareArchitecture {
   }
 
   part def CleaningControlTask :> FirmwareTask {
-    attribute :>> taskName = "CleaningControlTask";
+    doc /*
+      Owns brush/fan command and dust-bin debounce state. Actuator faults or a
+      missing bin publish diagnostics and, where continued motion is unsafe,
+      a hazard event.
+    */
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
     attribute :>> criticality = TaskCriticality::missionCritical;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "brush/fan command state, dust-bin status debounce, cleaning actuator diagnostics.";
-    attribute :>> errorHandling = "Actuator fault or missing bin emits DiagnosticEvent and HazardEvent when motion could continue unsafely.";
     attribute :>> maxStackBytes = 1536;
     attribute :>> maxStaticRamBytes = 2048;
     attribute :>> wcetBudget = 8 [ms];
@@ -248,13 +305,15 @@ package FirmwareArchitecture {
   }
 
   part def AppProtocolTask :> FirmwareTask {
-    attribute :>> taskName = "AppProtocolTask";
+    doc /*
+      Encodes and decodes the app protocol, owns version/consent/session state,
+      and exposes mission and diagnostic summaries. Raw map updates are never
+      serialized to the app path without an explicitly selected consent path.
+    */
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
     attribute :>> criticality = TaskCriticality::userFacing;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "protocol version, consent state, session health.";
-    attribute :>> errorHandling = "Malformed command frame is dropped and diagnostic warning is emitted; consent changes are idempotent.";
     attribute :>> maxStackBytes = 3072;
     attribute :>> maxStaticRamBytes = 8192;
     attribute :>> wcetBudget = 20 [ms];
@@ -268,13 +327,15 @@ package FirmwareArchitecture {
   }
 
   part def DiagnosticsTask :> FirmwareTask {
-    attribute :>> taskName = "DiagnosticsTask";
+    doc /*
+      Aggregates diagnostics and owns the publication window. Duplicate
+      diagnostics may be coalesced, but safety-critical diagnostics are never
+      discarded.
+    */
     attribute :>> period = 500 [ms];
     attribute :>> deadline = 500 [ms];
     attribute :>> criticality = TaskCriticality::diagnostic;
     attribute :>> startupPhase = StartupPhase::schedulerStart;
-    attribute :>> stateOwnedByTask = "diagnostic aggregation window and last published summary.";
-    attribute :>> errorHandling = "Dropped duplicate diagnostics are counted; safetyCritical diagnostics are never coalesced away.";
     attribute :>> maxStackBytes = 1536;
     attribute :>> maxStaticRamBytes = 4096;
     attribute :>> wcetBudget = 10 [ms];
@@ -285,13 +346,15 @@ package FirmwareArchitecture {
   }
 
   part def StorageTask :> FirmwareTask {
-    attribute :>> taskName = "StorageTask";
+    doc /*
+      Persists local map, diagnostic, and maintenance state; owns wear-level and
+      map-summary state; and prevents raw home-map geometry from entering the
+      app-visible summary. Failed writes retain the RAM copy and emit diagnostics.
+    */
     attribute :>> period = 1000 [ms];
     attribute :>> deadline = 1000 [ms];
     attribute :>> criticality = TaskCriticality::privacyCritical;
     attribute :>> startupPhase = StartupPhase::missionReady;
-    attribute :>> stateOwnedByTask = "wear-level cursor, map summary cache, privacy consent flag mirror.";
-    attribute :>> errorHandling = "On flash write failure, keep RAM cache, publish diagnostic and continue mission without cloud upload.";
     attribute :>> maxStackBytes = 2048;
     attribute :>> maxStaticRamBytes = 32768;
     attribute :>> wcetBudget = 100 [ms];
@@ -325,27 +388,64 @@ package FirmwareArchitecture {
     part storage : StorageTask;
     part deferredObstacleClassification : ObstacleClassificationTask;
 
-    // Producer -> consumer data flows (typed item transfers between task runs).
+    // Runtime queues are first-class typed transport resources.
+    part hazardQueue : HazardEventQueue {
+      attribute :>> depth = 8;
+      attribute :>> discipline = QueueDiscipline::fifoDropNewest;
+      attribute :>> maxAge = 100 [ms];
+      doc /* Overflow is represented by a synthetic safety-critical hazard. */
+    }
+    part userCommandQueue : UserCommandQueue {
+      attribute :>> depth = 4;
+      attribute :>> discipline = QueueDiscipline::overwriteLatest;
+      attribute :>> maxAge = 250 [ms];
+      doc /* Retain the newest idempotent user command. */
+    }
+    part plannerCommandQueue : DriveCommandQueue {
+      attribute :>> depth = 4;
+      attribute :>> discipline = QueueDiscipline::overwriteLatest;
+      attribute :>> maxAge = 100 [ms];
+      doc /* Retain the newest planner command; safety commands use a separate path. */
+    }
+    part safetyCommandQueue : DriveCommandQueue {
+      attribute :>> depth = 2;
+      attribute :>> discipline = QueueDiscipline::overwriteLatest;
+      attribute :>> maxAge = 20 [ms];
+      doc /* Safety commands are isolated from planner traffic and always take priority. */
+    }
+    part mapUpdateQueue : MapUpdateQueue {
+      attribute :>> depth = 16;
+      attribute :>> discipline = QueueDiscipline::fifoDropOldest;
+      attribute :>> maxAge = 5000 [ms];
+      doc /* Coalesce old updates while preserving the latest cell state. */
+    }
+
+    // Producer -> queue -> consumer data flows.
     flow sensorAcquisition.run.lidarScanOut to slam.run.lidarScanIn;
     flow sensorAcquisition.run.lidarScanOut to localization.run.lidarScanIn;
     flow slam.run.poseGraphOut to localization.run.poseGraphIn;
     flow localization.run.poseOut to slam.run.poseIn;
     flow localization.run.poseOut to coveragePlanner.run.poseIn;
-    flow slam.run.mapUpdateOut to storage.run.mapUpdateIn;
-    flow coveragePlanner.run.mapUpdateOut to storage.run.mapUpdateIn;
-    flow coveragePlanner.run.plannerCommandOut to missionController.run.plannerCommandIn;
+    flow slam.run.mapUpdateOut to mapUpdateQueue.transfer.enqueue;
+    flow coveragePlanner.run.mapUpdateOut to mapUpdateQueue.transfer.enqueue;
+    flow mapUpdateQueue.transfer.dequeue to storage.run.mapUpdateIn;
+    flow coveragePlanner.run.plannerCommandOut to plannerCommandQueue.transfer.enqueue;
+    flow plannerCommandQueue.transfer.dequeue to missionController.run.plannerCommandIn;
     flow batteryManager.run.batteryTelemetryOut to missionController.run.batteryTelemetryIn;
     flow batteryManager.run.batteryTelemetryOut to safetySupervisor.run.batteryTelemetryIn;
-    flow batteryManager.run.hazardOut to safetySupervisor.run.hazardIn;
-    flow sensorAcquisition.run.hazardOut to safetySupervisor.run.hazardIn;
-    flow motorControl.run.hazardOut to safetySupervisor.run.hazardIn;
-    flow cleaningControl.run.hazardOut to safetySupervisor.run.hazardIn;
+    flow batteryManager.run.hazardOut to hazardQueue.transfer.enqueue;
+    flow sensorAcquisition.run.hazardOut to hazardQueue.transfer.enqueue;
+    flow motorControl.run.hazardOut to hazardQueue.transfer.enqueue;
+    flow cleaningControl.run.hazardOut to hazardQueue.transfer.enqueue;
+    flow hazardQueue.transfer.dequeue to safetySupervisor.run.hazardIn;
     flow missionController.run.driveCommandOut to motorControl.run.driveCommandIn;
-    flow safetySupervisor.run.safeStopCommandOut to motorControl.run.driveCommandIn;
+    flow safetySupervisor.run.safeStopCommandOut to safetyCommandQueue.transfer.enqueue;
+    flow safetyCommandQueue.transfer.dequeue to motorControl.run.driveCommandIn;
     flow missionController.run.cleaningCommandOut to cleaningControl.run.cleaningCommandIn;
     flow missionController.run.missionStatusOut to appProtocol.run.missionStatusIn;
-    flow appProtocol.run.userCommandOut to missionController.run.userCommandIn;
-    flow appProtocol.run.userCommandOut to storage.run.userCommandIn;
+    flow appProtocol.run.userCommandOut to userCommandQueue.transfer.enqueue;
+    flow userCommandQueue.transfer.dequeue to missionController.run.userCommandIn;
+    flow userCommandQueue.transfer.dequeue to storage.run.userCommandIn;
     flow storage.run.mapSummaryOut to appProtocol.run.appMessageIn;
     flow motorControl.run.diagnosticOut to diagnostics.run.diagnosticIn;
     flow cleaningControl.run.diagnosticOut to diagnostics.run.diagnosticIn;

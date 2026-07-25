@@ -9,12 +9,16 @@
 package Verification {
   private import SystemRequirements::*;
   private import Architecture::*;
+  private import FirmwareArchitecture::*;
 
   action def RecordModelAnalysisEvidence {
     doc /* Capture the output of a model-based analysis case as traceable verification evidence. */
   }
   action def RunPhysicalTest {
     doc /* Execute a physical test procedure on a robot unit and record pass/fail evidence. */
+  }
+  action def RunSoftwareVerification {
+    doc /* Execute unit and integration checks against a typed firmware task and its runtime connections. */
   }
 
   verification verifyCleaningCoverage {
@@ -229,5 +233,75 @@ package Verification {
       verify requirement notifyMaintenanceNeeded;
     }
     then action runProtocolConformanceTest : RunPhysicalTest;
+  }
+
+  verification verifyMissionControllerImplementation {
+    doc /*
+      Exercise mission-state transitions, arbitration priority, stale-input
+      handling, app-to-mission commands, planner commands, and the safe-stop chain.
+    */
+    subject task : MissionControllerTask;
+    objective {
+      verify requirement reportCleaningStatus;
+      verify requirement recoverFromStall;
+      verify requirement returnToDock;
+    }
+    then action runMissionControllerChecks : RunSoftwareVerification;
+  }
+
+  verification verifySafetySupervisorImplementation {
+    doc /*
+      Exercise hazard mapping, latch/clear behavior, GPIO-to-stop propagation,
+      BMS escalation, and diagnostic publication.
+    */
+    subject task : SafetySupervisorTask;
+    objective {
+      verify requirement superviseHazards;
+      verify requirement detectCliffs;
+      verify requirement chargeSafely;
+    }
+    then action runSafetySupervisorChecks : RunSoftwareVerification;
+  }
+
+  verification verifySensorAcquisitionImplementation {
+    doc /*
+      Exercise sample normalization, stale-frame detection, cliff debounce,
+      I2C addressing, LiDAR framing, and safety-GPIO aggregation.
+    */
+    subject task : SensorAcquisitionTask;
+    objective {
+      verify requirement avoidObstacles;
+      verify requirement detectCliffs;
+      verify requirement supportRoomScaleSlam;
+    }
+    then action runSensorAcquisitionChecks : RunSoftwareVerification;
+  }
+
+  verification verifyMotorControlImplementation {
+    doc /*
+      Exercise command bounds, forced stop, PWM ramping, stall timing, encoder
+      feedback, and motor-driver fault propagation.
+    */
+    subject task : MotorControlTask;
+    objective {
+      verify requirement avoidObstacles;
+      verify requirement recoverFromStall;
+      verify requirement superviseHazards;
+    }
+    then action runMotorControlChecks : RunSoftwareVerification;
+  }
+
+  verification verifyAppPrivacyImplementation {
+    doc /*
+      Exercise protocol encoding, consent handling, malformed frames, local map
+      filtering, storage persistence, and app-command delivery.
+    */
+    subject task : AppProtocolTask;
+    objective {
+      verify requirement reportCleaningStatus;
+      verify requirement protectMapPrivacy;
+      verify requirement notifyMaintenanceNeeded;
+    }
+    then action runAppPrivacyChecks : RunSoftwareVerification;
   }
 }

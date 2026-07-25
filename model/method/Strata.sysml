@@ -73,6 +73,24 @@ package Strata {
     deferred;
   }
 
+  enum def ImplementationReadinessKind {
+    readyForSchematic;
+    needsComponentSelection;
+    needsLayoutDetail;
+    needsSafetyReview;
+    deferred;
+  }
+
+  enum def ImplementationDomainKind {
+    powerEntry;
+    motorDrive;
+    sensing;
+    compute;
+    wireless;
+    charging;
+    safetyMonitor;
+  }
+
   metadata def ModelLayer {
     attribute layer : ModelLayerKind;
     attribute description : String;
@@ -104,6 +122,12 @@ package Strata {
     attribute externalSystem : String;
     attribute externalId : String;
     attribute externalUrl : String;
+  }
+
+  metadata def ImplementationHandoff {
+    attribute artifactId : String;
+    attribute readiness : ImplementationReadinessKind;
+    attribute domain : ImplementationDomainKind;
   }
 
   part def MethodCompletenessRule {
@@ -152,16 +176,16 @@ package Strata {
       attribute :>> ruleId = "E8-CPS-SW-HANDOFF-001";
       attribute :>> appliesToArtifact = ArtifactKind::softwareImplementationHandoff;
       attribute :>> expectation = CompletionExpectationKind::required;
-      attribute :>> requiredFact = "Each software task has runtime timing, startup phase, owned state, error policy, resource budgets, message contracts, HAL bindings, requirements, verification refs, and test intent.";
-      attribute :>> validationHint = "Join SoftwareImplementationRecord.taskPath with FirmwareTask usages and related InterfaceControl, QueueContract, HalBinding, and verification refs.";
+      attribute :>> requiredFact = "Each software task has typed runtime flows, timing, startup phase, resource budgets, queue paths, peripheral allocations, requirements, and verification intent.";
+      attribute :>> validationHint = "Traverse FirmwareTask usages through typed flows, SoftwareQueue parts, TaskToPeripheralAccess allocations, satisfy links, and verification cases.";
     }
 
     part electronicsHandoffCompleteness : MethodCompletenessRule {
       attribute :>> ruleId = "E8-CPS-EE-HANDOFF-001";
       attribute :>> appliesToArtifact = ArtifactKind::electronicsImplementationHandoff;
       attribute :>> expectation = CompletionExpectationKind::required;
-      attribute :>> requiredFact = "Each electronics work package has owning board/harness, interface contracts, rail budgets, layout constraints, component candidates, and verification refs.";
-      attribute :>> validationHint = "Join ElectronicsWorkPackage records with ElectronicsInterfaceContract, RailBudgetRecord, and ComponentCandidate usages.";
+      attribute :>> requiredFact = "Each electronics handoff subject has authoritative typed ports and connections, interface metadata, semantic rail budgets, component candidates, and verification intent.";
+      attribute :>> validationHint = "Traverse physical parts and ports through connect relationships, ElectricalInterfaceInfo and ImplementationHandoff metadata, PowerRailBudget parts, ComponentCandidate refs, and verification cases.";
     }
 
     part componentSelectionCompleteness : MethodCompletenessRule {
@@ -175,19 +199,19 @@ package Strata {
     part softwareHandoffExtraction : MethodExtractionRule {
       attribute :>> ruleId = "E8-CPS-EXTRACT-SW-001";
       attribute :>> artifactKind = ArtifactKind::softwareImplementationHandoff;
-      attribute :>> sourcePackage = "Implementation, FirmwareArchitecture, InterfaceControl, SoftwareImplementation";
-      attribute :>> primaryElementKind = "SoftwareImplementationRecord";
-      attribute :>> joinHint = "Group by taskPath; join runtime facts from FirmwareTask, message facts from DataFlowContract and MessageFieldRule, queue facts from QueueContract, and driver facts from HalBinding.";
-      attribute :>> outputIntent = "Generate engineer-facing software task cards, queue tables, HAL driver cards, and verification checklists.";
+      attribute :>> sourcePackage = "Implementation, FirmwareArchitecture, InterfaceControl, PhysicalArchitecture, ArchitectureAllocations";
+      attribute :>> primaryElementKind = "FirmwareTask";
+      attribute :>> joinHint = "Start from FirmwareTask usages; traverse typed flows and queues, DataFlowContract ends, task-to-module and task-to-peripheral allocations, and verification cases.";
+      attribute :>> outputIntent = "Generate engineer-facing runtime, queue, peripheral-access, and verification views from the semantic graph.";
     }
 
     part electronicsHandoffExtraction : MethodExtractionRule {
       attribute :>> ruleId = "E8-CPS-EXTRACT-EE-001";
       attribute :>> artifactKind = ArtifactKind::electronicsImplementationHandoff;
-      attribute :>> sourcePackage = "Implementation, ElectronicsInterfaceControl, ElectronicsImplementation, ElectronicsComponentSelection";
-      attribute :>> primaryElementKind = "ElectronicsWorkPackage";
-      attribute :>> joinHint = "Group by owningBoardOrHarness; join interfaceContractRefs, railFeaturePath, relatedContractRefs, workPackageRefs, and verification refs.";
-      attribute :>> outputIntent = "Generate electronics work-package cards, connector/rail tables, and component-candidate sheets.";
+      attribute :>> sourcePackage = "Implementation, PhysicalArchitecture, ElectronicsInterfaceControl, ElectronicsComponentSelection";
+      attribute :>> primaryElementKind = "PartUsage and PortUsage";
+      attribute :>> joinHint = "Start from ImplementationHandoff-tagged physical usages; traverse ports, connects, ElectricalInterfaceInfo metadata, PowerRailBudget refs, and ComponentCandidate refs.";
+      attribute :>> outputIntent = "Generate electronics interface, rail-budget, readiness, and component-selection views from the semantic graph.";
     }
   }
 

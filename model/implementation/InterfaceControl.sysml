@@ -18,12 +18,13 @@ package InterfaceControl {
 
   // Message-layer enumerations (shared mission enums live in ArchitectureCommon).
   enum def AppMessageKind { command; status; mapSummary; diagnostic; consent; }
+  enum def AppProtocolVersion { v1; }
   enum def ObstacleClassName { cable; petWaste; shoe; unknown; }
 
   item def MapUpdate {
     attribute sequenceNumber : Integer;
     attribute changedCellCount : Integer;
-    attribute includesRawHomeMap : Boolean;
+    attribute includesRawHomeMap : Boolean = false;
   }
 
   item def DiagnosticEvent {
@@ -34,8 +35,8 @@ package InterfaceControl {
 
   item def AppMessage {
     attribute messageKind : AppMessageKind;
-    attribute protocolVersion : String;
-    attribute requiresConsent : Boolean;
+    attribute protocolVersion : AppProtocolVersion = AppProtocolVersion::v1;
+    attribute requiresConsent : Boolean = false;
   }
 
   item def LidarScanFrame {

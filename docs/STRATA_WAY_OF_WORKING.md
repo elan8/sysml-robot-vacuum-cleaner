@@ -102,7 +102,9 @@ A software engineer should be able to extract the following facts without readin
 - relevant requirements and verification cases;
 - algorithm notes, unit-test intent, and integration-test intent.
 
-In this repository those facts are composed through `Implementation`, `FirmwareArchitecture`, `InterfaceControl`, and `SoftwareImplementation`.
+In this repository those facts are composed through `Implementation`,
+`FirmwareArchitecture`, `InterfaceControl`, `PhysicalArchitecture`,
+`ArchitectureAllocations`, and `Verification`.
 
 ## Electronics Handoff Contract
 
@@ -114,18 +116,22 @@ An electronics engineer should be able to extract:
 - component candidates with manufacturer, MPN, package, footprint, critical specs, cost target, lifecycle/compliance status, and datasheet review status;
 - verification references to system-level cases.
 
-In this repository those facts are composed through `Implementation`, `ElectronicsInterfaceControl`, `ElectronicsImplementation`, and `ElectronicsComponentSelection`.
+In this repository those facts are composed through `Implementation`,
+`PhysicalArchitecture`, `ElectronicsInterfaceControl`,
+`ElectronicsComponentSelection`, and `Verification`.
 
 ## Extraction Rules
 
-Tooling should treat `Implementation` views as the main implementation entry point. It should then use method rules from `Strata` and package-specific handoff records to discover engineering facts.
+Tooling should treat `Implementation` views as the main implementation entry
+point. It should then use method rules from `Strata` and traverse native
+features, flows, connections, allocations, references, and metadata.
 
 Recommended extraction behavior:
 
 - Extract `MethodCompletenessRule` usages from `Strata` to learn required facts per artifact kind.
 - Extract `MethodExtractionRule` usages to find source packages, primary element kinds, join hints, and output intent.
 - Prefer native SysML relationships and typed features when available.
-- Use string paths only as compatibility bridges where the current tool cannot resolve the intended feature path.
+- Do not reconstruct internal model identity from string paths.
 - Report unresolved references as model hygiene findings rather than silently dropping them.
 
 ## Validation Expectations

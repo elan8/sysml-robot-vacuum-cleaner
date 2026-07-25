@@ -110,7 +110,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::deferred;
       attribute :>> optionName = "ToF plus IMU navigation";
       attribute :>> selectedModelElementPaths = "ProductVariants::NavigationSensorSuiteChoice::tofImuOnly; TradeStudies::sensorBaseline";
-      attribute :>> changedImplementationPaths = "PhysicalArchitecture::SensorAssembly; FirmwareArchitecture::LocalizationTask; FirmwareArchitecture::SlamTask; SoftwareImplementation localization/map records";
+      attribute :>> changedImplementationPaths = "PhysicalArchitecture::SensorAssembly; FirmwareArchitecture::LocalizationTask; FirmwareArchitecture::SlamTask; typed runtime queues and peripheral allocations";
       attribute :>> requirementRefs = "limitBomCost; localizeReliably; updateCoverageMap";
       attribute :>> verificationRefs = "Verification::verifyLocalizationPerformance; AnalysisCases::LocalizationPerformanceAnalysis";
       attribute :>> rationaleRef = "TradeStudies::sensorBaseline";
@@ -123,7 +123,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "ToF plus IMU plus 2D dToF/LiDAR";
       attribute :>> selectedModelElementPaths = "ProductVariants::NavigationSensorSuiteChoice::lidarSlamSuite; PhysicalArchitecture::AutonomousFloorCleaningRobot.sensorAssembly; ElectronicsComponentSelection::electronicsComponentSelectionBaseline.lidarModuleCandidate";
-      attribute :>> changedImplementationPaths = "InterfaceControl::lidarScanContract; FirmwareArchitecture::sensorAcquisition; FirmwareArchitecture::localization; FirmwareArchitecture::slam; ElectronicsInterfaceControl::electronicsInterfaceBaseline.lidarUart";
+      attribute :>> changedImplementationPaths = "FirmwareArchitecture sensor acquisition/localization/SLAM flows; PhysicalArchitecture LiDAR UART port metadata and peripheral allocation";
       attribute :>> requirementRefs = "localizeReliably; updateCoverageMap; protectMapPrivacy";
       attribute :>> verificationRefs = "Verification::verifyLocalizationPerformance; Verification::verifyCoverageMapping; Verification::verifyElectricalInterfaceControl";
       attribute :>> rationaleRef = "TradeStudies::sensorLidarUpgrade";
@@ -149,7 +149,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "standard low-power fan";
       attribute :>> selectedModelElementPaths = "ProductVariants::CleaningPerformanceChoice::standardQuietCleaning; TradeStudies::standardFan";
-      attribute :>> changedImplementationPaths = "PhysicalArchitecture::CleaningHeadModule; FirmwareArchitecture::cleaningControl; ElectronicsImplementation cleaning load budget";
+      attribute :>> changedImplementationPaths = "PhysicalArchitecture::CleaningHeadModule; FirmwareArchitecture::cleaningControl; PhysicalArchitecture power-rail budgets";
       attribute :>> requirementRefs = "keepNoise; cleanAtLeastEighty";
       attribute :>> verificationRefs = "Verification::verifyNoiseLimit; Verification::verifyCleaningCoverage";
       attribute :>> rationaleRef = "TradeStudies::standardFan";
@@ -175,7 +175,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "4S2P 12500 mAh pack";
       attribute :>> selectedModelElementPaths = "ProductVariants::BatteryPackChoice::pack4s2p12500mAh; PhysicalArchitecture::AutonomousFloorCleaningRobot.powerModule.batteryPack; TradeStudies::battery4s2p";
-      attribute :>> changedImplementationPaths = "DesignLimits::batteryCapacityBudget; ElectronicsImplementation::electronicsHandoff.batteryRailBudget; FirmwareArchitecture::batteryManager";
+      attribute :>> changedImplementationPaths = "DesignLimits::batteryCapacityBudget; PhysicalArchitecture::AutonomousFloorCleaningRobot.batteryRailBudget; FirmwareArchitecture::batteryManager";
       attribute :>> requirementRefs = "cleanAtLeastEighty; returnToDock; chargeSafely";
       attribute :>> verificationRefs = "Verification::verifyReturnToDock; Verification::verifyChargingSafety; AnalysisCases::MissionEnergyAnalysis";
       attribute :>> rationaleRef = "TradeStudies::battery4s2p";
@@ -188,7 +188,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "same-MCU safety supervisor";
       attribute :>> selectedModelElementPaths = "ProductVariants::SafetyMonitorChoice::sameMcuSafetySupervisor; PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.safetySupervisor; TradeStudies::sameMcuSafetySupervisor";
-      attribute :>> changedImplementationPaths = "FirmwareArchitecture::safetySupervisor; SoftwareImplementation::safetySupervisorImplementation; SafetyAnalysis hazard mitigations";
+      attribute :>> changedImplementationPaths = "FirmwareArchitecture::SafetySupervisorTask; typed hazard/safety queues; PhysicalArchitecture safety peripheral allocation; SafetyAnalysis hazard mitigations";
       attribute :>> requirementRefs = "superviseHazards; detectCliffs; detectBinRemovedOrMissing";
       attribute :>> verificationRefs = "Verification::verifyHazardSupervision; Verification::verifyElectricalInterfaceControl";
       attribute :>> rationaleRef = "TradeStudies::sameMcuSafetySupervisor";
@@ -201,7 +201,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "local-only privacy default";
       attribute :>> selectedModelElementPaths = "PhysicalArchitecture::AutonomousFloorCleaningRobot.cloudBackupDefaultEnabled; TradeStudies::localOnlyPrivacyDefault";
-      attribute :>> changedImplementationPaths = "SoftwareImplementation::appProtocolImplementation; FirmwareArchitecture::storage; InterfaceControl privacy consent fields";
+      attribute :>> changedImplementationPaths = "FirmwareArchitecture::AppProtocolTask; FirmwareArchitecture::StorageTask; InterfaceControl privacy consent fields";
       attribute :>> requirementRefs = "protectMapPrivacy";
       attribute :>> verificationRefs = "Verification::verifyMapPrivacy";
       attribute :>> rationaleRef = "TradeStudies::localOnlyPrivacyDefault";
@@ -214,7 +214,7 @@ package ProductVariants {
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
       attribute :>> optionName = "Wi-Fi/BLE local app link";
       attribute :>> selectedModelElementPaths = "ProductVariants::ConnectivityChoice::wifiBleLocalApp; ElectronicsComponentSelection::electronicsComponentSelectionBaseline.wirelessModuleCandidate";
-      attribute :>> changedImplementationPaths = "ElectronicsInterfaceControl::electronicsInterfaceBaseline.appUart; FirmwareArchitecture::appProtocol; SoftwareImplementation::appProtocolImplementation";
+      attribute :>> changedImplementationPaths = "PhysicalArchitecture app UART port metadata and wireless peripheral allocation; FirmwareArchitecture::AppProtocolTask";
       attribute :>> requirementRefs = "reportCleaningStatus; protectMapPrivacy";
       attribute :>> verificationRefs = "Verification::verifyStatusReporting; Verification::verifyMapPrivacy";
       attribute :>> rationaleRef = "ElectronicsComponentSelection::electronicsComponentSelectionBaseline.wirelessModuleCandidate";

@@ -42,9 +42,11 @@ package ArchitectureCommon {
     attribute safeStopRequired : Boolean;
   }
   item def DriveCommand {
-    attribute linearVelocityMmPerS : Real;
-    attribute angularVelocityDegPerS : Real;
-    attribute forceStop : Boolean;
+    attribute linearVelocityMmPerS : Real = 0.0;
+    attribute angularVelocityDegPerS : Real = 0.0;
+    attribute forceStop : Boolean = false;
+    constraint { linearVelocityMmPerS >= -350.0 }
+    constraint { linearVelocityMmPerS <= 350.0 }
   }
   item def CleaningCommand {
     attribute brushEnabled : Boolean;

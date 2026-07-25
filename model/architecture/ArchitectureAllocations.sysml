@@ -22,4 +22,16 @@ package ArchitectureAllocations {
     end software : ExecutableComponent;
     end computeNode : EmbeddedComputeUnit;
   }
+
+  allocation def TaskToPeripheralAccess {
+    end task : FirmwareTask;
+    end peripheral;
+  }
+
+  allocation def I2cMasterAccess :> TaskToPeripheralAccess;
+  allocation def UartDmaAccess :> TaskToPeripheralAccess;
+  allocation def PwmOutputAccess :> TaskToPeripheralAccess;
+  allocation def GpioInputAccess :> TaskToPeripheralAccess;
+  allocation def FlashStorageAccess :> TaskToPeripheralAccess;
+  allocation def WirelessUartAccess :> TaskToPeripheralAccess;
 }

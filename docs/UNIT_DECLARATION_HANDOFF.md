@@ -39,18 +39,18 @@ There are eight `[mAh]` literals:
 | `model/assurance/AnalysisCases.sysml` | 98 | `usableMissionBudget` |
 | `model/assurance/AnalysisCases.sysml` | 99 | `missionChargeMargin` |
 
-There are also 65 loaded `[ms]` literals:
+There are also 70 loaded `[ms]` literals:
 
 | File | Count |
 |------|------:|
-| `model/implementation/FirmwareArchitecture.sysml` | 58 |
+| `model/implementation/FirmwareArchitecture.sysml` | 63 |
 | `model/architecture/PhysicalArchitecture.sysml` | 4 |
-| `model/implementation/SoftwareImplementation.sysml` | 3 |
+| `model/assurance/AnalysisCases.sysml` | 1 |
+| `model/requirements/DesignLimits.sysml` | 2 |
 
-The strict Spec42 workspace run reports 68 `unknown_unit_symbol` diagnostics: all 65 loaded `[ms]`
-literals and the three `[mAh]` literals in `PhysicalArchitecture.sysml`. All eight `[mAh]` literals
-have the same declaration dependency and must be handled consistently even when a particular
-validation entry point does not currently report every occurrence.
+The original strict Spec42 workspace run reported unknown-unit diagnostics for
+these literals. The project unit library now resolves them, and the canonical
+workspace validation completes without diagnostics.
 
 ## Proposed model work
 

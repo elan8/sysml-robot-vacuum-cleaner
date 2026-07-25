@@ -17,7 +17,9 @@ Use this tour when evaluating the model as a high-end SysML v2 example:
 4. Read `PhysicalArchitecture` for product assemblies, typed ports, harnesses, firmware suite parts, and mass/BOM/power roll-ups.
 5. Read `ProductVariants` to see the product-line choices and selected SKU baselines.
 6. Read `ArchitectureAllocations` to follow capability-to-LRU, software-to-MCU, scenario-action, and firmware-task allocations.
-7. Read `Implementation` views, then the software and electronics implementation packages for message contracts, task timing/resource constraints, PCB/harness contracts, component candidates, software implementation records, electronics work packages, queues, HAL bindings, and rail budgets.
+7. Read `Implementation` views, then follow their exposed firmware tasks,
+   typed queues, peripheral allocations, physical ports, rail budgets,
+   component candidates, and verification cases in the shared semantic graph.
 8. Read `SafetyAnalysis`, `TradeStudies`, `Verification`, and `AnalysisCases` for assurance, rationale, and engineering margins.
 9. Finish in `ModelViews` and `Implementation` views for curated stakeholder and engineer slices over the same source model.
 
@@ -33,7 +35,7 @@ The model is intentionally layered from product intent to implementation evidenc
 | Context | `ProductContext`, `OperationalScenarios` | External actors, home environment, dock, app/cloud, and mission flows. |
 | Architecture | `ArchitectureCommon`, `PhysicalProtocols`, `FunctionalArchitecture`, `PhysicalArchitecture`, `ArchitectureAllocations`, `Architecture` | Functional capabilities, product assemblies, typed interfaces, and allocation links. |
 | Variants | `ProductVariants` | Native SysML variation choices, variant option records, selected SKU baselines, and implementation/verification impact summaries. |
-| Implementation | `Implementation`, `InterfaceControl`, `FirmwareArchitecture`, `SoftwareImplementation`, `ElectronicsInterfaceControl`, `ElectronicsImplementation`, `ElectronicsComponentSelection` | Implementation views, software message contracts, firmware tasks, scheduler assumptions, runtime/resource constraints, PCB/harness contracts, component candidates, software implementation records, electronics work packages, queue policies, HAL bindings, rail budgets, and test intent. Harness ICD notes live on `PhysicalArchitecture` ports. |
+| Implementation | `Implementation`, `InterfaceControl`, `FirmwareArchitecture`, `ElectronicsInterfaceControl`, `ElectronicsComponentSelection`, plus implementation facts in `PhysicalArchitecture` | Views over software contracts, firmware tasks, typed queues, scheduler/resource constraints, peripheral allocations, physical interface metadata, semantic rail budgets, component candidates, and verification intent. |
 | Assurance | `SafetyAnalysis`, `TradeStudies`, `Verification`, `AnalysisCases` | Hazards, mitigations, trade rationale, verification cases, and engineering margins. |
 | Views | `ModelViews`, `Implementation` | Firmware diagram views and electronics work-package handoff. |
 | Root | `AutonomousFloorCleaningRobotDemo` | Import hub for loading the full workspace. |
@@ -62,9 +64,11 @@ model/
 - Needs to evidence: stakeholder needs derive system requirements, which are satisfied by design elements and verified by cases or analyses.
 - Context to architecture: product context defines external interactions; architecture packages define the robot boundary and internal realization.
 - Function to realization: functional actions allocate to physical LRUs, firmware modules, and MCU execution targets.
-- Variants to implementation impact: product variants define selected and deferred choices, then point to changed architecture, software, electronics, verification, and trade-study records.
+- Variants to implementation impact: product variants define selected and deferred choices, then point to changed architecture, software, electronics, verification, and trade-study elements.
 - Safety assurance: hazards link to mitigations, safety requirements, implementation elements, analyses, and verification cases.
-- Implementation handoff: `Implementation` provides the software/electronics entry point, while electrical interfaces, software contracts, firmware task constraints, electronics contracts, component candidates, PCB/harness work packages, and software implementation records provide a bridge from MBSE model to PCB and embedded-software work.
+- Implementation handoff: `Implementation` provides the software/electronics
+  entry point; its views expose the authoritative runtime, allocation,
+  interface, rail, component-selection, and verification elements directly.
 - Design rationale: trade studies record selected and deferred product options, including the privacy-conscious LiDAR SLAM baseline.
 
 ## Package Map
@@ -80,16 +84,14 @@ model/
 | `PhysicalProtocols` | Product-specific bus aliases and domain electronics imports. | Electronics, bus, wireless, and software domain libraries. |
 | `ProductContext` | External systems and residential cleaning context. | Architecture and protocol packages. |
 | `FunctionalArchitecture` | Capability `action def`s and mission actions. | `ArchitectureCommon`, `SystemRequirements`. |
-| `PhysicalArchitecture` | Product assemblies, physical harnesses, harness port ICD docs, authoritative `firmwareTasks` and `robotFirmware` instances, task/module/MCU allocations, and roll-ups. | Common items, protocols, behavior, software, compute, units. |
-| `ArchitectureAllocations` | `TaskToSoftwareModule`, `SoftwareToComputeNode`, and reusable allocation definition types. | Firmware architecture, software core, embedded compute libraries. |
+| `PhysicalArchitecture` | Product assemblies, physical harnesses, interface metadata, semantic rail budgets, authoritative task/software instances, task/module/MCU/peripheral allocations, and roll-ups. | Common items, protocols, behavior, software, compute, units. |
+| `ArchitectureAllocations` | Task-to-software, software-to-compute, and typed task-to-peripheral allocation definitions. | Firmware architecture, software core, embedded compute libraries. |
 | `Architecture` | Public architecture import hub and `robot` part. | Architecture packages and system requirements. |
 | `ProductVariants` | Product-line variation definitions, variant option records, SKU configuration baselines, and implementation/verification impact summaries. | Physical architecture, firmware architecture, component selection. |
 | `InterfaceControl` | Software-facing message contracts and producer/consumer ownership. | Common items and software library. |
-| `FirmwareArchitecture` | Firmware task definitions, scheduler model, `FirmwareTaskArchitecture` structure, flows, and embedded interface-control contracts. | Common items, contracts, physical architecture, software library. |
-| `SoftwareImplementation` | Engineer-facing software implementation records, queue contracts, message field rules, HAL bindings, and test intent. | Firmware architecture, interface control, physical architecture, requirements, verification. |
-| `ElectronicsInterfaceControl` | Electronics connector, signal, rail, bus, harness, and test-point contracts. | Physical architecture, physical protocols, units. |
-| `ElectronicsImplementation` | PCB/harness work packages, schematic/layout constraints, BOM notes, and rail budgets. | Physical architecture, electronics interface control, requirements, verification. |
-| `ElectronicsComponentSelection` | Baseline component candidates, MPNs, footprints, key specs, cost targets, lifecycle status, and selection rationale. | Physical architecture, electronics interface control, electronics implementation, monetary units. |
+| `FirmwareArchitecture` | Firmware task definitions, scheduler model, typed runtime queues, task structure, flows, and embedded data contracts. | Common items, contracts, software library. |
+| `ElectronicsInterfaceControl` | Reusable interface kind, direction, criticality, and quantity metadata. | Scalar values and ISQ. |
+| `ElectronicsComponentSelection` | Component candidates with refs to physical targets/interfaces, typed limits, MPNs, lifecycle status, and rationale. | Architecture, physical architecture, interface metadata, monetary units. |
 | `BehaviorStates` | Operating lifecycle and detailed behavior fragments. | None beyond SysML basics. |
 | `OperationalScenarios` | Scenario-level use cases over context and functional actions. | Architecture, functional architecture, product context. |
 | `SafetyAnalysis` | Hazards, mitigations, safety satisfaction, and safety evidence links. | Requirements, design, behavior, verification, analysis packages. |
@@ -97,7 +99,7 @@ model/
 | `Verification` | Verification cases and evidence intent. | Requirements and architecture. |
 | `AnalysisCases` | Power, mass, cost, energy, localization, coverage, and timing analyses. | Architecture, design limits, units. |
 | `ModelViews` | Firmware task/deployment interconnection views and requirements traceability. | Requirements, physical architecture, verification. |
-| `Implementation` | Electronics work-package handoff view. | Electronics implementation package, views. |
+| `Implementation` | Software runtime, peripheral access, electronics interface, rail budget, and component-selection views. | Architecture graph, allocations, and component selection. |
 
 ## Reading Strategy
 
@@ -108,7 +110,8 @@ Start with requirements and functional behavior before reading physical details.
 3. Functional architecture and operational scenarios.
 4. Physical protocols and product context.
 5. Product variants and selected SKU baselines.
-6. Physical, electrical, implementation views, interface-control, firmware architecture, software implementation handoff, and electronics handoff.
+6. Physical and firmware architecture, interface control, component selection,
+   and the implementation views over their shared graph.
 7. Allocations and the `Architecture` hub.
 8. Behavior, safety, trade studies, verification, and analyses.
 9. Views for stakeholder-specific slices.

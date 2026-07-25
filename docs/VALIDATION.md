@@ -61,6 +61,11 @@ spec42 diagrams export model --selected-view robotLruInterconnection --format sv
 spec42 diagrams export model --selected-view firmwareDeployment --format svg --output target/diagrams
 spec42 diagrams export model --selected-view productDecomposition --format svg --output target/diagrams
 spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
+spec42 diagrams export model --selected-view softwareRuntimeHandoff --format svg --output target/diagrams
+spec42 diagrams export model --selected-view peripheralAccessHandoff --format svg --output target/diagrams
+spec42 diagrams export model --selected-view electronicsInterfaceHandoff --format svg --output target/diagrams
+spec42 diagrams export model --selected-view railBudgetHandoff --format svg --output target/diagrams
+spec42 diagrams export model --selected-view componentSelectionHandoff --format svg --output target/diagrams
 ```
 
 `InterconnectionView` exports (`robotLruInterconnection`) render reliably in Spec42 SVG for harness `connect` relationships. `firmwareDeployment` uses `GeneralView` because deployment is expressed with `allocate`, not `connect`. Robot-level harness `connect` statements target LRU boundary ports on `mainElectronics` (no cross-boundary pierce into PCB or harness internals). Spec42 may still expand composite LRU internals in `robotLruInterconnection`.
@@ -73,7 +78,10 @@ The robot-vacuum corpus should validate with:
 - `0 warnings`
 - `0 information` diagnostics
 
-The `ModelViews` catalog covers product decomposition, robot LRU interconnection, firmware deployment, and requirements traceability.
+The `ModelViews` catalog covers product decomposition, robot LRU interconnection,
+firmware deployment, and requirements traceability. `Implementation` adds
+graph-derived software runtime, peripheral access, electronics interface, rail
+budget, and component-selection handoff views.
 
 ## Known Notes
 

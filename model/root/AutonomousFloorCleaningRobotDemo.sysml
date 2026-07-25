@@ -31,9 +31,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import TradeStudies::*;
   private import InterfaceControl::*;
   private import FirmwareArchitecture::*;
-  private import SoftwareImplementation::*;
   private import ElectronicsInterfaceControl::*;
-  private import ElectronicsImplementation::*;
   private import ElectronicsComponentSelection::*;
   private import Implementation::*;
 }

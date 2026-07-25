@@ -14,6 +14,8 @@ package PhysicalArchitecture {
   private import BehaviorStates::*;
   private import FirmwareArchitecture::*;
   private import ArchitectureAllocations::*;
+  private import ElectronicsInterfaceControl::*;
+  private import Strata::*;
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;
@@ -342,6 +344,12 @@ package PhysicalArchitecture {
     connect beaconReceiver.statusOut to dockStatusOut;
   }
 
+  part def PowerRailBudget {
+    attribute nominalVoltage : ElectricPotentialValue;
+    attribute continuousCurrentBudget : ElectricCurrentValue;
+    attribute peakCurrentBudget : ElectricCurrentValue;
+  }
+
   // Main electronics, MCU peripherals, and deployable firmware suite.
   part def MicrocontrollerUnit :> Microcontroller {
     attribute core : String = "Arm Cortex-M33";
@@ -359,18 +367,42 @@ package PhysicalArchitecture {
     */
     attribute layerCount : Integer = 4;
     port leftMotorPhaseOut : ThreePhaseMotorPort {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-J_MOTOR_PHASE-L";
+        interfaceKind = ElectricalInterfaceKind::threePhaseMotor;
+        signalDirection = SignalDirection::sourceToLoad;
+        nominalVoltage = 14.4 [V];
+        maxCurrent = 3.0 [A];
+        criticality = ConnectorCriticality::safetyCritical;
+      }
       doc /*
         Left wheel motor phase harness (U/V/W) from onboard inverter;
         part of J_MOTOR_PWM motor/actuator net group (20 kHz PWM target).
       */
     }
     port rightMotorPhaseOut : ThreePhaseMotorPort {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-J_MOTOR_PHASE-R";
+        interfaceKind = ElectricalInterfaceKind::threePhaseMotor;
+        signalDirection = SignalDirection::sourceToLoad;
+        nominalVoltage = 14.4 [V];
+        maxCurrent = 3.0 [A];
+        criticality = ConnectorCriticality::safetyCritical;
+      }
       doc /*
         Right wheel motor phase harness (U/V/W) from onboard inverter;
         part of J_MOTOR_PWM motor/actuator net group (20 kHz PWM target).
       */
     }
     port sensorBusHarness : I2cPort {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-J_SENSOR_I2C";
+        interfaceKind = ElectricalInterfaceKind::i2cBus;
+        signalDirection = SignalDirection::bidirectional;
+        nominalVoltage = 3.3 [V];
+        maxCurrent = 0.3 [A];
+        criticality = ConnectorCriticality::missionCritical;
+      }
       doc /*
         J_SENSOR_I2C, 6-pin JST-GH, 3.3 V logic at 400 kHz.
         SDA (SENSOR_I2C_SDA, open-drain bidirectional), SCL (SENSOR_I2C_SCL, open-drain clock),
@@ -379,6 +411,14 @@ package PhysicalArchitecture {
       */
     }
     port lidarUartHarness : UartPort {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-J_LIDAR";
+        interfaceKind = ElectricalInterfaceKind::uartBus;
+        signalDirection = SignalDirection::bidirectional;
+        nominalVoltage = 5.0 [V];
+        maxCurrent = 0.5 [A];
+        criticality = ConnectorCriticality::missionCritical;
+      }
       doc /*
         J_LIDAR, 6-pin JST-GH; 5 V sensor power plus 3.3 V logic at 1 Mbps UART target (UART2_LIDAR).
         MCU_LIDAR_TX to LiDAR RX, LIDAR_MCU_RX from LiDAR TX; idle-high UART.
@@ -392,6 +432,14 @@ package PhysicalArchitecture {
       */
     }
     port mcuUartOut : UartPort {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-UART_APP";
+        interfaceKind = ElectricalInterfaceKind::uartBus;
+        signalDirection = SignalDirection::bidirectional;
+        nominalVoltage = 3.3 [V];
+        maxCurrent = 0.15 [A];
+        criticality = ConnectorCriticality::serviceable;
+      }
       doc /*
         U_WIFI_BLE wireless module (soldered castellated pads, 6-pin, 3.3 V logic, 1 Mbps UART1).
         MCU TX/RX cross to wireless RX/TX; optional wake/reset GPIO.
@@ -413,9 +461,27 @@ package PhysicalArchitecture {
       */
     }
     part flashNode : SpiBusSlaveNode;
-    part flash : NonVolatileMemory;
-    part leftMotorDriver : MotorDriverIC;
-    part rightMotorDriver : MotorDriverIC;
+    part flash : NonVolatileMemory {
+      @ImplementationHandoff {
+        artifactId = "EWP-WIRELESS-STORAGE";
+        readiness = ImplementationReadinessKind::readyForSchematic;
+        domain = ImplementationDomainKind::wireless;
+      }
+    }
+    part leftMotorDriver : MotorDriverIC {
+      @ImplementationHandoff {
+        artifactId = "EWP-MOTOR-DRIVE-L";
+        readiness = ImplementationReadinessKind::needsComponentSelection;
+        domain = ImplementationDomainKind::motorDrive;
+      }
+    }
+    part rightMotorDriver : MotorDriverIC {
+      @ImplementationHandoff {
+        artifactId = "EWP-MOTOR-DRIVE-R";
+        readiness = ImplementationReadinessKind::needsComponentSelection;
+        domain = ImplementationDomainKind::motorDrive;
+      }
+    }
     part liftSensorInput {
       port hazardOut : GpioPort;
     }
@@ -423,7 +489,13 @@ package PhysicalArchitecture {
       attribute overTemperatureThresholdK = 343.15;
       port hazardOut : GpioPort;
     }
-    part wirelessUart : McuWirelessUart;
+    part wirelessUart : McuWirelessUart {
+      @ImplementationHandoff {
+        artifactId = "EWP-WIRELESS-STORAGE";
+        readiness = ImplementationReadinessKind::readyForSchematic;
+        domain = ImplementationDomainKind::wireless;
+      }
+    }
     connect mcu.sensorI2c to mcuI2cMaster.busPort;
     connect sensorBusHarness to mcuI2cMaster.busPort;
     connect lidarUartHarness to mcu.lidarUart;
@@ -488,6 +560,14 @@ package PhysicalArchitecture {
     attribute :>> massKg = 0.28 [kg];
     attribute :>> bomCost = 48 [EUR];
     port powerIn : PowerRailPort {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-J_POWER";
+        interfaceKind = ElectricalInterfaceKind::powerRail;
+        signalDirection = SignalDirection::sourceToLoad;
+        nominalVoltage = 14.4 [V];
+        maxCurrent = 6.0 [A];
+        criticality = ConnectorCriticality::safetyCritical;
+      }
       doc /*
         Main electronics power from battery module (J_POWER segment).
         14.4 V battery, 5 V regulated, 3.3 V logic; charger input on dock path.
@@ -548,8 +628,23 @@ package PhysicalArchitecture {
     }
     port statusOut : MissionStatusPort;
     port userCommandIn : GpioPort;
-    part mainControlPcb : MainControlPcb;
-    part safetyGpioHarness : SafetyGpioHarness;
+    part mainControlPcb : MainControlPcb {
+      @ImplementationHandoff {
+        artifactId = "EWP-MAIN-PCB";
+        readiness = ImplementationReadinessKind::readyForSchematic;
+        domain = ImplementationDomainKind::compute;
+      }
+    }
+    part safetyGpioHarness : SafetyGpioHarness {
+      @ElectricalInterfaceInfo {
+        connectorId = "EIC-J_SAFETY_GPIO";
+        interfaceKind = ElectricalInterfaceKind::gpioFaultLine;
+        signalDirection = SignalDirection::activeLowFaultToMcu;
+        nominalVoltage = 3.3 [V];
+        maxCurrent = 0.02 [A];
+        criticality = ConnectorCriticality::safetyCritical;
+      }
+    }
     connect powerIn to mainControlPcb.leftMotorDriver.powerIn;
     connect powerIn to mainControlPcb.rightMotorDriver.powerIn;
     connect sensorBusIn to mainControlPcb.sensorBusHarness;
@@ -608,13 +703,66 @@ package PhysicalArchitecture {
     part chassis : ChassisAssembly;
     part driveModule : DriveModule;
     part cleaningHead : CleaningHeadModule;
-    part sensorAssembly : SensorAssembly;
+    part sensorAssembly : SensorAssembly {
+      @ImplementationHandoff {
+        artifactId = "EWP-SENSOR-HARNESS";
+        readiness = ImplementationReadinessKind::needsLayoutDetail;
+        domain = ImplementationDomainKind::sensing;
+      }
+    }
     part mainElectronics : MainElectronicsAssembly;
-    part powerModule : PowerModule;
+    part powerModule : PowerModule {
+      @ImplementationHandoff {
+        artifactId = "EWP-POWER-CHARGE";
+        readiness = ImplementationReadinessKind::needsSafetyReview;
+        domain = ImplementationDomainKind::charging;
+      }
+    }
     part dockInterface : DockInterfaceModule;
     part hmi : HumanMachineInterface;
     part robotFirmware : RobotFirmwareSuite;
     part firmwareTasks : FirmwareTaskArchitecture;
+
+    part batteryRailBudget : PowerRailBudget {
+      attribute :>> nominalVoltage = 14.4 [V];
+      attribute :>> continuousCurrentBudget = 5.0 [A];
+      attribute :>> peakCurrentBudget = 8.0 [A];
+      ref source = powerModule.batteryPack.packOut;
+      ref mainElectronicsLoad = mainElectronics.powerIn;
+      ref cleaningLoad = cleaningHead.powerIn;
+      ref dockingLoad = dockInterface.powerIn;
+      doc /*
+        BAT_14V4 budget. Protect with battery fuse, reverse-polarity protection,
+        charger-current limiting, and motor-rail current monitoring. Measure at
+        the J_POWER BAT_14V4 test point.
+      */
+    }
+    part logicRailBudget : PowerRailBudget {
+      attribute :>> nominalVoltage = 3.3 [V];
+      attribute :>> continuousCurrentBudget = 1.0 [A];
+      attribute :>> peakCurrentBudget = 1.5 [A];
+      ref source = powerModule.logicRegulator.powerOut;
+      ref computeLoad = mainElectronics.mainControlPcb.mcu;
+      ref sensorBusLoad = mainElectronics.mainControlPcb.sensorBusHarness;
+      ref wirelessLoad = mainElectronics.mainControlPcb.wirelessModule;
+      ref storageLoad = mainElectronics.mainControlPcb.flash;
+      doc /*
+        LOGIC_3V3 budget. Use regulator current limiting, local decoupling, and
+        ESD protection on service/external lines. Measure near the MCU.
+      */
+    }
+    part sensorRailBudget : PowerRailBudget {
+      attribute :>> nominalVoltage = 5.0 [V];
+      attribute :>> continuousCurrentBudget = 0.8 [A];
+      attribute :>> peakCurrentBudget = 1.2 [A];
+      ref source = powerModule.logicRegulator.powerOut;
+      ref lidarLoad = sensorAssembly.lidar;
+      ref sensorHarnessLoad = sensorAssembly.sensorBusOut;
+      doc /*
+        SENSOR_5V budget. Use load-switch or polyfuse protection and LiDAR
+        inrush control. Measure near J_SENSOR_I2C and J_LIDAR.
+      */
+    }
 
     connect powerModule.mainPowerOut to cleaningHead.powerIn;
     connect powerModule.mainPowerOut to sensorAssembly.powerIn;
@@ -660,5 +808,25 @@ package PhysicalArchitecture {
     allocate robotFirmware.mapProcessing to mainElectronics.mainControlPcb.mcu;
     allocate robotFirmware.localizationEstimator to mainElectronics.mainControlPcb.mcu;
     allocate robotFirmware.coveragePlanner to mainElectronics.mainControlPcb.mcu;
+
+    // Firmware task access to concrete hardware peripherals and buses.
+    allocation sensorI2cAccess : I2cMasterAccess
+      allocate firmwareTasks.sensorAcquisition
+      to mainElectronics.mainControlPcb.mcuI2cMaster;
+    allocation lidarUartAccess : UartDmaAccess
+      allocate firmwareTasks.sensorAcquisition
+      to mainElectronics.mainControlPcb.mcu.lidarUart;
+    allocation motorPwmAccess : PwmOutputAccess
+      allocate firmwareTasks.motorControl
+      to mainElectronics.mainControlPcb.mcu;
+    allocation safetyGpioAccess : GpioInputAccess
+      allocate firmwareTasks.safetySupervisor
+      to mainElectronics.safetyGpioHarness;
+    allocation flashStorageAccess : FlashStorageAccess
+      allocate firmwareTasks.storage
+      to mainElectronics.mainControlPcb.flash;
+    allocation appWirelessAccess : WirelessUartAccess
+      allocate firmwareTasks.appProtocol
+      to mainElectronics.mainControlPcb.wirelessUart;
   }
 }
