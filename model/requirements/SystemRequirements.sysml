@@ -17,7 +17,7 @@ package SystemRequirements {
   private import SI::*;
   private import ScalarValues::*;
 
-  part def SystemRequirementSubject {
+  abstract part def SystemRequirementSubject {
     doc /*
       Requirement-facing abstraction of measurable system properties. Concrete
       architecture elements satisfy these requirements without making the

@@ -49,4 +49,11 @@ if ($DomainLibrariesRoot) {
 
 Write-Host "Running: $Spec42Exe $($arguments -join ' ')"
 & $Spec42Exe @arguments
+$spec42ExitCode = $LASTEXITCODE
+if ($spec42ExitCode -ne 0) {
+    exit $spec42ExitCode
+}
+
+$guardScript = Join-Path $PSScriptRoot "check-model-guards.ps1"
+& $guardScript -ModelPath $ModelPath
 exit $LASTEXITCODE

@@ -10,15 +10,48 @@ package Verification {
   private import SystemRequirements::*;
   private import Architecture::*;
   private import FirmwareArchitecture::*;
+  private import AnalysisCases::*;
+  private import DesignLimits::*;
+  private import ISQ::*;
+  private import SI::*;
+  private import ScalarValues::*;
+
+  enum def VerificationVerdict {
+    notRun;
+    pass;
+    fail;
+    inconclusive;
+  }
+
+  item def VerificationResult {
+    attribute verdict : VerificationVerdict = VerificationVerdict::notRun;
+    attribute evidenceId : String;
+  }
+
+  part def VerificationEvidence {
+    attribute evidenceId : String;
+    attribute verdict : VerificationVerdict;
+  }
+
+  part def ReferenceHomeTestEnvironment {
+    attribute rectangularRoom : Boolean = true;
+    attribute includesStairEdge : Boolean = true;
+    attribute localNetworkOnly : Boolean = true;
+  }
+
+  part referenceHomeEnvironment : ReferenceHomeTestEnvironment;
 
   action def RecordModelAnalysisEvidence {
     doc /* Capture the output of a model-based analysis case as traceable verification evidence. */
+    out result : VerificationResult;
   }
   action def RunPhysicalTest {
     doc /* Execute a physical test procedure on a robot unit and record pass/fail evidence. */
+    out result : VerificationResult;
   }
   action def RunSoftwareVerification {
     doc /* Execute unit and integration checks against a typed firmware task and its runtime connections. */
+    out result : VerificationResult;
   }
 
   verification verifyCleaningCoverage {
@@ -108,6 +141,7 @@ package Verification {
       verify requirement detectCliffs;
       verify requirement superviseHazards;
     }
+    ref testEnvironment = referenceHomeEnvironment;
     then action runCliffEdgeTest : RunPhysicalTest;
     then action recordReactionTiming : RecordModelAnalysisEvidence;
   }
@@ -160,6 +194,7 @@ package Verification {
     objective {
       verify requirement protectMapPrivacy;
     }
+    ref testEnvironment = referenceHomeEnvironment;
     then action runPrivacyConfigurationReview : RunPhysicalTest;
   }
 
@@ -303,5 +338,59 @@ package Verification {
       verify requirement notifyMaintenanceNeeded;
     }
     then action runAppPrivacyChecks : RunSoftwareVerification;
+  }
+
+  part cliffSafeStopEvidence : VerificationEvidence {
+    attribute :>> evidenceId = "EVID-CLIFF-SAFE-STOP-001";
+    attribute :>> verdict = VerificationVerdict::pass;
+    attribute measuredReactionTime : DurationValue = 90 [ms];
+    attribute reactionTimeLimit : DurationValue =
+      DesignLimits::maxSafeStopReactionTime;
+    constraint { measuredReactionTime <= reactionTimeLimit }
+    ref verificationCase = verifyCliffDetection;
+    ref analysisCase = SafetyReactionAnalysis;
+    ref requirementUnderTest = detectCliffs;
+    ref secondaryRequirement = superviseHazards;
+    ref testEnvironment = referenceHomeEnvironment;
+    ref observedResult = verifyCliffDetection.runCliffEdgeTest.result;
+  }
+
+  part missionEnergyEvidence : VerificationEvidence {
+    attribute :>> evidenceId = "EVID-MISSION-ENERGY-001";
+    attribute :>> verdict = VerificationVerdict::pass;
+    attribute missionChargeDraw : ElectricChargeValue = 9375 [mAh];
+    attribute usableChargeBudget : ElectricChargeValue = 10625 [mAh];
+    constraint { missionChargeDraw <= usableChargeBudget }
+    ref verificationCase = verifyBatteryRuntime;
+    ref analysisCase = MissionEnergyAnalysis;
+    ref requirementUnderTest = cleanAtLeastEighty;
+    ref observedResult = verifyBatteryRuntime.runRuntimeTest.result;
+  }
+
+  part privacyConsentEvidence : VerificationEvidence {
+    attribute :>> evidenceId = "EVID-PRIVACY-CONSENT-001";
+    attribute :>> verdict = VerificationVerdict::pass;
+    attribute rawMapTransferredWithoutConsent : Boolean = false;
+    constraint { rawMapTransferredWithoutConsent == false }
+    ref verificationCase = verifyPrivacyControls;
+    ref requirementUnderTest = protectMapPrivacy;
+    ref testEnvironment = referenceHomeEnvironment;
+    ref observedResult = verifyPrivacyControls.runPrivacyConfigurationReview.result;
+  }
+
+  part appPrivacySoftwareEvidence : VerificationEvidence {
+    attribute :>> evidenceId = "EVID-APP-PRIVACY-SW-001";
+    attribute :>> verdict = VerificationVerdict::pass;
+    attribute malformedFrameRejected : Boolean = true;
+    attribute consentRevocationPersisted : Boolean = true;
+    constraint {
+      malformedFrameRejected == true and
+      consentRevocationPersisted == true
+    }
+    ref verificationCase = verifyAppPrivacyImplementation;
+    ref requirementUnderTest = protectMapPrivacy;
+    ref taskUnderTest = FirmwareTaskArchitecture::appProtocol;
+    ref observedResult =
+      verifyAppPrivacyImplementation.runAppPrivacyChecks.result;
   }
 }

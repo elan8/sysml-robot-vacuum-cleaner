@@ -189,20 +189,20 @@ package FunctionalArchitecture {
     first recoverFromStall then reportMissionStatus;
   }
 
-  satisfy operateCleaningRobot.locomotion by coverFloor;
-  satisfy operateCleaningRobot.cleaning by cleanAtLeastEighty;
-  satisfy operateCleaningRobot.cleaning by detectDustBin;
-  satisfy operateCleaningRobot.cleaning by keepNoise;
-  satisfy operateCleaningRobot.perception by avoidObstacles;
-  satisfy operateCleaningRobot.perception by detectCliffs;
-  satisfy operateCleaningRobot.navigation by coverFloor;
-  satisfy operateCleaningRobot.navigation by localizeReliably;
-  satisfy operateCleaningRobot.navigation by updateCoverageMap;
-  satisfy operateCleaningRobot.powerManagement by cleanAtLeastEighty;
-  satisfy operateCleaningRobot.powerManagement by chargeSafely;
-  satisfy operateCleaningRobot.docking by returnToDock;
-  satisfy operateCleaningRobot.missionControl by recoverFromStall;
-  satisfy operateCleaningRobot.safetySupervision by superviseHazards;
-  satisfy operateCleaningRobot.userInteraction by reportCleaningStatus;
-  satisfy operateCleaningRobot.userInteraction by protectMapPrivacy;
+  satisfy coverFloor by operateCleaningRobot.locomotion;
+  satisfy cleanAtLeastEighty by operateCleaningRobot.cleaning;
+  satisfy detectDustBin by operateCleaningRobot.cleaning;
+  satisfy keepNoise by operateCleaningRobot.cleaning;
+  satisfy avoidObstacles by operateCleaningRobot.perception;
+  satisfy detectCliffs by operateCleaningRobot.perception;
+  satisfy coverFloor by operateCleaningRobot.navigation;
+  satisfy localizeReliably by operateCleaningRobot.navigation;
+  satisfy updateCoverageMap by operateCleaningRobot.navigation;
+  satisfy cleanAtLeastEighty by operateCleaningRobot.powerManagement;
+  satisfy chargeSafely by operateCleaningRobot.powerManagement;
+  satisfy returnToDock by operateCleaningRobot.docking;
+  satisfy recoverFromStall by operateCleaningRobot.missionControl;
+  satisfy superviseHazards by operateCleaningRobot.safetySupervision;
+  satisfy reportCleaningStatus by operateCleaningRobot.userInteraction;
+  satisfy protectMapPrivacy by operateCleaningRobot.userInteraction;
 }

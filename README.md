@@ -32,7 +32,7 @@ reliably discover handoff information from the model.
 - Functional and physical decomposition with explicit allocation layers.
 - Product-line variant modeling for navigation sensor suites, cleaning performance, battery pack, safety monitor, connectivity, privacy mode, dock options, and SKU baselines.
 - Implementation-facing interface control for PCB harnesses, software message contracts, firmware tasks, scheduler timing, and MCU deployment.
-- An implementation layer tying software contracts, firmware runtime/resource constraints, electronics interfaces, PCB/harness work packages, component candidates, queue policies, HAL bindings, rail budgets, timing budgets, and verification scope together.
+- An implementation view catalog over software contracts, firmware runtime/resource constraints, electronics interfaces, component candidates, typed queues, peripheral allocations, rail budgets, timing budgets, and verification scope.
 - A lightweight `Elan8Methodology` package that separates native SysML v2 engineering semantics from metadata used for ownership, maturity, extraction, and external lifecycle references.
 - Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
 - First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
@@ -84,15 +84,16 @@ The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits
 10. [`ElectronicsInterfaceControl.sysml`](model/implementation/ElectronicsInterfaceControl.sysml) - electronics-interface metadata applied to physical ports
 11. [`ElectronicsComponentSelection.sysml`](model/implementation/ElectronicsComponentSelection.sysml) - component candidates linked to physical targets and interfaces
 12. [`PhysicalArchitecture.sysml`](model/architecture/PhysicalArchitecture.sysml) - product assemblies, typed physical connections, rail budgets, interface metadata, and peripheral allocations
-13. [`ProductVariants.sysml`](model/variants/ProductVariants.sysml) - native SysML variation choices, variant option records, and SKU configuration baselines
+13. [`ProductVariants.sysml`](model/variants/ProductVariants.sysml) - native SysML variation choices, semantically linked options, and configured product baselines
 14. [`ArchitectureAllocations.sysml`](model/architecture/ArchitectureAllocations.sysml) - function, software, compute, and peripheral-access allocations
 15. [`Architecture.sysml`](model/architecture/Architecture.sysml) - public architecture hub and system-level satisfy links
 16. [`BehaviorStates.sysml`](model/behavior/BehaviorStates.sysml) - mission lifecycle states
 17. [`OperationalScenarios.sysml`](model/context/OperationalScenarios.sysml) - nominal and recovery mission flows
-18. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - hazards and design rationale
+18. [`SafetyAnalysis.sysml`](model/assurance/SafetyAnalysis.sysml) and [`TradeStudies.sysml`](model/assurance/TradeStudies.sysml) - typed hazards, safety controls, mitigation links, and design rationale
 19. [`ModelViews.sysml`](model/views/ModelViews.sysml) - stakeholder views
 20. [`Verification.sysml`](model/assurance/Verification.sysml) and [`AnalysisCases.sysml`](model/assurance/AnalysisCases.sysml) - V&V and engineering margins
-21. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
+21. [`Elan8ProjectMethodology.sysml`](model/method/Elan8ProjectMethodology.sysml) - semantic bindings from reusable method rules to this project graph
+22. [`AutonomousFloorCleaningRobotDemo.sysml`](model/root/AutonomousFloorCleaningRobotDemo.sysml) - full workspace import hub
 
 ## More Documentation
 

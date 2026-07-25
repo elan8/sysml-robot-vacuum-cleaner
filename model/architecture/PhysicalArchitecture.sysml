@@ -16,6 +16,7 @@ package PhysicalArchitecture {
   private import ArchitectureAllocations::*;
   private import ElectronicsInterfaceControl::*;
   private import Elan8Methodology::*;
+  private import SystemRequirements::*;
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;
@@ -699,7 +700,7 @@ package PhysicalArchitecture {
     attribute :>> bomCost = 20 [EUR];
   }
 
-  part def AutonomousFloorCleaningRobot {
+  part def AutonomousFloorCleaningRobot :> SystemRequirementSubject {
     part chassis : ChassisAssembly;
     part driveModule : DriveModule;
     part cleaningHead : CleaningHeadModule;

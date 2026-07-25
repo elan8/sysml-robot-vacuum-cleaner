@@ -9,7 +9,6 @@
 package TradeStudies {
   private import SystemRequirements::*;
   private import PhysicalArchitecture::*;
-  private import ProductVariants::*;
   private import AnalysisCases::*;
   private import ScalarValues::*;
 
@@ -73,15 +72,15 @@ package TradeStudies {
     attribute :>> rationale = "satisfies protectMapPrivacy without requiring cloud trust";
   }
 
-  satisfy sensorBaseline by limitBomCost;
-  satisfy sensorLidarUpgrade by localizeReliably;
-  satisfy sensorLidarUpgrade by updateCoverageMap;
-  satisfy flagshipAiVisionUpgrade by avoidObstacles;
-  satisfy flagshipAiVisionUpgrade by protectMapPrivacy;
-  satisfy standardFan by keepNoise;
-  satisfy standardFan by cleanAtLeastEighty;
-  satisfy battery4s2p by cleanAtLeastEighty;
-  satisfy battery4s2p by chargeSafely;
-  satisfy sameMcuSafetySupervisor by superviseHazards;
-  satisfy localOnlyPrivacyDefault by protectMapPrivacy;
+  satisfy limitBomCost by sensorBaseline;
+  satisfy localizeReliably by sensorLidarUpgrade;
+  satisfy updateCoverageMap by sensorLidarUpgrade;
+  satisfy avoidObstacles by flagshipAiVisionUpgrade;
+  satisfy protectMapPrivacy by flagshipAiVisionUpgrade;
+  satisfy keepNoise by standardFan;
+  satisfy cleanAtLeastEighty by standardFan;
+  satisfy cleanAtLeastEighty by battery4s2p;
+  satisfy chargeSafely by battery4s2p;
+  satisfy superviseHazards by sameMcuSafetySupervisor;
+  satisfy protectMapPrivacy by localOnlyPrivacyDefault;
 }

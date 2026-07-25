@@ -15,7 +15,11 @@ From the repository root:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The script validates `model/` with Spec42 and passes local domain-library roots when they exist.
+The script validates `model/` with Spec42, passes local domain-library roots
+when they exist, and then runs `scripts/check-model-guards.ps1`.
+
+The guards reject reversed `satisfy` relationships, removed record types, and
+internal model identity encoded in path/reference strings.
 
 Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). The repository also validates pull requests with the Spec42 GitHub Action.
 
@@ -57,7 +61,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
 Run these after changing `ModelViews`, `Implementation`, view exposure paths, or file layout:
 
 ```powershell
-spec42 diagrams export model --selected-view robotLruInterconnection --format svg --output target/diagrams
+spec42 diagrams export model --selected-view interconnections --format svg --output target/diagrams
 spec42 diagrams export model --selected-view firmwareDeployment --format svg --output target/diagrams
 spec42 diagrams export model --selected-view productDecomposition --format svg --output target/diagrams
 spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
@@ -66,9 +70,17 @@ spec42 diagrams export model --selected-view peripheralAccessHandoff --format sv
 spec42 diagrams export model --selected-view electronicsInterfaceHandoff --format svg --output target/diagrams
 spec42 diagrams export model --selected-view railBudgetHandoff --format svg --output target/diagrams
 spec42 diagrams export model --selected-view componentSelectionHandoff --format svg --output target/diagrams
+spec42 diagrams export model --selected-view cliffSafeStopGoldenThread --format svg --output target/diagrams
+spec42 diagrams export model --selected-view productConfiguration --format svg --output target/diagrams
+spec42 diagrams export model --selected-view safetyAssuranceGraph --format svg --output target/diagrams
 ```
 
-`InterconnectionView` exports (`robotLruInterconnection`) render reliably in Spec42 SVG for harness `connect` relationships. `firmwareDeployment` uses `GeneralView` because deployment is expressed with `allocate`, not `connect`. Robot-level harness `connect` statements target LRU boundary ports on `mainElectronics` (no cross-boundary pierce into PCB or harness internals). Spec42 may still expand composite LRU internals in `robotLruInterconnection`.
+`InterconnectionView` exports (`interconnections`, `productConfiguration`, and
+`safetyAssuranceGraph`) render typed connections directly. The golden thread
+uses `ActionFlowView`. `firmwareDeployment` uses `GeneralView` because
+deployment is expressed with `allocate`, not `connect`. Robot-level harness
+connections target LRU boundary ports on `mainElectronics` without piercing
+into PCB or harness internals.
 
 ## Expected Result
 
@@ -79,7 +91,8 @@ The robot-vacuum corpus should validate with:
 - `0 information` diagnostics
 
 The `ModelViews` catalog covers product decomposition, robot LRU interconnection,
-firmware deployment, and requirements traceability. `Implementation` adds
+firmware deployment, requirements traceability, configured products, safety
+assurance, and the cliff safe-stop golden thread. `Implementation` adds
 graph-derived software runtime, peripheral access, electronics interface, rail
 budget, and component-selection handoff views.
 

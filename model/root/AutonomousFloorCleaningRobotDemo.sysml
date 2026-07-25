@@ -8,6 +8,7 @@
  */
 package AutonomousFloorCleaningRobotDemo {
   private import Elan8Methodology::*;
+  private import Elan8ProjectMethodology::*;
   private import RequirementManagement::*;
   private import MonetaryUnits::*;
   private import VacuumCleanerQuantitiesAndUnits::*;

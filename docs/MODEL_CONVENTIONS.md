@@ -22,10 +22,13 @@ These conventions keep the SysML model readable and maintainable while preservin
 - `Elan8Methodology` owns way-of-working concepts, metadata definitions,
   completeness rules, and extraction rules. It should not own product-specific
   engineering facts.
+- `Elan8ProjectMethodology` binds reusable method rules to project elements with
+  semantic references. Engineering packages must not import this downstream
+  binding package.
 - Requirements packages own requirement intent and derivation. They should not own implementation structure.
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.
 - `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes, semantic rail budgets, the `firmwareTasks` and `robotFirmware` instances, task/module/MCU/peripheral allocations, and roll-up values. It should not own software message schemas.
-- `ProductVariants` owns product-line variation definitions, selected/deferred variant option records, and SKU configuration baselines. It should not duplicate trade rationale or realized architecture details.
+- `ProductVariants` owns product-line variation definitions, semantically linked options, and configured product baselines. It should reference rather than duplicate trade rationale and realized architecture details.
 - `InterfaceControl` owns software message contracts and producer/consumer ownership.
 - `FirmwareArchitecture` owns firmware task definitions, scheduler model, typed queues, task architecture structure, flows, and interface-control contracts. The authoritative `firmwareTasks` instance lives on `AutonomousFloorCleaningRobot` in `PhysicalArchitecture`.
 - `ElectronicsInterfaceControl` owns only reusable electronics-interface metadata. Concrete connector identity, limits, pinout guidance, and connectivity live on physical ports and harness parts.
@@ -76,17 +79,17 @@ These conventions keep the SysML model readable and maintainable while preservin
 ## Elan8 Methodology Metadata
 
 - Use native SysML v2 relationships first; use Elan8 methodology metadata for ownership, maturity, extraction, and external references.
-- Prefer tagging package entry points, handoff baselines, source-of-truth records, and view/report roots over tagging every small feature.
+- Prefer tagging package entry points, handoff baselines, source-of-truth elements, and view/report roots over tagging every small feature.
 - Do not encode requirements, allocations, interfaces, or verification links only as metadata when native SysML relationships are available.
-- Keep extraction-oriented string paths as compatibility bridges only where
-  current tooling cannot resolve the intended feature path. Remove the bridge
-  once the canonical relationship validates and downstream extraction can
-  follow it.
+- Never encode internal package, feature, requirement, verification, or variant
+  identity as a string. Put non-formalizable traversal guidance in `doc` and
+  bind project extraction entry points in `Elan8ProjectMethodology`.
 
 ## Deferred Options
 
 - Keep deferred product tiers visible when they explain a trade study or future variant.
-- Model product-line choices in `ProductVariants` using native SysML v2 `variation` and `variant` definitions first, then add lightweight records for selection status and extraction.
+- Model product-line choices with native SysML v2 `variation` and `variant`
+  definitions, semantic option usages, and concrete configuration usages.
 - Keep trade rationale in `TradeStudies`; keep the actual selected structure in architecture and implementation packages.
 - Mark deferred implementation elements explicitly with attributes such as `selectedForBaseline = false` or text values such as `deferred flagship`.
 - Do not allocate deferred options into the baseline operational path unless the model intentionally changes product selection.

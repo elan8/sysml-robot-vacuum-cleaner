@@ -115,7 +115,6 @@ package Elan8Methodology {
 
   metadata def TraceRole {
     attribute role : TraceRoleKind;
-    attribute authoritativeSourcePath : String;
   }
 
   metadata def ExternalReference {
@@ -141,10 +140,6 @@ package Elan8Methodology {
   part def MethodExtractionRule {
     attribute ruleId : String;
     attribute artifactKind : ArtifactKind;
-    attribute sourcePackage : String;
-    attribute primaryElementKind : String;
-    attribute joinHint : String;
-    attribute outputIntent : String;
   }
 
   part def Elan8MethodologyBaseline {
@@ -169,7 +164,7 @@ package Elan8Methodology {
       attribute :>> appliesToArtifact = ArtifactKind::interfaceControl;
       attribute :>> expectation = CompletionExpectationKind::required;
       attribute :>> requiredFact = "Each interface contract identifies producer/consumer ownership, payload or signal semantics, timing, safety relevance, and physical or logical endpoints.";
-      attribute :>> validationHint = "Extract interface-control records and report missing endpoint, payload/signal, timing, or safety fields.";
+      attribute :>> validationHint = "Traverse typed interface usages and report missing endpoint, payload or signal semantics, timing, or safety metadata.";
     }
 
     part softwareHandoffCompleteness : MethodCompletenessRule {
@@ -199,19 +194,19 @@ package Elan8Methodology {
     part softwareHandoffExtraction : MethodExtractionRule {
       attribute :>> ruleId = "E8-CPS-EXTRACT-SW-001";
       attribute :>> artifactKind = ArtifactKind::softwareImplementationHandoff;
-      attribute :>> sourcePackage = "Implementation, FirmwareArchitecture, InterfaceControl, PhysicalArchitecture, ArchitectureAllocations";
-      attribute :>> primaryElementKind = "FirmwareTask";
-      attribute :>> joinHint = "Start from FirmwareTask usages; traverse typed flows and queues, DataFlowContract ends, task-to-module and task-to-peripheral allocations, and verification cases.";
-      attribute :>> outputIntent = "Generate engineer-facing runtime, queue, peripheral-access, and verification views from the semantic graph.";
+      doc /*
+        Generate engineer-facing runtime, queue, peripheral-access, and
+        verification views from the project semantic graph.
+      */
     }
 
     part electronicsHandoffExtraction : MethodExtractionRule {
       attribute :>> ruleId = "E8-CPS-EXTRACT-EE-001";
       attribute :>> artifactKind = ArtifactKind::electronicsImplementationHandoff;
-      attribute :>> sourcePackage = "Implementation, PhysicalArchitecture, ElectronicsInterfaceControl, ElectronicsComponentSelection";
-      attribute :>> primaryElementKind = "PartUsage and PortUsage";
-      attribute :>> joinHint = "Start from ImplementationHandoff-tagged physical usages; traverse ports, connects, ElectricalInterfaceInfo metadata, PowerRailBudget refs, and ComponentCandidate refs.";
-      attribute :>> outputIntent = "Generate electronics interface, rail-budget, readiness, and component-selection views from the semantic graph.";
+      doc /*
+        Generate electronics interface, rail-budget, readiness, and
+        component-selection views from the project semantic graph.
+      */
     }
   }
 

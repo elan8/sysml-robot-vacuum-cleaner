@@ -67,6 +67,6 @@ package Architecture {
 
   part robotSystem : CleaningRobotSystemOfInterest;
 
-  satisfy robotSystem.physical by limitBomCost;
-  satisfy robotSystem.physical by limitTotalMass;
+  satisfy limitBomCost by robotSystem.physical;
+  satisfy limitTotalMass by robotSystem.physical;
 }

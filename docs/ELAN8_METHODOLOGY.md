@@ -53,7 +53,9 @@ Software-only projects may omit electronics and mechanical packages, but should 
 
 ## Method Library
 
-The method concepts live in `model/method/Elan8Methodology.sysml`.
+The reusable method concepts live in
+`model/method/Elan8Methodology.sysml`. Project-specific semantic bindings live
+separately in `model/method/Elan8ProjectMethodology.sysml`.
 
 The package defines:
 
@@ -63,7 +65,7 @@ The package defines:
 - `ArtifactKind` for extractable engineering artifacts.
 - `TraceRoleKind` for source-of-truth, derived view, handoff, evidence, and external-reference roles.
 - metadata definitions for model layer, engineering ownership, lifecycle status, extractable artifact, trace role, and external reference.
-- completeness and extraction rule records that tools can read even before full semantic metadata automation is available.
+- completeness and extraction rule usages that tools can read before full semantic metadata automation is available.
 
 ## Recommended Metadata Pattern
 
@@ -79,7 +81,9 @@ Example intent:
 }
 ```
 
-Apply this kind of metadata to package entry points, handoff records, source-of-truth baselines, or elements that automation must discover reliably. Avoid tagging every small attribute.
+Apply this kind of metadata to package entry points, handoff baselines,
+source-of-truth elements, or elements that automation must discover reliably.
+Avoid tagging every small attribute.
 
 ## CPS Modeling Flow
 
@@ -90,8 +94,8 @@ Model cyber-physical systems in this order:
 3. Define functional behavior as actions and mission flows.
 4. Define physical and logical architecture as parts, ports, item definitions, and connections.
 5. Allocate functions to physical parts, software tasks, electronics functions, or deployment targets.
-6. Define interface-control records for software messages, electrical connectors, rails, buses, and harnesses.
-7. Define implementation handoff packages for software, firmware, electronics, and components.
+6. Define typed interfaces for software messages, electrical connectors, rails, buses, and harnesses.
+7. Define implementation views over software, firmware, electronics, and component facts.
 8. Define verification cases, analysis cases, and evidence intent.
 9. Define views for stakeholder questions rather than creating diagram-specific source packages.
 
@@ -133,7 +137,8 @@ features, flows, connections, allocations, references, and metadata.
 Recommended extraction behavior:
 
 - Extract `MethodCompletenessRule` usages from `Elan8Methodology` to learn required facts per artifact kind.
-- Extract `MethodExtractionRule` usages to find source packages, primary element kinds, join hints, and output intent.
+- Follow the semantic bindings in `Elan8ProjectMethodology` from each
+  `MethodExtractionRule` to project views and authoritative graph elements.
 - Prefer native SysML relationships and typed features when available.
 - Do not reconstruct internal model identity from string paths.
 - Report unresolved references as model hygiene findings rather than silently dropping them.

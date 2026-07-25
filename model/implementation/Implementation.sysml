@@ -28,15 +28,28 @@ package Implementation {
 
   view softwareRuntimeHandoff : GeneralView {
     satisfy implementationHandoffPerspective;
+    expose FirmwareArchitecture::FirmwareTaskArchitecture;
+    expose PhysicalArchitecture::RobotFirmwareSuite;
     expose Architecture::robotSystem.physical.firmwareTasks;
     expose Architecture::robotSystem.physical.robotFirmware;
+    filter @SysML::PartUsage;
   }
 
   view peripheralAccessHandoff : GeneralView {
     satisfy implementationHandoffPerspective;
+    expose PhysicalArchitecture::AutonomousFloorCleaningRobot;
+    expose FirmwareArchitecture::FirmwareTaskArchitecture::sensorAcquisition;
+    expose FirmwareArchitecture::FirmwareTaskArchitecture::motorControl;
+    expose FirmwareArchitecture::FirmwareTaskArchitecture::safetySupervisor;
+    expose FirmwareArchitecture::FirmwareTaskArchitecture::storage;
+    expose FirmwareArchitecture::FirmwareTaskArchitecture::appProtocol;
+    expose PhysicalArchitecture::MainControlPcb::mcuI2cMaster;
+    expose PhysicalArchitecture::MainControlPcb::wirelessUart;
+    expose PhysicalArchitecture::MainControlPcb::flash;
     expose Architecture::robotSystem.physical.firmwareTasks;
     expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb;
     expose Architecture::robotSystem.physical.mainElectronics.safetyGpioHarness;
+    filter @SysML::PartUsage;
   }
 
   view electronicsInterfaceHandoff : InterconnectionView {
@@ -56,9 +69,11 @@ package Implementation {
 
   view componentSelectionHandoff : GeneralView {
     satisfy implementationHandoffPerspective;
+    expose ElectronicsComponentSelection::ElectronicsComponentSelectionBaseline;
     expose ElectronicsComponentSelection::electronicsComponentSelectionBaseline;
     expose Architecture::robotSystem.physical.mainElectronics;
     expose Architecture::robotSystem.physical.sensorAssembly;
     expose Architecture::robotSystem.physical.powerModule;
+    filter @SysML::PartUsage;
   }
 }

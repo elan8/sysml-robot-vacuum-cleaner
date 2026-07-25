@@ -2,15 +2,19 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Owns product-line variant choices and selected configuration baselines for
- * the robot. Keep rationale in TradeStudies and realized structure in
- * PhysicalArchitecture, Implementation, and assurance packages.
+ * Owns native product-line variation points, semantic option usages, and
+ * configured product baselines. Internal model identity is expressed with
+ * references; only external configuration identifiers remain textual.
  */
 package ProductVariants {
   private import ScalarValues::*;
+  private import SystemRequirements::*;
   private import PhysicalArchitecture::*;
   private import FirmwareArchitecture::*;
   private import ElectronicsComponentSelection::*;
+  private import Verification::*;
+  private import AnalysisCases::*;
+  private import TradeStudies::*;
 
   enum def VariantSelectionStatus {
     candidate;
@@ -28,38 +32,35 @@ package ProductVariants {
   }
 
   enum def VariantConcernKind {
-    productTier;
     navigationSensorSuite;
     cleaningPerformance;
     batteryPack;
     safetyMonitor;
     connectivity;
     privacyMode;
-    computePlatform;
     dockOption;
   }
 
-  part def VariantOptionRecord {
+  part def VariantOption {
     attribute optionId : String;
     attribute concern : VariantConcernKind;
     attribute tierApplicability : ProductTier;
     attribute selectionStatus : VariantSelectionStatus;
-    attribute optionName : String;
-    attribute selectedModelElementPaths : String;
-    attribute changedImplementationPaths : String;
-    attribute requirementRefs : String;
-    attribute verificationRefs : String;
-    attribute rationaleRef : String;
   }
 
   part def VariantConfiguration {
     attribute configurationId : String;
-    attribute displayName : String;
     attribute tier : ProductTier;
-    attribute selectedOptions : String;
-    attribute excludedOptions : String;
-    attribute implementationImpactSummary : String;
-    attribute verificationImpactSummary : String;
+  }
+
+  connection def ConfigurationSelection {
+    end configuration : VariantConfiguration;
+    end selectedOption : VariantOption;
+  }
+
+  connection def ConfigurationExclusion {
+    end configuration : VariantConfiguration;
+    end excludedOption : VariantOption;
   }
 
   variation part def NavigationSensorSuiteChoice :> SensorAssembly {
@@ -97,175 +98,295 @@ package ProductVariants {
 
   part def RobotVariantCatalog {
     doc /*
-      Product-line variant catalog. Native SysML variation definitions above
-      define the allowed choices; the records below make selection status,
-      affected model paths, requirements, verification, and trade-study
-      rationale easy for tools to extract.
+      Semantic option catalog. Each option references its native SysML variant,
+      realized design elements, requirements, verification or analysis evidence,
+      and trade rationale without encoding model paths in strings.
     */
 
-    part entryTofImuNavigation : VariantOptionRecord {
+    part entryTofImuNavigation : VariantOption {
       attribute :>> optionId = "VAR-NAV-ENTRY-TOF-IMU";
       attribute :>> concern = VariantConcernKind::navigationSensorSuite;
       attribute :>> tierApplicability = ProductTier::entry;
       attribute :>> selectionStatus = VariantSelectionStatus::deferred;
-      attribute :>> optionName = "ToF plus IMU navigation";
-      attribute :>> selectedModelElementPaths = "ProductVariants::NavigationSensorSuiteChoice::tofImuOnly; TradeStudies::sensorBaseline";
-      attribute :>> changedImplementationPaths = "PhysicalArchitecture::SensorAssembly; FirmwareArchitecture::LocalizationTask; FirmwareArchitecture::SlamTask; typed runtime queues and peripheral allocations";
-      attribute :>> requirementRefs = "limitBomCost; localizeReliably; updateCoverageMap";
-      attribute :>> verificationRefs = "Verification::verifyLocalizationPerformance; AnalysisCases::LocalizationPerformanceAnalysis";
-      attribute :>> rationaleRef = "TradeStudies::sensorBaseline";
+      ref selectedChoice = NavigationSensorSuiteChoice::tofImuOnly;
+      ref sensorDesign = AutonomousFloorCleaningRobot::sensorAssembly;
+      ref localizationTask = FirmwareTaskArchitecture::localization;
+      ref slamTask = FirmwareTaskArchitecture::slam;
+      ref costRequirement = limitBomCost;
+      ref localizationRequirement = localizeReliably;
+      ref mapRequirement = updateCoverageMap;
+      ref localizationEvidence = verifyLocalizationAccuracy;
+      ref performanceAnalysis = LocalizationPerformanceAnalysis;
+      ref rationale = sensorBaseline;
+      doc /*
+        Low-cost ToF plus IMU option for simple reference layouts. It remains
+        deferred because the present analysis does not satisfy the premium
+        room-scale localization target.
+      */
     }
 
-    part premiumLidarNavigation : VariantOptionRecord {
+    part premiumLidarNavigation : VariantOption {
       attribute :>> optionId = "VAR-NAV-PREMIUM-LIDAR";
       attribute :>> concern = VariantConcernKind::navigationSensorSuite;
       attribute :>> tierApplicability = ProductTier::premium;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "ToF plus IMU plus 2D dToF/LiDAR";
-      attribute :>> selectedModelElementPaths = "ProductVariants::NavigationSensorSuiteChoice::lidarSlamSuite; PhysicalArchitecture::AutonomousFloorCleaningRobot.sensorAssembly; ElectronicsComponentSelection::electronicsComponentSelectionBaseline.lidarModuleCandidate";
-      attribute :>> changedImplementationPaths = "FirmwareArchitecture sensor acquisition/localization/SLAM flows; PhysicalArchitecture LiDAR UART port metadata and peripheral allocation";
-      attribute :>> requirementRefs = "localizeReliably; updateCoverageMap; protectMapPrivacy";
-      attribute :>> verificationRefs = "Verification::verifyLocalizationPerformance; Verification::verifyCoverageMapping; Verification::verifyElectricalInterfaceControl";
-      attribute :>> rationaleRef = "TradeStudies::sensorLidarUpgrade";
+      ref selectedChoice = NavigationSensorSuiteChoice::lidarSlamSuite;
+      ref sensorDesign = AutonomousFloorCleaningRobot::sensorAssembly;
+      ref componentCandidate =
+        ElectronicsComponentSelection::electronicsComponentSelectionBaseline.lidarModuleCandidate;
+      ref localizationRequirement = localizeReliably;
+      ref mapRequirement = updateCoverageMap;
+      ref privacyRequirement = protectMapPrivacy;
+      ref localizationEvidence = verifyLocalizationAccuracy;
+      ref mappingEvidence = verifyCoverageMap;
+      ref interfaceEvidence = verifyElectricalInterfaceControl;
+      ref performanceAnalysis = LocalizationPerformanceAnalysis;
+      ref rationale = sensorLidarUpgrade;
+      doc /*
+        Selected premium LiDAR SLAM option. It activates the LiDAR UART,
+        acquisition, localization, SLAM, and mapping paths while preserving
+        local-first map privacy.
+      */
     }
 
-    part flagshipAiVisionNavigation : VariantOptionRecord {
+    part flagshipAiVisionNavigation : VariantOption {
       attribute :>> optionId = "VAR-NAV-FLAGSHIP-AI-VISION";
       attribute :>> concern = VariantConcernKind::navigationSensorSuite;
       attribute :>> tierApplicability = ProductTier::flagship;
       attribute :>> selectionStatus = VariantSelectionStatus::deferred;
-      attribute :>> optionName = "LiDAR plus RGB/dual camera plus local AI accelerator plus 3D ToF";
-      attribute :>> selectedModelElementPaths = "ProductVariants::NavigationSensorSuiteChoice::aiVisionSuite; PhysicalArchitecture::DeferredVisionObstacleModule; FirmwareArchitecture::deferredObstacleClassification";
-      attribute :>> changedImplementationPaths = "Deferred camera/AI electronics, privacy verification, obstacle classification task, additional firmware memory and power budgets";
-      attribute :>> requirementRefs = "avoidObstacles; protectMapPrivacy; limitBomCost";
-      attribute :>> verificationRefs = "Verification::verifyObstacleAvoidance; Verification::verifyMapPrivacy";
-      attribute :>> rationaleRef = "TradeStudies::flagshipAiVisionUpgrade";
+      ref selectedChoice = NavigationSensorSuiteChoice::aiVisionSuite;
+      ref visionDesign = DeferredVisionObstacleModule;
+      ref classificationTask = FirmwareTaskArchitecture::deferredObstacleClassification;
+      ref obstacleRequirement = avoidObstacles;
+      ref privacyRequirement = protectMapPrivacy;
+      ref costRequirement = limitBomCost;
+      ref obstacleEvidence = verifyObstacleAvoidance;
+      ref privacyEvidence = verifyPrivacyControls;
+      ref rationale = flagshipAiVisionUpgrade;
+      doc /*
+        Deferred camera and local-AI option. Selection requires additional
+        compute, power, privacy, thermal, EMC, and recognition evidence.
+      */
     }
 
-    part standardQuietCleaningOption : VariantOptionRecord {
+    part standardQuietCleaningOption : VariantOption {
       attribute :>> optionId = "VAR-CLEAN-STANDARD";
       attribute :>> concern = VariantConcernKind::cleaningPerformance;
       attribute :>> tierApplicability = ProductTier::standard;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "standard low-power fan";
-      attribute :>> selectedModelElementPaths = "ProductVariants::CleaningPerformanceChoice::standardQuietCleaning; TradeStudies::standardFan";
-      attribute :>> changedImplementationPaths = "PhysicalArchitecture::CleaningHeadModule; FirmwareArchitecture::cleaningControl; PhysicalArchitecture power-rail budgets";
-      attribute :>> requirementRefs = "keepNoise; cleanAtLeastEighty";
-      attribute :>> verificationRefs = "Verification::verifyNoiseLimit; Verification::verifyCleaningCoverage";
-      attribute :>> rationaleRef = "TradeStudies::standardFan";
+      ref selectedChoice = CleaningPerformanceChoice::standardQuietCleaning;
+      ref cleaningDesign = AutonomousFloorCleaningRobot::cleaningHead;
+      ref cleaningTask = FirmwareTaskArchitecture::cleaningControl;
+      ref noiseRequirement = keepNoise;
+      ref areaRequirement = cleanAtLeastEighty;
+      ref noiseEvidence = verifyNoiseLevel;
+      ref coverageEvidence = verifyCleaningCoverage;
+      ref rationale = standardFan;
     }
 
-    part highSuctionCleaningOption : VariantOptionRecord {
+    part highSuctionCleaningOption : VariantOption {
       attribute :>> optionId = "VAR-CLEAN-HIGH-SUCTION";
       attribute :>> concern = VariantConcernKind::cleaningPerformance;
       attribute :>> tierApplicability = ProductTier::premium;
       attribute :>> selectionStatus = VariantSelectionStatus::deferred;
-      attribute :>> optionName = "higher suction fan";
-      attribute :>> selectedModelElementPaths = "ProductVariants::CleaningPerformanceChoice::highSuctionCleaning; TradeStudies::highSuctionFan";
-      attribute :>> changedImplementationPaths = "Cleaning motor driver current, acoustic verification, power budget, firmware cleaning modes";
-      attribute :>> requirementRefs = "keepNoise; cleanAtLeastEighty; limitBomCost";
-      attribute :>> verificationRefs = "Verification::verifyNoiseLimit; AnalysisCases::TotalPowerConsumptionAnalysis";
-      attribute :>> rationaleRef = "TradeStudies::highSuctionFan";
+      ref selectedChoice = CleaningPerformanceChoice::highSuctionCleaning;
+      ref cleaningDesign = AutonomousFloorCleaningRobot::cleaningHead;
+      ref noiseRequirement = keepNoise;
+      ref areaRequirement = cleanAtLeastEighty;
+      ref costRequirement = limitBomCost;
+      ref noiseEvidence = verifyNoiseLevel;
+      ref powerAnalysis = TotalPowerConsumptionAnalysis;
+      ref rationale = highSuctionFan;
     }
 
-    part baselineBatteryOption : VariantOptionRecord {
+    part baselineBatteryOption : VariantOption {
       attribute :>> optionId = "VAR-BATT-4S2P-12500";
       attribute :>> concern = VariantConcernKind::batteryPack;
       attribute :>> tierApplicability = ProductTier::premium;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "4S2P 12500 mAh pack";
-      attribute :>> selectedModelElementPaths = "ProductVariants::BatteryPackChoice::pack4s2p12500mAh; PhysicalArchitecture::AutonomousFloorCleaningRobot.powerModule.batteryPack; TradeStudies::battery4s2p";
-      attribute :>> changedImplementationPaths = "DesignLimits::batteryCapacityBudget; PhysicalArchitecture::AutonomousFloorCleaningRobot.batteryRailBudget; FirmwareArchitecture::batteryManager";
-      attribute :>> requirementRefs = "cleanAtLeastEighty; returnToDock; chargeSafely";
-      attribute :>> verificationRefs = "Verification::verifyReturnToDock; Verification::verifyChargingSafety; AnalysisCases::MissionEnergyAnalysis";
-      attribute :>> rationaleRef = "TradeStudies::battery4s2p";
+      ref selectedChoice = BatteryPackChoice::pack4s2p12500mAh;
+      ref batteryDesign = AutonomousFloorCleaningRobot::powerModule.batteryPack;
+      ref railBudget = AutonomousFloorCleaningRobot::batteryRailBudget;
+      ref batteryTask = FirmwareTaskArchitecture::batteryManager;
+      ref areaRequirement = cleanAtLeastEighty;
+      ref dockingRequirement = returnToDock;
+      ref chargingRequirement = chargeSafely;
+      ref dockingEvidence = verifyDockingSuccess;
+      ref chargingEvidence = verifySafeCharging;
+      ref energyAnalysis = MissionEnergyAnalysis;
+      ref rationale = battery4s2p;
     }
 
-    part sameMcuSafetyOption : VariantOptionRecord {
+    part sameMcuSafetyOption : VariantOption {
       attribute :>> optionId = "VAR-SAFE-SAME-MCU";
       attribute :>> concern = VariantConcernKind::safetyMonitor;
       attribute :>> tierApplicability = ProductTier::standard;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "same-MCU safety supervisor";
-      attribute :>> selectedModelElementPaths = "ProductVariants::SafetyMonitorChoice::sameMcuSafetySupervisor; PhysicalArchitecture::AutonomousFloorCleaningRobot.robotFirmware.safetySupervisor; TradeStudies::sameMcuSafetySupervisor";
-      attribute :>> changedImplementationPaths = "FirmwareArchitecture::SafetySupervisorTask; typed hazard/safety queues; PhysicalArchitecture safety peripheral allocation; SafetyAnalysis hazard mitigations";
-      attribute :>> requirementRefs = "superviseHazards; detectCliffs; detectBinRemovedOrMissing";
-      attribute :>> verificationRefs = "Verification::verifyHazardSupervision; Verification::verifyElectricalInterfaceControl";
-      attribute :>> rationaleRef = "TradeStudies::sameMcuSafetySupervisor";
+      ref selectedChoice = SafetyMonitorChoice::sameMcuSafetySupervisor;
+      ref safetyDesign = AutonomousFloorCleaningRobot::robotFirmware.safetySupervisor;
+      ref safetyTask = FirmwareTaskArchitecture::safetySupervisor;
+      ref hazardRequirement = superviseHazards;
+      ref cliffRequirement = detectCliffs;
+      ref binRequirement = detectBinRemovedOrMissing;
+      ref safetyEvidence = verifySafetySupervisorImplementation;
+      ref interfaceEvidence = verifyElectricalInterfaceControl;
+      ref rationale = sameMcuSafetySupervisor;
     }
 
-    part localPrivacyOption : VariantOptionRecord {
+    part localPrivacyOption : VariantOption {
       attribute :>> optionId = "VAR-PRIVACY-LOCAL-ONLY";
       attribute :>> concern = VariantConcernKind::privacyMode;
       attribute :>> tierApplicability = ProductTier::premium;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "local-only privacy default";
-      attribute :>> selectedModelElementPaths = "PhysicalArchitecture::AutonomousFloorCleaningRobot.cloudBackupDefaultEnabled; TradeStudies::localOnlyPrivacyDefault";
-      attribute :>> changedImplementationPaths = "FirmwareArchitecture::AppProtocolTask; FirmwareArchitecture::StorageTask; InterfaceControl privacy consent fields";
-      attribute :>> requirementRefs = "protectMapPrivacy";
-      attribute :>> verificationRefs = "Verification::verifyMapPrivacy";
-      attribute :>> rationaleRef = "TradeStudies::localOnlyPrivacyDefault";
+      ref robotSetting = AutonomousFloorCleaningRobot::cloudBackupDefaultEnabled;
+      ref appTask = FirmwareTaskArchitecture::appProtocol;
+      ref storageTask = FirmwareTaskArchitecture::storage;
+      ref privacyRequirement = protectMapPrivacy;
+      ref privacyEvidence = verifyPrivacyControls;
+      ref rationale = localOnlyPrivacyDefault;
     }
 
-    part wifiBleLocalAppOption : VariantOptionRecord {
+    part wifiBleLocalAppOption : VariantOption {
       attribute :>> optionId = "VAR-CONN-WIFI-BLE-LOCAL";
       attribute :>> concern = VariantConcernKind::connectivity;
       attribute :>> tierApplicability = ProductTier::standard;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "Wi-Fi/BLE local app link";
-      attribute :>> selectedModelElementPaths = "ProductVariants::ConnectivityChoice::wifiBleLocalApp; ElectronicsComponentSelection::electronicsComponentSelectionBaseline.wirelessModuleCandidate";
-      attribute :>> changedImplementationPaths = "PhysicalArchitecture app UART port metadata and wireless peripheral allocation; FirmwareArchitecture::AppProtocolTask";
-      attribute :>> requirementRefs = "reportCleaningStatus; protectMapPrivacy";
-      attribute :>> verificationRefs = "Verification::verifyStatusReporting; Verification::verifyMapPrivacy";
-      attribute :>> rationaleRef = "ElectronicsComponentSelection::electronicsComponentSelectionBaseline.wirelessModuleCandidate";
+      ref selectedChoice = ConnectivityChoice::wifiBleLocalApp;
+      ref componentCandidate =
+        ElectronicsComponentSelection::electronicsComponentSelectionBaseline.wirelessModuleCandidate;
+      ref appTask = FirmwareTaskArchitecture::appProtocol;
+      ref statusRequirement = reportCleaningStatus;
+      ref privacyRequirement = protectMapPrivacy;
+      ref protocolEvidence = verifyProtocolContracts;
+      ref privacyEvidence = verifyPrivacyControls;
     }
 
-    part beaconChargeDockOption : VariantOptionRecord {
+    part beaconChargeDockOption : VariantOption {
       attribute :>> optionId = "VAR-DOCK-BEACON-CHARGE";
       attribute :>> concern = VariantConcernKind::dockOption;
       attribute :>> tierApplicability = ProductTier::standard;
       attribute :>> selectionStatus = VariantSelectionStatus::selectedBaseline;
-      attribute :>> optionName = "charging dock with homing beacon";
-      attribute :>> selectedModelElementPaths = "ProductVariants::DockChoice::beaconChargeDock; PhysicalArchitecture::AutonomousFloorCleaningRobot.dockInterface";
-      attribute :>> changedImplementationPaths = "FunctionalArchitecture::HomeAndDock; PhysicalArchitecture::DockInterfaceModule; FirmwareArchitecture::missionController; ElectronicsInterfaceControl power and GPIO contracts";
-      attribute :>> requirementRefs = "returnToDock; chargeSafely";
-      attribute :>> verificationRefs = "Verification::verifyReturnToDock; Verification::verifyChargingSafety";
-      attribute :>> rationaleRef = "OperationalScenarios::returnToDockAndCharge";
+      ref selectedChoice = DockChoice::beaconChargeDock;
+      ref dockDesign = AutonomousFloorCleaningRobot::dockInterface;
+      ref missionTask = FirmwareTaskArchitecture::missionController;
+      ref dockingRequirement = returnToDock;
+      ref chargingRequirement = chargeSafely;
+      ref dockingEvidence = verifyDockingSuccess;
+      ref chargingEvidence = verifySafeCharging;
     }
   }
 
   part def RobotVariantConfigurations {
     part premiumPrivacySlamBaseline : VariantConfiguration {
       attribute :>> configurationId = "SKU-PREMIUM-PRIVACY-SLAM";
-      attribute :>> displayName = "Premium privacy-conscious LiDAR SLAM baseline";
       attribute :>> tier = ProductTier::premium;
-      attribute :>> selectedOptions = "VAR-NAV-PREMIUM-LIDAR; VAR-CLEAN-STANDARD; VAR-BATT-4S2P-12500; VAR-SAFE-SAME-MCU; VAR-PRIVACY-LOCAL-ONLY; VAR-CONN-WIFI-BLE-LOCAL; VAR-DOCK-BEACON-CHARGE";
-      attribute :>> excludedOptions = "VAR-NAV-ENTRY-TOF-IMU; VAR-NAV-FLAGSHIP-AI-VISION; VAR-CLEAN-HIGH-SUCTION";
-      attribute :>> implementationImpactSummary = "Use LiDAR UART, sensor I2C, local map storage, standard fan power budget, same-MCU safety supervision, 4S2P pack and beacon charging dock.";
-      attribute :>> verificationImpactSummary = "Run localization, coverage mapping, privacy, charging safety, hazard supervision, app status, and electrical interface verification.";
+      doc /*
+        Released demonstration baseline: LiDAR SLAM, standard quiet cleaning,
+        4S2P battery, same-MCU safety supervision, local-first privacy,
+        Wi-Fi/BLE local app connectivity, and beacon charging dock.
+      */
     }
 
     part entryCostOptimizedCandidate : VariantConfiguration {
       attribute :>> configurationId = "SKU-ENTRY-COST-CANDIDATE";
-      attribute :>> displayName = "Entry cost-optimized candidate";
       attribute :>> tier = ProductTier::entry;
-      attribute :>> selectedOptions = "VAR-NAV-ENTRY-TOF-IMU; VAR-CLEAN-STANDARD; VAR-SAFE-SAME-MCU; VAR-PRIVACY-LOCAL-ONLY; VAR-DOCK-BEACON-CHARGE";
-      attribute :>> excludedOptions = "VAR-NAV-PREMIUM-LIDAR; VAR-NAV-FLAGSHIP-AI-VISION; VAR-CLEAN-HIGH-SUCTION";
-      attribute :>> implementationImpactSummary = "Remove LiDAR UART and SLAM scan matching path; retain lower-cost localization candidate only if localization and coverage requirements are relaxed or reallocated.";
-      attribute :>> verificationImpactSummary = "Requires localization and coverage re-verification; current requirement set does not accept this as the baseline.";
+      doc /*
+        Cost candidate only. The current localization and coverage requirements
+        prevent baseline selection until its performance is improved or the
+        affected requirements are deliberately changed.
+      */
     }
 
     part flagshipAiVisionCandidate : VariantConfiguration {
       attribute :>> configurationId = "SKU-FLAGSHIP-AI-VISION-CANDIDATE";
-      attribute :>> displayName = "Flagship AI vision candidate";
       attribute :>> tier = ProductTier::flagship;
-      attribute :>> selectedOptions = "VAR-NAV-FLAGSHIP-AI-VISION; VAR-CLEAN-HIGH-SUCTION; VAR-BATT-4S2P-12500; VAR-PRIVACY-LOCAL-ONLY";
-      attribute :>> excludedOptions = "VAR-NAV-ENTRY-TOF-IMU";
-      attribute :>> implementationImpactSummary = "Adds camera/AI accelerator electronics, obstacle-classification firmware, higher power and stronger privacy handling.";
-      attribute :>> verificationImpactSummary = "Requires additional privacy, AI obstacle recognition, thermal, EMC, battery runtime and acoustic verification before baseline selection.";
+      doc /*
+        Flagship candidate. Additional privacy, recognition, thermal, EMC,
+        runtime, acoustic, and cost evidence is mandatory before selection.
+      */
     }
   }
 
   part robotVariantCatalog : RobotVariantCatalog;
   part robotVariantConfigurations : RobotVariantConfigurations;
+
+  connection premiumNavigationSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.premiumLidarNavigation;
+  connection premiumCleaningSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.standardQuietCleaningOption;
+  connection premiumBatterySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.baselineBatteryOption;
+  connection premiumSafetySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.sameMcuSafetyOption;
+  connection premiumPrivacySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.localPrivacyOption;
+  connection premiumConnectivitySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.wifiBleLocalAppOption;
+  connection premiumDockSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.premiumPrivacySlamBaseline
+    to selectedOption ::> robotVariantCatalog.beaconChargeDockOption;
+
+  connection entryNavigationSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to selectedOption ::> robotVariantCatalog.entryTofImuNavigation;
+  connection entryCleaningSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to selectedOption ::> robotVariantCatalog.standardQuietCleaningOption;
+  connection entrySafetySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to selectedOption ::> robotVariantCatalog.sameMcuSafetyOption;
+  connection entryPrivacySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to selectedOption ::> robotVariantCatalog.localPrivacyOption;
+  connection entryDockSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to selectedOption ::> robotVariantCatalog.beaconChargeDockOption;
+  connection entryPremiumNavigationExclusion : ConfigurationExclusion
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to excludedOption ::> robotVariantCatalog.premiumLidarNavigation;
+  connection entryVisionNavigationExclusion : ConfigurationExclusion
+    connect configuration ::>
+      robotVariantConfigurations.entryCostOptimizedCandidate
+    to excludedOption ::> robotVariantCatalog.flagshipAiVisionNavigation;
+
+  connection flagshipNavigationSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.flagshipAiVisionCandidate
+    to selectedOption ::> robotVariantCatalog.flagshipAiVisionNavigation;
+  connection flagshipCleaningSelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.flagshipAiVisionCandidate
+    to selectedOption ::> robotVariantCatalog.highSuctionCleaningOption;
+  connection flagshipBatterySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.flagshipAiVisionCandidate
+    to selectedOption ::> robotVariantCatalog.baselineBatteryOption;
+  connection flagshipPrivacySelection : ConfigurationSelection
+    connect configuration ::>
+      robotVariantConfigurations.flagshipAiVisionCandidate
+    to selectedOption ::> robotVariantCatalog.localPrivacyOption;
+  connection flagshipEntryNavigationExclusion : ConfigurationExclusion
+    connect configuration ::>
+      robotVariantConfigurations.flagshipAiVisionCandidate
+    to excludedOption ::> robotVariantCatalog.entryTofImuNavigation;
+
 }

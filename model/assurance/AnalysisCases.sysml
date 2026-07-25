@@ -21,7 +21,8 @@ package AnalysisCases {
     attribute ecoModePowerW : PowerValue = 54 [W];
     attribute standardModePowerW : PowerValue = 73 [W];
     attribute maxModePowerW : PowerValue = 94 [W];
-    attribute standardModeMarginW : PowerValue = 2 [W];
+    attribute standardModeMarginW : PowerValue =
+      powerBudgetW - standardModePowerW;
     subject robot : AutonomousFloorCleaningRobot;
     return ref powerWithinBudget {
       return sum(
@@ -44,9 +45,19 @@ package AnalysisCases {
   }
   analysis def ProductCostAnalysis {
     attribute bomCostBudget : MonetaryAmount = DesignLimits::bomCostBudget;
-    attribute estimatedBomCost : MonetaryAmount = 397 [EUR];
-    attribute bomCostMargin : MonetaryAmount = 3 [EUR];
     subject robot : AutonomousFloorCleaningRobot;
+    attribute estimatedBomCost : MonetaryAmount = sum(
+      robot.driveModule.bomCost,
+      robot.cleaningHead.bomCost,
+      robot.sensorAssembly.bomCost,
+      robot.mainElectronics.bomCost,
+      robot.powerModule.bomCost,
+      robot.dockInterface.bomCost,
+      robot.hmi.bomCost,
+      robot.chassis.bomCost
+    );
+    attribute bomCostMargin : MonetaryAmount =
+      bomCostBudget - estimatedBomCost;
     return ref costWithinTarget {
       return sum(
         robot.driveModule.bomCost,
@@ -67,11 +78,22 @@ package AnalysisCases {
   }
   analysis def TotalMassAnalysis {
     attribute massBudget : MassValue = DesignLimits::massBudget;
-    attribute estimatedMass : MassValue = 4.95 [kg];
     attribute manufacturingMassAllowance : MassValue = 0.25 [kg];
-    attribute designTargetMass : MassValue = 4.75 [kg];
-    attribute massMarginToTarget : MassValue = -0.20 [kg];
     subject robot : AutonomousFloorCleaningRobot;
+    attribute estimatedMass : MassValue = sum(
+      robot.driveModule.massKg,
+      robot.cleaningHead.massKg,
+      robot.sensorAssembly.massKg,
+      robot.mainElectronics.massKg,
+      robot.powerModule.massKg,
+      robot.dockInterface.massKg,
+      robot.hmi.massKg,
+      robot.chassis.massKg
+    );
+    attribute designTargetMass : MassValue =
+      massBudget - manufacturingMassAllowance;
+    attribute massMarginToTarget : MassValue =
+      designTargetMass - estimatedMass;
     return ref massWithinLimit {
       return sum(
         robot.driveModule.massKg,
@@ -93,11 +115,16 @@ package AnalysisCases {
     }
   }
   analysis def MissionEnergyAnalysis {
-    attribute missionChargeDraw : ElectricChargeValue = 9375 [mAh];
     attribute chargeBudget : ElectricChargeValue = DesignLimits::batteryCapacityBudget;
-    attribute reserveCharge : ElectricChargeValue = 1875 [mAh];
-    attribute usableMissionBudget : ElectricChargeValue = 10625 [mAh];
-    attribute missionChargeMargin : ElectricChargeValue = 1250 [mAh];
+    attribute averageMissionCurrent : ElectricCurrentValue = 5 [A];
+    attribute missionDuration : DurationValue = 1.875 [h];
+    attribute missionChargeDraw : ElectricChargeValue =
+      averageMissionCurrent * missionDuration;
+    attribute reserveCharge : ElectricChargeValue = chargeBudget * 0.15;
+    attribute usableMissionBudget : ElectricChargeValue =
+      chargeBudget - reserveCharge;
+    attribute missionChargeMargin : ElectricChargeValue =
+      usableMissionBudget - missionChargeDraw;
     subject robot : AutonomousFloorCleaningRobot;
     return ref energyWithinBudget {
       return missionChargeDraw <= chargeBudget;
@@ -129,7 +156,16 @@ package AnalysisCases {
     }
   }
   analysis def SafetyReactionAnalysis {
-    attribute measuredReactionTime : DurationValue = 90 [ms];
+    attribute sensorDetectionLatency : DurationValue = 25 [ms];
+    attribute queueAndSchedulingLatency : DurationValue = 10 [ms];
+    attribute safetyTaskExecutionLatency : DurationValue = 5 [ms];
+    attribute motorDisableLatency : DurationValue = 50 [ms];
+    attribute measuredReactionTime : DurationValue = sum(
+      sensorDetectionLatency,
+      queueAndSchedulingLatency,
+      safetyTaskExecutionLatency,
+      motorDisableLatency
+    );
     attribute reactionTimeLimit : DurationValue = DesignLimits::maxSafeStopReactionTime;
     subject robot : AutonomousFloorCleaningRobot;
     return ref reactsWithinLimit {
