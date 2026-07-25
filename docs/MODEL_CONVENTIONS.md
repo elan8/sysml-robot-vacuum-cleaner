@@ -49,6 +49,22 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Keep requirement names short and stable because they are referenced by satisfy, verify, view, and analysis relationships.
 - Use explicit deferred names for non-baseline options, for example `DeferredVisionObstacleSoftware`.
 
+## Semantic Links Before Text
+
+- Use `ref`, typed usages, feature values, connection ends, `connect`, `flow`,
+  `allocate`, `satisfy`, and `verify` for model identity and traceability.
+- Do not store a qualified model path or an element name in `String` when the
+  target exists in the loaded model and can be referenced directly.
+- Do not repeat the payload type as text when it follows from typed ports,
+  action parameters, items, or connection ends.
+- Keep strings for genuine prose and external identifiers: rationale, human
+  guidance, manufacturer part numbers, source-code symbols, external URLs, and
+  identifiers owned by systems outside the SysML model.
+- If current tooling cannot resolve a canonical relationship, keep the real
+  typed `flow`, `connect`, allocation, or trace relationship as the source of
+  truth and label any temporary string bridge explicitly as a compatibility
+  field.
+
 ## Comments And Documentation
 
 - Use package-header comments to state ownership, dependencies, and boundaries.
@@ -62,7 +78,10 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Use native SysML v2 relationships first; use Strata method metadata for ownership, maturity, extraction, and external references.
 - Prefer tagging package entry points, handoff baselines, source-of-truth records, and view/report roots over tagging every small feature.
 - Do not encode requirements, allocations, interfaces, or verification links only as metadata when native SysML relationships are available.
-- Keep extraction-oriented string paths as compatibility bridges only where current tooling cannot resolve the intended feature path.
+- Keep extraction-oriented string paths as compatibility bridges only where
+  current tooling cannot resolve the intended feature path. Remove the bridge
+  once the canonical relationship validates and downstream extraction can
+  follow it.
 
 ## Deferred Options
 

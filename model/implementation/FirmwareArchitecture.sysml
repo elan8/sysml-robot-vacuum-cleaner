@@ -356,81 +356,72 @@ package FirmwareArchitecture {
 
     // Interface-control contracts for the most important task-to-task payloads.
     connection lidarScanToSlamContract : DataFlowContract {
-      attribute :>> producerFeature = "sensorAcquisition.run.lidarScanOut";
-      attribute :>> consumerFeature = "slam.run.lidarScanIn";
-      attribute :>> payloadType = "LidarScanFrame";
+      end producer ::> sensorAcquisition.run.lidarScanOut;
+      end consumer ::> slam.run.lidarScanIn;
       attribute :>> period = 20 [ms];
       attribute :>> maxLatency = 50 [ms];
       attribute :>> privacySensitive = false;
       attribute :>> allowedValues = "scanRateHz nominal 10 Hz; includesRawImageData must be false";
     }
     connection lidarScanToLocalizationContract : DataFlowContract {
-      attribute :>> producerFeature = "sensorAcquisition.run.lidarScanOut";
-      attribute :>> consumerFeature = "localization.run.lidarScanIn";
-      attribute :>> payloadType = "LidarScanFrame";
+      end producer ::> sensorAcquisition.run.lidarScanOut;
+      end consumer ::> localization.run.lidarScanIn;
       attribute :>> period = 20 [ms];
       attribute :>> maxLatency = 50 [ms];
       attribute :>> privacySensitive = false;
       attribute :>> allowedValues = "rangeSampleCount shall match selected LiDAR frame profile";
     }
     connection poseGraphToLocalizationContract : DataFlowContract {
-      attribute :>> producerFeature = "slam.run.poseGraphOut";
-      attribute :>> consumerFeature = "localization.run.poseGraphIn";
-      attribute :>> payloadType = "PoseGraphUpdate";
+      end producer ::> slam.run.poseGraphOut;
+      end consumer ::> localization.run.poseGraphIn;
       attribute :>> period = 50 [ms];
       attribute :>> maxLatency = 100 [ms];
       attribute :>> privacySensitive = true;
       attribute :>> allowedValues = "mapStabilityScore range 0..100; no raw home map export";
     }
     connection mapUpdateToStorageContract : DataFlowContract {
-      attribute :>> producerFeature = "slam.run.mapUpdateOut";
-      attribute :>> consumerFeature = "storage.run.mapUpdateIn";
-      attribute :>> payloadType = "MapUpdate";
+      end producer ::> slam.run.mapUpdateOut;
+      end consumer ::> storage.run.mapUpdateIn;
       attribute :>> period = 50 [ms];
       attribute :>> maxLatency = 1000 [ms];
       attribute :>> privacySensitive = true;
       attribute :>> allowedValues = "includesRawHomeMap may be true only for local storage";
     }
     connection plannerCommandToMissionContract : DataFlowContract {
-      attribute :>> producerFeature = "coveragePlanner.run.plannerCommandOut";
-      attribute :>> consumerFeature = "missionController.run.plannerCommandIn";
-      attribute :>> payloadType = "DriveCommand";
+      end producer ::> coveragePlanner.run.plannerCommandOut;
+      end consumer ::> missionController.run.plannerCommandIn;
       attribute :>> period = 100 [ms];
       attribute :>> maxLatency = 100 [ms];
       attribute :>> privacySensitive = false;
       attribute :>> allowedValues = "forceStop false unless planner escalates obstacle recovery";
     }
     connection hazardToSafetyContract : DataFlowContract {
-      attribute :>> producerFeature = "sensorAcquisition.run.hazardOut";
-      attribute :>> consumerFeature = "safetySupervisor.run.hazardIn";
-      attribute :>> payloadType = "HazardEvent";
+      end producer ::> sensorAcquisition.run.hazardOut;
+      end consumer ::> safetySupervisor.run.hazardIn;
       attribute :>> period = 20 [ms];
       attribute :>> maxLatency = 100 [ms];
       attribute :>> privacySensitive = false;
       attribute :>> allowedValues = "severity safetyCritical requires safeStopRequired true";
     }
     connection missionStatusToAppContract : DataFlowContract {
-      attribute :>> producerFeature = "missionController.run.missionStatusOut";
-      attribute :>> consumerFeature = "appProtocol.run.missionStatusIn";
-      attribute :>> payloadType = "MissionStatus";
+      end producer ::> missionController.run.missionStatusOut;
+      end consumer ::> appProtocol.run.missionStatusIn;
       attribute :>> period = 100 [ms];
       attribute :>> maxLatency = 500 [ms];
       attribute :>> privacySensitive = false;
       attribute :>> allowedValues = "stateName shall match public mission lifecycle vocabulary";
     }
     connection appCommandToMissionContract : DataFlowContract {
-      attribute :>> producerFeature = "appProtocol.run.userCommandOut";
-      attribute :>> consumerFeature = "missionController.run.userCommandIn";
-      attribute :>> payloadType = "UserCommand";
+      end producer ::> appProtocol.run.userCommandOut;
+      end consumer ::> missionController.run.userCommandIn;
       attribute :>> period = 100 [ms];
       attribute :>> maxLatency = 250 [ms];
       attribute :>> privacySensitive = true;
       attribute :>> allowedValues = "cloudBackupConsent changes require explicit consent command";
     }
     connection diagnosticSummaryToAppContract : DataFlowContract {
-      attribute :>> producerFeature = "diagnostics.run.diagnosticSummaryOut";
-      attribute :>> consumerFeature = "appProtocol.run.diagnosticIn";
-      attribute :>> payloadType = "DiagnosticEvent";
+      end producer ::> diagnostics.run.diagnosticSummaryOut;
+      end consumer ::> appProtocol.run.diagnosticIn;
       attribute :>> period = 500 [ms];
       attribute :>> maxLatency = 1000 [ms];
       attribute :>> privacySensitive = false;

@@ -62,14 +62,14 @@ package InterfaceControl {
   // ownership by firmware tasks is asserted in FirmwareArchitecture via flows.
   connection def DataFlowContract {
     doc /*
-      Typed software data contract. producerFeature and consumerFeature name
-      the concrete firmware features bound by FirmwareArchitecture flows.
+      Typed software data contract. Concrete usages bind producer and consumer
+      directly to the firmware action parameters that participate in the flow;
+      their typing identifies the payload without a parallel string field.
       allowedValues captures contract constraints that are not yet expressible
       as an enum or range.
     */
-    attribute producerFeature : String;
-    attribute consumerFeature : String;
-    attribute payloadType : String;
+    end producer;
+    end consumer;
     attribute period : DurationValue;
     attribute maxLatency : DurationValue;
     attribute privacySensitive : Boolean;
