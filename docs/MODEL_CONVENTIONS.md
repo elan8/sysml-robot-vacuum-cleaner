@@ -13,13 +13,15 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Keep package names stable; file moves should not rename packages.
 - Treat `AutonomousFloorCleaningRobotDemo` as the full-workspace import hub.
 - Treat `Architecture` as the public architecture hub for downstream packages that need the realized robot type.
-- Treat `Strata` as the lightweight method library for ownership, maturity, extractability, and handoff rules.
+- Treat `Elan8Methodology` as the lightweight method library for ownership, maturity, extractability, and handoff rules.
 - Use `model/` subfolders only as navigation aids; SysML package ownership remains independent of file paths.
 
 ## Package Ownership
 
 - `VacuumCleanerQuantitiesAndUnits` owns project-specific measurement-unit declarations and their standard-library-based conversions. It should not duplicate units already declared by the loaded OMG libraries.
-- `Strata` owns way-of-working concepts, metadata definitions, completeness rules, and extraction rules. It should not own product-specific engineering facts.
+- `Elan8Methodology` owns way-of-working concepts, metadata definitions,
+  completeness rules, and extraction rules. It should not own product-specific
+  engineering facts.
 - Requirements packages own requirement intent and derivation. They should not own implementation structure.
 - `FunctionalArchitecture` owns capability and mission action definitions. It should not own PCB, harness, or task scheduling details.
 - `PhysicalArchitecture` owns product assemblies, physical ports, harness ICD notes, semantic rail budgets, the `firmwareTasks` and `robotFirmware` instances, task/module/MCU/peripheral allocations, and roll-up values. It should not own software message schemas.
@@ -71,9 +73,9 @@ These conventions keep the SysML model readable and maintainable while preservin
 - Do not comment trivial attributes whose names and values are self-explanatory.
 - Add rationale near non-obvious tradeoffs, package boundaries, allocations, and safety assumptions.
 
-## Strata Metadata
+## Elan8 Methodology Metadata
 
-- Use native SysML v2 relationships first; use Strata method metadata for ownership, maturity, extraction, and external references.
+- Use native SysML v2 relationships first; use Elan8 methodology metadata for ownership, maturity, extraction, and external references.
 - Prefer tagging package entry points, handoff baselines, source-of-truth records, and view/report roots over tagging every small feature.
 - Do not encode requirements, allocations, interfaces, or verification links only as metadata when native SysML relationships are available.
 - Keep extraction-oriented string paths as compatibility bridges only where

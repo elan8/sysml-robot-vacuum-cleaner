@@ -7,7 +7,7 @@
  * engineering content in the imported packages.
  */
 package AutonomousFloorCleaningRobotDemo {
-  private import Strata::*;
+  private import Elan8Methodology::*;
   private import RequirementManagement::*;
   private import MonetaryUnits::*;
   private import VacuumCleanerQuantitiesAndUnits::*;

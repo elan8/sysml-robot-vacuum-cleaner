@@ -12,7 +12,7 @@ This guide explains how the robot-vacuum model is organized and how to read it w
 Use this tour when evaluating the model as a high-end SysML v2 example:
 
 1. Start in `StakeholderNeeds` and `SystemRequirements` to see user needs, derived requirements, metadata, and derivation links.
-2. Read `Strata` for the lightweight way-of-working concepts used by extraction and handoff tooling.
+2. Read `Elan8Methodology` for the lightweight way-of-working concepts used by extraction and handoff tooling.
 3. Read `FunctionalArchitecture` for capability actions and mission-level behavior.
 4. Read `PhysicalArchitecture` for product assemblies, typed ports, harnesses, firmware suite parts, and mass/BOM/power roll-ups.
 5. Read `ProductVariants` to see the product-line choices and selected SKU baselines.
@@ -30,7 +30,7 @@ The model is intentionally layered from product intent to implementation evidenc
 | Layer | Main packages | Purpose |
 | --- | --- | --- |
 | Libraries | `VacuumCleanerQuantitiesAndUnits` | Project-specific measurement units declared in terms of the OMG quantities-and-units library. |
-| Method | `Strata` | Way-of-working concepts, ownership and maturity metadata, completeness rules, and extraction rules for CPS and software-only models. |
+| Method | `Elan8Methodology` | Way-of-working concepts, ownership and maturity metadata, completeness rules, and extraction rules for CPS and software-only models. |
 | Requirements | `StakeholderNeeds`, `SystemRequirements`, `DesignLimits` | User needs, derived system requirements, and shared numeric limits. |
 | Context | `ProductContext`, `OperationalScenarios` | External actors, home environment, dock, app/cloud, and mission flows. |
 | Architecture | `ArchitectureCommon`, `PhysicalProtocols`, `FunctionalArchitecture`, `PhysicalArchitecture`, `ArchitectureAllocations`, `Architecture` | Functional capabilities, product assemblies, typed interfaces, and allocation links. |
@@ -76,7 +76,7 @@ model/
 | Package | Owns | Key dependencies |
 | --- | --- | --- |
 | `VacuumCleanerQuantitiesAndUnits` | Project-specific `Ah` and `mAh` electric-charge units and the `ms` duration unit. | OMG measurement references, ISQ, SI, and SI prefixes. |
-| `Strata` | Lightweight method metadata, artifact kinds, completeness rules, and extraction rules. | Scalar values. |
+| `Elan8Methodology` | Lightweight method metadata, artifact kinds, completeness rules, and extraction rules. | Scalar values. |
 | `StakeholderNeeds` | User-facing needs with requirement metadata. | Requirement and modeling metadata libraries. |
 | `SystemRequirements` | Derived system requirements and derivation links. | `StakeholderNeeds`, metadata libraries. |
 | `DesignLimits` | Shared budget, mass, energy, and timing limits. | Quantity and monetary libraries. |

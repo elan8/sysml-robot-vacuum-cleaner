@@ -21,7 +21,10 @@ This repository gives systems engineers, tool builders, and educators a realisti
 
 It demonstrates how requirements, functional architecture, physical architecture, firmware allocation, safety analysis, verification, analysis cases, and stakeholder views can live together in one coherent model.
 
-The repository also includes Strata, a lightweight SysML v2 way of working for cyber-physical and software-only systems. It defines method concepts, metadata, completeness rules, and extraction rules so tools can reliably discover handoff information from the model.
+The repository also includes the Elan8 methodology, a lightweight SysML v2 way
+of working for cyber-physical and software-only systems. It defines method
+concepts, metadata, completeness rules, and extraction rules so tools can
+reliably discover handoff information from the model.
 
 ## Highlights
 
@@ -30,7 +33,7 @@ The repository also includes Strata, a lightweight SysML v2 way of working for c
 - Product-line variant modeling for navigation sensor suites, cleaning performance, battery pack, safety monitor, connectivity, privacy mode, dock options, and SKU baselines.
 - Implementation-facing interface control for PCB harnesses, software message contracts, firmware tasks, scheduler timing, and MCU deployment.
 - An implementation layer tying software contracts, firmware runtime/resource constraints, electronics interfaces, PCB/harness work packages, component candidates, queue policies, HAL bindings, rail budgets, timing budgets, and verification scope together.
-- A lightweight `Strata` package that separates native SysML v2 engineering semantics from metadata used for ownership, maturity, extraction, and external lifecycle references.
+- A lightweight `Elan8Methodology` package that separates native SysML v2 engineering semantics from metadata used for ownership, maturity, extraction, and external lifecycle references.
 - Safety assurance, design trade studies, and technical margins instead of structure-only modeling.
 - First-class SysML v2 views for context, structure, interconnections, behavior, traceability, safety, deployment, and rationale.
 
@@ -71,7 +74,7 @@ The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits
 
 1. [`StakeholderNeeds.sysml`](model/requirements/StakeholderNeeds.sysml) - user needs
 2. [`SystemRequirements.sysml`](model/requirements/SystemRequirements.sysml) - derived system requirements
-3. [`Strata.sysml`](model/method/Strata.sysml) - Strata CPS/software-only way-of-working concepts, metadata, completeness rules, and extraction rules
+3. [`Elan8Methodology.sysml`](model/method/Elan8Methodology.sysml) - Elan8 methodology concepts, metadata, completeness rules, and extraction rules
 4. [`FunctionalArchitecture.sysml`](model/architecture/FunctionalArchitecture.sysml) - capabilities and functional composition
 5. [`PhysicalProtocols.sysml`](model/architecture/PhysicalProtocols.sysml) - electronics library imports and product bus aliases
 6. [`ProductContext.sysml`](model/context/ProductContext.sysml) - external actors and context boundary
@@ -95,7 +98,7 @@ The limits are defined in [`DesignLimits.sysml`](model/requirements/DesignLimits
 
 - [`docs/MODEL_GUIDE.md`](docs/MODEL_GUIDE.md) - model layers, package map, and engineering threads.
 - [`docs/MODEL_CONVENTIONS.md`](docs/MODEL_CONVENTIONS.md) - naming, imports, comments, package ownership, and future folder structure.
-- [`docs/STRATA_WAY_OF_WORKING.md`](docs/STRATA_WAY_OF_WORKING.md) - Strata CPS/software-only modeling method, metadata guidance, handoff contracts, and extraction rules.
+- [`docs/ELAN8_METHODOLOGY.md`](docs/ELAN8_METHODOLOGY.md) - Elan8 methodology guidance, handoff contracts, metadata, and extraction rules.
 - [`docs/VALIDATION.md`](docs/VALIDATION.md) - Spec42 setup, library paths, validation commands, and known tool notes.
 
 ## Known Limitations

@@ -2,11 +2,11 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Defines the lightweight Strata CPS modeling method layer. Native SysML v2
+ * Defines the lightweight Elan8 methodology layer. Native SysML v2
  * elements remain the engineering source of truth; these method concepts add
  * ownership, maturity, extractability, and handoff intent for tools.
  */
-package Strata {
+package Elan8Methodology {
   private import ScalarValues::*;
 
   enum def ModelLayerKind {
@@ -147,11 +147,11 @@ package Strata {
     attribute outputIntent : String;
   }
 
-  part def StrataMethodBaseline {
+  part def Elan8MethodologyBaseline {
     doc /*
       Method baseline for cyber-physical and software-only systems. Use native
       SysML v2 requirements, parts, ports, actions, allocations, cases, and views
-      for engineering semantics. Use Strata metadata to classify ownership,
+      for engineering semantics. Use Elan8 methodology metadata to classify ownership,
       lifecycle maturity, extractable artifacts, trace roles, and external tool
       references in a stable way for automation.
     */
@@ -215,5 +215,5 @@ package Strata {
     }
   }
 
-  part strataMethodBaseline : StrataMethodBaseline;
+  part elan8MethodologyBaseline : Elan8MethodologyBaseline;
 }

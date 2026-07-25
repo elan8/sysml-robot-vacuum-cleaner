@@ -15,7 +15,7 @@ package PhysicalArchitecture {
   private import FirmwareArchitecture::*;
   private import ArchitectureAllocations::*;
   private import ElectronicsInterfaceControl::*;
-  private import Strata::*;
+  private import Elan8Methodology::*;
   private import SoftwareCore::*;
   private import EmbeddedComputeDomain::*;
   private import MonetaryUnits::*;

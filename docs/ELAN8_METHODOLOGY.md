@@ -3,13 +3,17 @@ SPDX-FileCopyrightText: 2026 Elan8
 SPDX-License-Identifier: MIT
 -->
 
-# Strata Way Of Working
+# Elan8 Methodology
 
-This document defines Strata, a lightweight modeling method for cyber-physical systems and software-only systems. The goal is to make SysML v2 models consistent for engineers and predictable for tools that extract handoff information, traceability, dashboards, reviews, and reports.
+This document defines the Elan8 methodology, a lightweight modeling method for
+cyber-physical and software-only systems. The goal is to make SysML v2 models
+consistent for engineers and predictable for tools that extract handoff
+information, traceability, dashboards, reviews, and reports.
 
 ## Core Principle
 
-Use native SysML v2 for engineering semantics. Use Strata method metadata for classification, ownership, maturity, extraction, and external references.
+Use native SysML v2 for engineering semantics. Use Elan8 methodology metadata
+for classification, ownership, maturity, extraction, and external references.
 
 Native SysML v2 should own:
 
@@ -18,7 +22,7 @@ Native SysML v2 should own:
 - physical, software, electronics, safety, verification, and analysis facts;
 - views and viewpoints over the same model graph.
 
-Strata method metadata should own:
+Elan8 methodology metadata should own:
 
 - model layer and discipline ownership;
 - lifecycle maturity, such as draft, candidate, baseline, verified, or released;
@@ -34,7 +38,7 @@ Use a stable package structure by engineering ownership rather than diagram type
 
 ```text
 model/
-  method/          Strata method library and extraction rules.
+  method/          Elan8 methodology library and extraction rules.
   root/            Full workspace import hubs.
   requirements/    Stakeholder needs, system requirements, design limits.
   context/         External actors, environment, use cases, operational scenarios.
@@ -49,7 +53,7 @@ Software-only projects may omit electronics and mechanical packages, but should 
 
 ## Method Library
 
-The method concepts live in `model/method/Strata.sysml`.
+The method concepts live in `model/method/Elan8Methodology.sysml`.
 
 The package defines:
 
@@ -68,8 +72,8 @@ Use metadata sparingly and consistently. A package or element should only be tag
 Example intent:
 
 ```sysml
-@Strata::EngineeringOwnership {
-  discipline = Strata::DisciplineKind::software;
+@Elan8Methodology::EngineeringOwnership {
+  discipline = Elan8Methodology::DisciplineKind::software;
   ownerRole = "Embedded Software Lead";
   reviewRole = "Systems Engineer";
 }
@@ -123,12 +127,12 @@ In this repository those facts are composed through `Implementation`,
 ## Extraction Rules
 
 Tooling should treat `Implementation` views as the main implementation entry
-point. It should then use method rules from `Strata` and traverse native
+point. It should then use method rules from `Elan8Methodology` and traverse native
 features, flows, connections, allocations, references, and metadata.
 
 Recommended extraction behavior:
 
-- Extract `MethodCompletenessRule` usages from `Strata` to learn required facts per artifact kind.
+- Extract `MethodCompletenessRule` usages from `Elan8Methodology` to learn required facts per artifact kind.
 - Extract `MethodExtractionRule` usages to find source packages, primary element kinds, join hints, and output intent.
 - Prefer native SysML relationships and typed features when available.
 - Do not reconstruct internal model identity from string paths.
