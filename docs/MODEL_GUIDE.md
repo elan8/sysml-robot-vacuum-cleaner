@@ -3,122 +3,80 @@ SPDX-FileCopyrightText: 2026 Elan8
 SPDX-License-Identifier: MIT
 -->
 
-# Model Guide
+# Model guide
 
-This guide explains how the robot-vacuum model is organized and how to read it without needing to inspect every package first.
+The model is intentionally small enough to read end to end. File paths organize
+the workspace; SysML packages remain the semantic ownership boundary.
 
-## Showcase Tour
+## Recommended tour
 
-Use this tour when evaluating the model as a high-end SysML v2 example:
+1. Start in `Requirements.sysml`: six stakeholder needs derive twelve testable
+   requirements with quantities and constraints.
+2. Read `FunctionalBehavior.sysml`: `OperateCleaningRobot` decomposes the
+   product behavior. `RobotOperatingBehavior` and `PrivacyConsentBehavior` are
+   the only state definitions.
+3. Open `PhysicalArchitecture.sysml`: the selected baseline contains the major
+   LRUs, typed interfaces, three power rails and concrete catalog-based parts.
+4. Follow `Architecture::robotSystem`. Its single `operate` behavior usage is
+   used for both allocation and requirement satisfaction.
+5. Inspect `FirmwareArchitecture.sysml`: seven task definitions carry timing,
+   criticality, WCET and memory data. Five runtime queue parts own typed
+   producer/consumer flows and freshness limits.
+6. Follow `OperationalScenarios::cliffSafeStopGoldenThread` from sensing,
+   through safety supervision and actuation, to status reporting. The same
+   elements continue into `SafetyReactionAnalysis` and
+   `verifyCliffSafeStop`.
+7. Finish with the six views in `ModelViews.sysml`; they select existing graph
+   elements and do not duplicate handoff records.
 
-1. Start in `StakeholderNeeds` and `SystemRequirements` to see user needs, derived requirements, metadata, and derivation links.
-2. Read `Elan8Methodology` for the lightweight way-of-working concepts used by extraction and handoff tooling.
-3. Read `FunctionalArchitecture` for capability actions and mission-level behavior.
-4. Read `PhysicalArchitecture` for product assemblies, typed ports, harnesses, firmware suite parts, and mass/BOM/power roll-ups.
-5. Read `ProductVariants` to see native variation points, semantically linked options, and configured product baselines.
-6. Read `ArchitectureAllocations` to follow capability-to-LRU, software-to-MCU, scenario-action, and firmware-task allocations.
-7. Read `Implementation` views, then follow their exposed firmware tasks,
-   typed queues, peripheral allocations, physical ports, rail budgets,
-   component candidates, and verification cases in the shared semantic graph.
-8. Follow `OperationalScenarios::cliffSafeStopGoldenThread` through safety controls, calculated reaction analysis, and verification evidence.
-9. Read `SafetyAnalysis`, `TradeStudies`, `Verification`, and `AnalysisCases` for assurance, rationale, calculated margins, and evidence verdicts.
-10. Finish in `ModelViews` and `Implementation` views for curated stakeholder and engineer slices over the same source model.
+## Semantic backbone
 
-## Model Layers
-
-The model is intentionally layered from product intent to implementation evidence:
-
-| Layer | Main packages | Purpose |
-| --- | --- | --- |
-| Libraries | `VacuumCleanerQuantitiesAndUnits` | Project-specific measurement units declared in terms of the OMG quantities-and-units library. |
-| Method | `Elan8Methodology`, `Elan8ProjectMethodology` | Reusable way-of-working concepts plus semantic bindings from method rules to this project graph. |
-| Requirements | `StakeholderNeeds`, `SystemRequirements`, `DesignLimits` | User needs, derived system requirements, and shared numeric limits. |
-| Context | `ProductContext`, `OperationalScenarios` | External actors, home environment, dock, app/cloud, and mission flows. |
-| Architecture | `ArchitectureCommon`, `PhysicalProtocols`, `FunctionalArchitecture`, `PhysicalArchitecture`, `ArchitectureAllocations`, `Architecture` | Functional capabilities, product assemblies, typed interfaces, and allocation links. |
-| Variants | `ProductVariants` | Native variation choices, semantic option references, and configured product baselines. |
-| Implementation | `Implementation`, `InterfaceControl`, `FirmwareArchitecture`, `ElectronicsInterfaceControl`, `ElectronicsComponentSelection`, plus implementation facts in `PhysicalArchitecture` | Views over software contracts, firmware tasks, typed queues, scheduler/resource constraints, peripheral allocations, physical interface metadata, semantic rail budgets, component candidates, and verification intent. |
-| Assurance | `SafetyAnalysis`, `TradeStudies`, `Verification`, `AnalysisCases` | Typed hazards, mitigation connections, trade rationale, verification evidence, and calculated engineering margins. |
-| Views | `ModelViews`, `Implementation` | Firmware diagram views and electronics work-package handoff. |
-| Root | `AutonomousFloorCleaningRobotDemo` | Import hub for loading the full workspace. |
-
-## Folder Layout
-
-The `model/` directory mirrors the layer structure for navigation. The folder names do not define SysML namespaces; each file still owns exactly one top-level package.
-
-```text
-model/
-  root/
-  libraries/
-  method/
-  requirements/
-  context/
-  architecture/
-  variants/
-  implementation/
-  behavior/
-  assurance/
-  views/
+```mermaid
+flowchart LR
+  N["Stakeholder need"] -->|derive| R["System requirement"]
+  R -->|satisfy by| B["robotSystem.operate behavior usage"]
+  B -->|allocate to| P["Physical LRU / firmware task"]
+  T["Purchased part definition"] -->|specialized by| P
+  P -->|typed connect / flow| P
+  V["Verification case / analysis"] -->|verify| R
+  W["View"] -->|expose| R
+  W -->|expose| B
+  W -->|expose| P
+  W -->|expose| V
 ```
 
-## Engineering Threads
+## Package ownership
 
-- Needs to evidence: stakeholder needs derive system requirements, which are satisfied by design elements and verified by cases or analyses.
-- Context to architecture: product context defines external interactions; architecture packages define the robot boundary and internal realization.
-- Function to realization: functional actions allocate to physical LRUs, firmware modules, and MCU execution targets.
-- Variants to implementation impact: native variant choices and configurations reference architecture, software, electronics, requirements, analyses, verification, and trade-study elements directly.
-- Safety assurance: typed hazards connect to safety controls that reference requirements, implementation elements, analyses, and verification evidence.
-- Operational golden thread: a cliff stimulus flows through sensing, safety supervision, drive stop, status reporting, requirements, allocation, analysis, and evidence.
-- Implementation handoff: `Implementation` provides the software/electronics
-  entry point; its views expose the authoritative runtime, allocation,
-  interface, rail, component-selection, and verification elements directly.
-- Design rationale: trade studies record selected and deferred product options, including the privacy-conscious LiDAR SLAM baseline.
+| Package | Owns |
+| --- | --- |
+| `VacuumCleanerQuantitiesAndUnits` | Project-specific charge and duration units. |
+| `PurchasedParts` | Generic `BuyPart` metadata and six catalog part definitions. |
+| `DomainModel` | Protocol vocabulary, items, ports and bus structures. |
+| `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and formal constraints. |
+| `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, state behavior and two scenarios. |
+| `ProductContext` | Users, app, network, dock, home and robot boundary. |
+| `FirmwareArchitecture` | Runtime tasks, queues and item flows. |
+| `PhysicalArchitecture` | Selected physical baseline, connections, rail budgets and peripheral allocations. |
+| `Architecture` | Concrete system usage, functional allocations and satisfaction. |
+| `AnalysisCases`, `Verification` | Three analyses and nine verification cases. |
+| `ModelViews` | Six stakeholder projections. |
 
-## Package Map
+## Purchased parts
 
-| Package | Owns | Key dependencies |
-| --- | --- | --- |
-| `VacuumCleanerQuantitiesAndUnits` | Project-specific `Ah` and `mAh` electric-charge units and the `ms` duration unit. | OMG measurement references, ISQ, SI, and SI prefixes. |
-| `Elan8Methodology` | Lightweight method metadata, artifact kinds, completeness rules, and extraction rules. | Scalar values. |
-| `Elan8ProjectMethodology` | Project-specific semantic bindings from reusable method rules to views, architecture, variants, assurance, and evidence. | Method, implementation, architecture, variants, and assurance packages. |
-| `StakeholderNeeds` | User-facing needs with requirement metadata. | Requirement and modeling metadata libraries. |
-| `SystemRequirements` | Derived system requirements and derivation links. | `StakeholderNeeds`, metadata libraries. |
-| `DesignLimits` | Shared budget, mass, energy, and timing limits. | Quantity and monetary libraries. |
-| `ArchitectureCommon` | Shared mission items, commands, telemetry, map, and CPS ports. | Scalar values. |
-| `PhysicalProtocols` | Product-specific bus aliases and domain electronics imports. | Electronics, bus, wireless, and software domain libraries. |
-| `ProductContext` | External systems and residential cleaning context. | Architecture and protocol packages. |
-| `FunctionalArchitecture` | Capability `action def`s and mission actions. | `ArchitectureCommon`, `SystemRequirements`. |
-| `PhysicalArchitecture` | Product assemblies, physical harnesses, interface metadata, semantic rail budgets, authoritative task/software instances, task/module/MCU/peripheral allocations, and roll-ups. | Common items, protocols, behavior, software, compute, units. |
-| `ArchitectureAllocations` | Task-to-software, software-to-compute, and typed task-to-peripheral allocation definitions. | Firmware architecture, software core, embedded compute libraries. |
-| `Architecture` | Public architecture import hub and `robot` part. | Architecture packages and system requirements. |
-| `ProductVariants` | Product-line variation definitions, semantic options, and configured product baselines. | Requirements, architecture, implementation, trade, analysis, and verification packages. |
-| `InterfaceControl` | Software-facing message contracts and producer/consumer ownership. | Common items and software library. |
-| `FirmwareArchitecture` | Firmware task definitions, scheduler model, typed runtime queues, task structure, flows, and embedded data contracts. | Common items, contracts, software library. |
-| `ElectronicsInterfaceControl` | Reusable interface kind, direction, criticality, and quantity metadata. | Scalar values and ISQ. |
-| `ElectronicsComponentSelection` | Component candidates with refs to physical targets/interfaces, typed limits, MPNs, lifecycle status, and rationale. | Architecture, physical architecture, interface metadata, monetary units. |
-| `BehaviorStates` | Operating lifecycle and detailed behavior fragments. | None beyond SysML basics. |
-| `OperationalScenarios` | Scenario-level use cases over context and functional actions. | Architecture, functional architecture, product context. |
-| `SafetyAnalysis` | Hazards, mitigations, safety satisfaction, and safety evidence links. | Requirements, design, behavior, verification, analysis packages. |
-| `TradeStudies` | Selected/deferred options and rationale. | Requirements, physical architecture, analyses. |
-| `Verification` | Verification cases and evidence intent. | Requirements and architecture. |
-| `AnalysisCases` | Power, mass, cost, energy, localization, coverage, and timing analyses. | Architecture, design limits, units. |
-| `ModelViews` | Firmware task/deployment interconnection views and requirements traceability. | Requirements, physical architecture, verification. |
-| `Implementation` | Software runtime, peripheral access, electronics interface, rail budget, and component-selection views. | Architecture graph, allocations, and component selection. |
+`BuyPart` is metadata for `SysML::PartDefinition`, not a project-specific
+record table. It stores manufacturer identity and document provenance.
+Voltage and temperature limits remain typed quantities on the catalog
+definitions. Project definitions such as `RobotMainMcu` specialize catalog
+definitions such as `STM32U575VGT6`; the physical product uses the project
+definitions directly.
 
-## Reading Strategy
+The library imports only standard and domain libraries. It therefore has no
+references to the vacuum-cleaner architecture and can later be extracted to a
+sibling repository without changing project usage semantics.
 
-Start with requirements and functional behavior before reading physical details. The recommended path is:
+## Deliberate boundaries
 
-1. Requirements and design limits.
-2. Method package when building tools or checking handoff completeness.
-3. Functional architecture and operational scenarios.
-4. Physical protocols and product context.
-5. Product variants and selected SKU baselines.
-6. Physical and firmware architecture, interface control, component selection,
-   and the implementation views over their shared graph.
-7. Allocations and the `Architecture` hub.
-8. Behavior, safety, trade studies, verification, and analyses.
-9. Views for stakeholder-specific slices.
-
-## Folder Changes
-
-Validate immediately after moving model files. If import resolution or demo bootstrapping regresses in a tool, keep package names stable and fix the tool configuration rather than renaming packages to match paths.
+This baseline omits product-line engineering, custom assurance records, detailed
+PCB implementation data, commercial evaluation and methodology metadata. Add a
+new concept only when it creates a useful semantic relationship or a formal
+engineering constraint; narrative guidance belongs in `doc`.

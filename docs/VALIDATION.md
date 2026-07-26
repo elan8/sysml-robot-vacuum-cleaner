@@ -5,9 +5,7 @@ SPDX-License-Identifier: MIT
 
 # Validation
 
-Use this page for reproducible validation commands.
-
-## Standard Command
+## Full model check
 
 From the repository root:
 
@@ -15,32 +13,17 @@ From the repository root:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The script validates `model/` with Spec42, passes local domain-library roots
-when they exist, and then runs `scripts/check-model-guards.ps1`.
+The script runs Spec42 over all twelve model documents, supplies local Elan8
+domain-library paths when available, and then runs static model guards.
 
-The guards reject reversed `satisfy` relationships, removed record types, and
-internal model identity encoded in path/reference strings.
+Expected result:
 
-Spec42 is open source at [`elan8/spec42`](https://github.com/elan8/spec42). The repository also validates pull requests with the Spec42 GitHub Action.
-
-## GitHub Actions
-
-The CI workflow is defined in `.github/workflows/validate.yml` and runs on `push`, `pull_request`, and manual dispatch.
-
-It uses:
-
-```yaml
-uses: elan8/spec42@v0.31.0
-with:
-  path: model
-  format: sarif
-  warnings-as-errors: false
-  upload-sarif: true
+```text
+Checked 12 document(s): 0 error(s), 0 warning(s), 0 info(s)
+Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean.
 ```
 
-Warnings are reported in CI and should be resolved before release because this repository is intended to remain a clean validation corpus.
-
-## Parameters
+Optional parameters:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
@@ -49,54 +32,38 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
   -Format text
 ```
 
-| Parameter | Default | Purpose |
-| --- | --- | --- |
-| `Spec42Exe` | `SPEC42_EXE`, or `spec42` on `PATH` | Spec42 executable to run. |
-| `DomainLibrariesRoot` | `SYSML_DOMAIN_LIBRARIES_ROOT`, or sibling `../sysml-domain-libraries` if present | Root containing `domain`, `technical`, and `generic`. |
-| `ModelPath` | `model` | Model workspace to validate. |
-| `Format` | `text` | Spec42 output format. |
+The guards reject removed layers and types, handoff names, internal path-string
+identity, missing catalog specialization, incomplete `BuyPart` metadata,
+missing queue flows and requirements without satisfaction or verification.
 
-## Diagram Smoke Checks
-
-Run these after changing `ModelViews`, `Implementation`, view exposure paths, or file layout:
+## Diagram smoke check
 
 ```powershell
-spec42 diagrams export model --selected-view interconnections --format svg --output target/diagrams
-spec42 diagrams export model --selected-view firmwareDeployment --format svg --output target/diagrams
-spec42 diagrams export model --selected-view productDecomposition --format svg --output target/diagrams
-spec42 diagrams export model --selected-view requirementsTraceability --format svg --output target/diagrams
-spec42 diagrams export model --selected-view softwareRuntimeHandoff --format svg --output target/diagrams
-spec42 diagrams export model --selected-view peripheralAccessHandoff --format svg --output target/diagrams
-spec42 diagrams export model --selected-view electronicsInterfaceHandoff --format svg --output target/diagrams
-spec42 diagrams export model --selected-view railBudgetHandoff --format svg --output target/diagrams
-spec42 diagrams export model --selected-view componentSelectionHandoff --format svg --output target/diagrams
-spec42 diagrams export model --selected-view cliffSafeStopGoldenThread --format svg --output target/diagrams
-spec42 diagrams export model --selected-view productConfiguration --format svg --output target/diagrams
-spec42 diagrams export model --selected-view safetyAssuranceGraph --format svg --output target/diagrams
+$views = @(
+  "productDecomposition",
+  "interconnections",
+  "firmwareRuntime",
+  "requirementsTraceability",
+  "cliffSafeStopGoldenThread",
+  "selectedParts"
+)
+foreach ($view in $views) {
+  spec42 diagrams export model `
+    --selected-view $view `
+    --format svg `
+    --output target/lean-diagrams
+}
 ```
 
-`InterconnectionView` exports (`interconnections`, `productConfiguration`, and
-`safetyAssuranceGraph`) render typed connections directly. The golden thread
-uses `ActionFlowView`. `firmwareDeployment` uses `GeneralView` because
-deployment is expressed with `allocate`, not `connect`. Robot-level harness
-connections target LRU boundary ports on `mainElectronics` without piercing
-into PCB or harness internals.
+Each generated SVG must contain model nodes and no unresolved-reference
+fallback labels.
 
-## Expected Result
+## CI
 
-The robot-vacuum corpus should validate with:
+`.github/workflows/validate.yml` runs Spec42 for pushes and pull requests.
+Warnings remain visible in SARIF; this showcase treats any error, warning or
+information diagnostic as a release blocker.
 
-- `0 errors`
-- `0 warnings`
-- `0 information` diagnostics
-
-The `ModelViews` catalog covers product decomposition, robot LRU interconnection,
-firmware deployment, requirements traceability, configured products, safety
-assurance, and the cliff safe-stop golden thread. `Implementation` adds
-graph-derived software runtime, peripheral access, electronics interface, rail
-budget, and component-selection handoff views.
-
-## Known Notes
-
-- Local domain-library checkouts may contain newer electronics packages than the bundled Spec42 libraries, so use `-DomainLibrariesRoot` during active library development.
-- Tool-specific investigation notes should stay outside the public repository, for example under ignored `internal_docs/`.
+If Spec42 rejects or misprojects an independently confirmed SysML v2-conforming
+construct, add a minimal Spec42 regression test and repair the tool. Do not
+encode tool workarounds into the model.

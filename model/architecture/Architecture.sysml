@@ -2,71 +2,50 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Owns the public architecture hub, the system-of-interest definition
- * (CleaningRobotSystemOfInterest), and all allocation links. Depends on
- * functional/physical/firmware architecture and system requirements.
- * Keep detailed hardware assemblies in PhysicalArchitecture and firmware
- * task definitions in FirmwareArchitecture.
+ * System-of-interest usage, functional realization, and requirement satisfaction.
  */
 package Architecture {
-  public import ArchitectureCommon::*;
-  public import PhysicalProtocols::*;
+  public import DomainModel::*;
   public import FunctionalArchitecture::*;
   public import PhysicalArchitecture::*;
-  public import ArchitectureAllocations::*;
+  private import BehaviorStates::*;
   private import SystemRequirements::*;
 
   part def CleaningRobotSystemOfInterest {
-    doc /*
-      The system of interest: the physical robot together with its operational
-      behavior and firmware execution surface. Use this as the subject for
-      use cases, allocation views, and system-level verification.
-    */
     part physical : AutonomousFloorCleaningRobot;
-
-    // Operational capability and scenario surface.
     perform action operate : OperateCleaningRobot;
     perform action nominalMission : AutonomousCleaningMission;
-    perform action recoveryMission : ObstacleRecoveryMission;
-    perform action startMission : StartMission;
-    perform action buildMap : BuildMap;
-    perform action planCoveragePath : PlanCoveragePath;
-    perform action cleanReachableArea : CleanReachableArea;
-    perform action avoidDynamicObstacle : AvoidDynamicObstacle;
-    perform action recoverFromStall : RecoverFromStall;
-    perform action reportMissionStatus : ReportMissionStatus;
-    perform action returnToDock : ReturnToDock;
-    perform action chargeBattery : ChargeBattery;
+    exhibit state operatingBehavior : RobotOperatingBehavior;
 
-    // Capability-to-LRU/software realization.
     allocate operate.locomotion to physical.driveModule;
+    allocate operate.locomotion to physical.firmwareTasks.actuatorControl;
     allocate operate.cleaning to physical.cleaningHead;
+    allocate operate.cleaning to physical.firmwareTasks.actuatorControl;
     allocate operate.perception to physical.sensorAssembly;
-    allocate operate.perception to physical.robotFirmware.mapProcessing;
-    allocate operate.navigation to physical.robotFirmware.localizationEstimator;
-    allocate operate.navigation to physical.robotFirmware.coveragePlanner;
+    allocate operate.perception to physical.firmwareTasks.sensorAcquisition;
+    allocate operate.navigation to physical.firmwareTasks.navigation;
     allocate operate.powerManagement to physical.powerModule;
+    allocate operate.powerManagement to physical.firmwareTasks.powerManager;
     allocate operate.docking to physical.dockInterface;
-    allocate operate.missionControl to physical.robotFirmware.applicationFirmware;
-    allocate operate.safetySupervision to physical.robotFirmware.safetySupervisor;
+    allocate operate.missionControl to physical.firmwareTasks.missionController;
+    allocate operate.safetySupervision
+      to physical.firmwareTasks.safetySupervisor;
     allocate operate.userInteraction to physical.hmi;
-    allocate operate.userInteraction to physical.robotFirmware.applicationFirmware;
-
-    // Scenario action ownership by operational capability.
-    allocate startMission to operate.missionControl;
-    allocate buildMap to operate.perception;
-    allocate planCoveragePath to operate.navigation;
-    allocate cleanReachableArea to operate.cleaning;
-    allocate avoidDynamicObstacle to operate.perception;
-    allocate recoverFromStall to operate.missionControl;
-    allocate reportMissionStatus to operate.userInteraction;
-    allocate returnToDock to operate.docking;
-    allocate chargeBattery to operate.powerManagement;
-
+    allocate operate.userInteraction to physical.firmwareTasks.appService;
   }
 
   part robotSystem : CleaningRobotSystemOfInterest;
 
-  satisfy limitBomCost by robotSystem.physical;
-  satisfy limitTotalMass by robotSystem.physical;
+  satisfy cleanAtLeastEighty by robotSystem.operate.cleaning;
+  satisfy coverFloor by robotSystem.operate.navigation;
+  satisfy avoidObstacles by robotSystem.operate.perception;
+  satisfy detectCliffs by robotSystem.operate.perception;
+  satisfy superviseHazards by robotSystem.operate.safetySupervision;
+  satisfy localizeReliably by robotSystem.operate.navigation;
+  satisfy updateCoverageMap by robotSystem.operate.navigation;
+  satisfy recoverFromStall by robotSystem.operate.missionControl;
+  satisfy returnToDock by robotSystem.operate.docking;
+  satisfy chargeSafely by robotSystem.operate.powerManagement;
+  satisfy reportCleaningStatus by robotSystem.operate.userInteraction;
+  satisfy protectMapPrivacy by robotSystem.operate.userInteraction;
 }

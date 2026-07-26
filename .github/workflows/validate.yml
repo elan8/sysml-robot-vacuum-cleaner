@@ -21,10 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check lean-model invariants
+        shell: pwsh
+        run: ./scripts/check-model-guards.ps1
+
       - name: Validate model
-        uses: elan8/spec42@v0.31.0
+        uses: elan8/spec42@v0.46.0
         with:
           path: model
           format: sarif
-          warnings-as-errors: false
+          warnings-as-errors: true
           upload-sarif: true
