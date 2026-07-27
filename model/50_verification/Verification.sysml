@@ -2,82 +2,22 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Three quantitative analyses and nine verification cases.
+ * Nine verification cases (verification concern).
  */
-package AnalysisCases {
-  private import Architecture::*;
-  private import DesignLimits::*;
-  private import VacuumCleanerQuantitiesAndUnits::*;
-  private import ISQ::*;
-  private import SI::*;
-
-  analysis def MissionEnergyAnalysis {
-    subject robot : AutonomousFloorCleaningRobot;
-    attribute chargeBudget : ElectricChargeValue =
-      DesignLimits::batteryCapacityBudget;
-    attribute averageMissionCurrent : ElectricCurrentValue = 5 [A];
-    attribute missionDuration : DurationValue = 1.875 [h];
-    attribute missionChargeDraw : ElectricChargeValue =
-      averageMissionCurrent * missionDuration;
-    attribute reserveCharge : ElectricChargeValue = chargeBudget * 0.15;
-    attribute usableMissionBudget : ElectricChargeValue =
-      chargeBudget - reserveCharge;
-    return ref energyWithinBudget {
-      return missionChargeDraw <= usableMissionBudget;
-    }
-    objective estimateMissionEnergy {
-      doc /* Demonstrate quantity-based mission energy analysis with reserve. */
-    }
-  }
-
-  analysis def SafetyReactionAnalysis {
-    subject robot : AutonomousFloorCleaningRobot;
-    attribute sensorDetectionLatency : DurationValue = 25 [ms];
-    attribute queueAndSchedulingLatency : DurationValue = 10 [ms];
-    attribute safetyTaskExecutionLatency : DurationValue = 5 [ms];
-    attribute motorDisableLatency : DurationValue = 50 [ms];
-    attribute measuredReactionTime : DurationValue = sum(
-      sensorDetectionLatency,
-      queueAndSchedulingLatency,
-      safetyTaskExecutionLatency,
-      motorDisableLatency
-    );
-    attribute reactionTimeLimit : DurationValue =
-      DesignLimits::maxSafeStopReactionTime;
-    return ref reactsWithinLimit {
-      return measuredReactionTime <= reactionTimeLimit;
-    }
-    objective estimateSafeStopTiming {
-      doc /* Demonstrate the quantitative path from sensing to motor disable. */
-    }
-  }
-
-  analysis def LocalizationPerformanceAnalysis {
-    subject robot : AutonomousFloorCleaningRobot;
-    attribute estimatedLocalizationError : LengthValue = 95 [mm];
-    attribute localizationErrorLimit : LengthValue =
-      DesignLimits::maxLocalizationError;
-    return ref localizationWithinLimit {
-      return estimatedLocalizationError <= localizationErrorLimit;
-    }
-    objective estimateLocalization {
-      doc /* Confirm the selected ToF, LiDAR, IMU, and odometry baseline. */
-    }
-  }
-}
-
 package Verification {
   private import AnalysisCases::*;
   private import Architecture::*;
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
   private import SystemRequirements::*;
+  private import Elan8Method::*;
 
   action def RunPhysicalTest;
   action def RunSoftwareVerification;
   action def RecordAnalysisResult;
 
   verification verifyMissionControl {
+    @EngineeringConcern { concern = verification; }
     subject task : MissionControllerTask;
     objective {
       verify requirement recoverFromStall;
@@ -88,6 +28,7 @@ package Verification {
   }
 
   verification verifySafetySupervisor {
+    @EngineeringConcern { concern = verification; }
     subject task : SafetySupervisorTask;
     objective {
       verify requirement superviseHazards;
@@ -156,6 +97,11 @@ package Verification {
   }
 
   verification verifyCliffSafeStop {
+    @EngineeringConcern { concern = verification; }
+    @EngineeringIncrement {
+      incrementId = "INC-CLIFF-001";
+      objective = "Detect cliff and stop safely with verified reaction time";
+    }
     subject thread : CliffSafeStopGoldenThread;
     objective {
       verify requirement detectCliffs;

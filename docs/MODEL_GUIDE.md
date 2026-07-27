@@ -5,37 +5,34 @@ SPDX-License-Identifier: MIT
 
 # Model guide
 
-The model is intentionally small enough to read end to end. File paths organize
-the workspace; SysML packages remain the semantic ownership boundary.
+The model is intentionally small enough to read end to end. File paths follow
+the Elan8 Method layout; SysML packages remain the semantic ownership boundary.
+
+Start with the [Elan8 Method tour](ELAN8_METHOD_TOUR.md) for the cliff-safe-stop
+vertical increment.
 
 ## Recommended tour
 
-1. Start in `Requirements.sysml`: six stakeholder needs derive twelve testable
-   requirements with quantities and constraints.
-2. Read `FunctionalBehavior.sysml`: `OperateCleaningRobot` decomposes the
-   product behavior. `RobotOperatingBehavior` and `PrivacyConsentBehavior` are
-   the only state definitions.
-3. Open `PhysicalArchitecture.sysml`: the selected baseline contains the major
-   LRUs, typed interfaces, three power rails and semantic implementation
-   selections for concrete catalog parts.
-4. Follow `Architecture::robotSystem`. Its single `operate` behavior usage is
-   used for both allocation and requirement satisfaction.
-5. Inspect `FirmwareArchitecture.sysml`: seven task definitions carry timing,
-   criticality, WCET and memory data. Five runtime queue parts own typed
-   producer/consumer flows and freshness limits.
-6. Follow `OperationalScenarios::cliffSafeStopGoldenThread` from sensing,
-   through safety supervision and actuation, to status reporting. The same
-   elements continue into `SafetyReactionAnalysis` and
-   `verifyCliffSafeStop`.
-7. Finish with the six views in `ModelViews.sysml`; they select existing graph
-   elements and do not duplicate handoff records.
+1. Start in `10_purpose/Requirements.sysml`: six stakeholder needs derive twelve
+   testable requirements with quantities, constraints, and Elan8 requirement roles.
+2. Read `20_behavior/FunctionalBehavior.sysml`: `OperateCleaningRobot` decomposes
+   product behavior. Follow `CliffSafeStopGoldenThread` (`INC-CLIFF-001`).
+3. Open `30_architecture/PhysicalArchitecture.sysml`: the selected baseline
+   contains the major LRUs, typed interfaces, power rails, and catalog selections.
+4. Follow `Architecture::robotSystem`. Its `operate` behavior usage is used for
+   allocation and requirement satisfaction.
+5. Inspect `30_architecture/FirmwareArchitecture.sysml`: seven tasks, queues, and
+   timing.
+6. Continue into `40_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
+   `50_verification/Verification.sysml` (`verifyCliffSafeStop`).
+7. Finish with the six views in `60_views/ModelViews.sysml`.
 
 ## Semantic backbone
 
 ```mermaid
 flowchart LR
   N["Stakeholder need"] -->|derive| R["System requirement"]
-  R -->|satisfy by| B["robotSystem.operate behavior usage"]
+  R -->|satisfy by| B["robotSystem.operate / scenario"]
   B -->|allocate to| P["Physical LRU / firmware task"]
   P -->|selected implementation dependency| T["Purchased part definition"]
   P -->|typed connect / flow| P
@@ -50,42 +47,28 @@ flowchart LR
 
 | Package | Owns |
 | --- | --- |
-| `VacuumCleanerQuantitiesAndUnits` | Project-specific charge and duration units. |
-| `PurchasedParts` | Generic `BuyPart` metadata and six catalog part definitions. |
-| `DomainModel` | Protocol vocabulary, items, ports and bus structures. |
-| `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and formal constraints. |
-| `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, state behavior and two scenarios. |
-| `ProductContext` | Users, app, network, dock, home and robot boundary. |
-| `FirmwareArchitecture` | Runtime tasks, queues and item flows. |
-| `PhysicalArchitecture` | Selected physical baseline, connections, rail budgets and peripheral allocations. |
-| `Architecture` | Concrete system usage, functional allocations and satisfaction. |
-| `AnalysisCases`, `Verification` | Three analyses and nine verification cases. |
-| `ModelViews` | Six stakeholder projections. |
+| `Project` | Tailoring and method profile |
+| `VacuumCleanerQuantitiesAndUnits` | Project-specific units |
+| `PurchasedParts` | `BuyPart` metadata and catalog definitions |
+| `DomainModel` | Protocol vocabulary, items, ports, buses |
+| `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
+| `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
+| `ProductContext` | Users, app, network, dock, home, robot boundary |
+| `FirmwareArchitecture` | Runtime tasks and queues |
+| `PhysicalArchitecture` | Selected physical baseline |
+| `Architecture` | Concrete system, allocations, satisfaction |
+| `AnalysisCases` | Three analyses |
+| `Verification` | Nine verification cases |
+| `ModelViews` | Six stakeholder projections |
 
 ## Purchased parts
 
-`BuyPart` is metadata for `SysML::PartDefinition`, not a project-specific
-record table. It stores manufacturer identity and document provenance.
-Voltage and temperature limits remain typed quantities on the catalog
-definitions. Project definitions such as `RobotMainMcu` specialize only their
-stable domain kind, such as `Microcontroller`. A named `dependency` records the
-selected catalog implementation, for example from `RobotMainMcu` to
-`STM32U575VGT6`. This keeps “is a kind of” separate from “is implemented by”,
-while retaining semantic navigation to the selected buy part.
-
-Each selection dependency is owned by its project-specific definition and uses
-the local name `selectedImplementation`, for example
-`PhysicalArchitecture::RobotMainMcu::selectedImplementation`. This ownership
-keeps the implementation decision with the definition it qualifies, while the
-same convention remains unambiguous across all selected parts.
-
-The library imports only standard and domain libraries. It therefore has no
-references to the vacuum-cleaner architecture and can later be extracted to a
-sibling repository without changing project usage semantics.
+`BuyPart` is metadata for `SysML::PartDefinition`. Project definitions specialize
+domain kinds; a named `dependency selectedImplementation` points at catalog parts.
 
 ## Deliberate boundaries
 
-This baseline omits product-line engineering, custom assurance records, detailed
-PCB implementation data, commercial evaluation and methodology metadata. Add a
-new concept only when it creates a useful semantic relationship or a formal
-engineering constraint; narrative guidance belongs in `doc`.
+This baseline omits product-line engineering, trade studies, and handoff record
+tables. It **does** use Elan8 Method libraries for requirement roles, concerns,
+and increment identity on the cliff-safe-stop spine. Narrative guidance beyond
+semantics belongs in `doc` and markdown tours.

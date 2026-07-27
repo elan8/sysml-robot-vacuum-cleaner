@@ -8,6 +8,7 @@ package ProductContext {
   private import DomainModel::*;
   private import PhysicalArchitecture::*;
   private import ScalarValues::*;
+  private import Elan8Method::*;
 
   part def User {
     port app : ~AppServicePort;
@@ -45,6 +46,8 @@ package ProductContext {
   }
 
   part def ResidentialCleaningContext {
+    @EngineeringConcern { concern = purpose; }
+    @AbstractionLevel { level = operational; }
     part robotBoundary : RobotContextBoundary;
     part user : User;
     part app : MobileApp;

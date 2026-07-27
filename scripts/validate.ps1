@@ -5,6 +5,7 @@
 param(
     [string]$Spec42Exe,
     [string]$DomainLibrariesRoot,
+    [string]$MethodLibraryRoot,
     [string]$ModelPath = "model",
     [ValidateSet("text", "json")]
     [string]$Format = "text"
@@ -14,10 +15,13 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $resolvedModelPath = Join-Path $repoRoot $ModelPath
+$parentRoot = Split-Path -Parent $repoRoot
 
 if (-not $Spec42Exe) {
     if ($env:SPEC42_EXE) {
         $Spec42Exe = $env:SPEC42_EXE
+    } elseif (Test-Path "C:\Git\elan8\spec42\target\debug\spec42.exe") {
+        $Spec42Exe = "C:\Git\elan8\spec42\target\debug\spec42.exe"
     } else {
         $Spec42Exe = "spec42"
     }
@@ -27,14 +31,31 @@ if (-not $DomainLibrariesRoot) {
     if ($env:SYSML_DOMAIN_LIBRARIES_ROOT) {
         $DomainLibrariesRoot = $env:SYSML_DOMAIN_LIBRARIES_ROOT
     } else {
-        $siblingDomainLibrariesRoot = Join-Path (Split-Path -Parent $repoRoot) "sysml-domain-libraries"
+        $siblingDomainLibrariesRoot = Join-Path $parentRoot "sysml-domain-libraries"
         if (Test-Path $siblingDomainLibrariesRoot) {
             $DomainLibrariesRoot = $siblingDomainLibrariesRoot
         }
     }
 }
 
-$arguments = @("check", $resolvedModelPath, "--format", $Format)
+if (-not $MethodLibraryRoot) {
+    if ($env:ELAN8_METHOD_LIBRARY_ROOT) {
+        $MethodLibraryRoot = $env:ELAN8_METHOD_LIBRARY_ROOT
+    } else {
+        $siblingMethodLibrary = Join-Path $parentRoot "mbse-methodology\library"
+        if (Test-Path $siblingMethodLibrary) {
+            $MethodLibraryRoot = $siblingMethodLibrary
+        }
+    }
+}
+
+if (-not $MethodLibraryRoot -or -not (Test-Path $MethodLibraryRoot)) {
+    throw "Required Elan8 Method library not found. Set ELAN8_METHOD_LIBRARY_ROOT or check out sibling mbse-methodology/library."
+}
+
+$arguments = @(
+    "--library-path", (Resolve-Path $MethodLibraryRoot)
+)
 
 if ($DomainLibrariesRoot) {
     foreach ($subdir in @("domain", "technical", "generic")) {
@@ -45,7 +66,11 @@ if ($DomainLibrariesRoot) {
             Write-Warning "Domain library path not found: $libraryPath"
         }
     }
+} else {
+    Write-Warning "Domain libraries root not found; Spec42 may fail to resolve domain imports."
 }
+
+$arguments += @("check", $resolvedModelPath, "--format", $Format)
 
 Write-Host "Running: $Spec42Exe $($arguments -join ' ')"
 & $Spec42Exe @arguments

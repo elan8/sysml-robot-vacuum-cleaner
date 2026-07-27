@@ -23,33 +23,51 @@ package DesignLimits {
 }
 
 package StakeholderNeeds {
+  private import Elan8RequirementMetadata::*;
+  private import Elan8Method::*;
+
   requirement cleanLargeAreas {
+    @RequirementRole { role = user; }
+    @RequirementIdentity { requirementId = "USR-001"; }
     doc /* Clean the reachable floor efficiently in one autonomous mission. */
   }
 
   requirement operateSafely {
+    @RequirementRole { role = user; }
+    @RequirementIdentity { requirementId = "USR-SAFE-001"; }
+    @EngineeringConcern { concern = purpose; }
     doc /* Operate safely around stairs, people, pets, and household obstacles. */
   }
 
   requirement reliableDocking {
+    @RequirementRole { role = user; }
+    @RequirementIdentity { requirementId = "USR-002"; }
     doc /* Return to the dock and charge without routine user intervention. */
   }
 
   requirement navigateReliably {
+    @RequirementRole { role = user; }
+    @RequirementIdentity { requirementId = "USR-003"; }
     doc /* Maintain a useful map and pose in a changing residential environment. */
   }
 
   requirement missionFeedback {
+    @RequirementRole { role = user; }
+    @RequirementIdentity { requirementId = "USR-004"; }
     doc /* Give the user clear mission progress and fault status. */
   }
 
   requirement respectPrivacy {
+    @RequirementRole { role = user; }
+    @RequirementIdentity { requirementId = "USR-005"; }
     doc /* Keep home-map data local unless the user explicitly consents to transfer. */
   }
 }
 
 package SystemRequirements {
-  private import RequirementManagement::*;
+  private import Elan8RequirementManagement::*;
+  private import Elan8RequirementMetadata::*;
+  private import Elan8Method::*;
   private import DesignLimits::*;
   private import StakeholderNeeds::*;
   private import ISQ::*;
@@ -74,12 +92,16 @@ package SystemRequirements {
 
   requirement cleanAtLeastEighty {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = performance; }
+    @RequirementIdentity { requirementId = "SYS-001"; }
     require constraint { robot.cleanedAreaPerCharge >= cleaningAreaTarget }
     doc /* Clean at least 80 m² on one charge. */
   }
 
   requirement coverFloor {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = performance; }
+    @RequirementIdentity { requirementId = "SYS-002"; }
     require constraint {
       robot.reachableFloorCoveragePercent >= floorCoverageTargetPercent
     }
@@ -88,6 +110,8 @@ package SystemRequirements {
 
   requirement avoidObstacles {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = safety; }
+    @RequirementIdentity { requirementId = "SYS-003"; }
     require constraint {
       robot.avoidedObstacleHeight >= minimumAvoidedObstacleHeight
     }
@@ -96,6 +120,9 @@ package SystemRequirements {
 
   requirement detectCliffs {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = safety; }
+    @RequirementIdentity { requirementId = "SYS-SAFE-010"; }
+    @EngineeringConcern { concern = purpose; }
     require constraint {
       robot.cliffHeightDetectedBeforeWheelCrossing >= minimumCliffHeight
     }
@@ -104,24 +131,33 @@ package SystemRequirements {
 
   requirement superviseHazards {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = safety; }
+    @RequirementIdentity { requirementId = "SYS-SAFE-011"; }
+    @EngineeringConcern { concern = purpose; }
     require constraint { robot.safeStopOnHazard == true }
     doc /* Command a safe stop for cliff, lift, collision, current, or thermal hazards. */
   }
 
   requirement localizeReliably {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = performance; }
+    @RequirementIdentity { requirementId = "SYS-004"; }
     require constraint { robot.localizationError <= maxLocalizationError }
     doc /* Maintain localization error below 150 mm during the reference mission. */
   }
 
   requirement updateCoverageMap {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = functional; }
+    @RequirementIdentity { requirementId = "SYS-005"; }
     require constraint { robot.coverageMapMaintained == true }
     doc /* Maintain cleaned, unreachable, and unknown cells throughout the mission. */
   }
 
   requirement recoverFromStall {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = functional; }
+    @RequirementIdentity { requirementId = "SYS-006"; }
     require constraint {
       robot.wheelStallDetectionTime <= maxWheelStallDetectionTime
     }
@@ -130,6 +166,8 @@ package SystemRequirements {
 
   requirement returnToDock {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = functional; }
+    @RequirementIdentity { requirementId = "SYS-007"; }
     require constraint {
       robot.lowBatteryReturnThresholdPercent <=
         lowBatteryReturnThresholdPercent
@@ -139,6 +177,8 @@ package SystemRequirements {
 
   requirement chargeSafely {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = safety; }
+    @RequirementIdentity { requirementId = "SYS-008"; }
     require constraint {
       robot.chargeCurrentWithinSafeOperatingArea == true and
       robot.chargeTemperatureWithinSafeOperatingArea == true
@@ -148,12 +188,16 @@ package SystemRequirements {
 
   requirement reportCleaningStatus {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = interface; }
+    @RequirementIdentity { requirementId = "SYS-009"; }
     require constraint { robot.cleaningStatusReported == true }
     doc /* Report progress and faults to the local application during a mission. */
   }
 
   requirement protectMapPrivacy {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = security; }
+    @RequirementIdentity { requirementId = "SYS-010"; }
     require constraint { robot.mapDataLocalUnlessConsented == true }
     doc /* Keep raw home-map data local unless the user explicitly consents. */
   }

@@ -61,9 +61,9 @@ fallback labels.
 
 ## CI
 
-`.github/workflows/validate.yml` runs Spec42 for pushes and pull requests.
-Warnings remain visible in SARIF; this showcase treats any error, warning or
-information diagnostic as a release blocker.
+`.github/workflows/validate.yml` runs Spec42 **v0.47.1** (`elan8/spec42@v0.47.1`) for
+pushes and pull requests. Warnings remain visible in SARIF; this showcase treats
+any error, warning or information diagnostic as a release blocker.
 
 If Spec42 rejects or misprojects an independently confirmed SysML v2-conforming
 construct, add a minimal Spec42 regression test and repair the tool. Do not

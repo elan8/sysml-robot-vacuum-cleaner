@@ -34,7 +34,7 @@ $removedNames = @(
     "ElectronicsComponentSelection", "ElectronicsInterfaceControl",
     "ProductVariants", "TradeStudies", "SafetyAnalysis",
     "ComponentCandidate", "TradeOption", "VariantOption",
-    "VerificationEvidence", "DataFlowContract"
+    "DataFlowContract"
 )
 foreach ($name in $removedNames) {
     if ($modelText -match ("\b" + [regex]::Escape($name) + "\b")) {
@@ -72,10 +72,10 @@ $catalogSelections = [ordered]@{
     "RobotBms" = "BQ40Z50R2"
 }
 $purchasedPartsText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "libraries\PurchasedParts.sysml"
+    Join-Path $resolvedModelPath "90_library\PurchasedParts.sysml"
 )
 $physicalText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "architecture\PhysicalArchitecture.sysml"
+    Join-Path $resolvedModelPath "30_architecture\PhysicalArchitecture.sysml"
 )
 foreach ($part in $catalogSelections.Values) {
     if ($purchasedPartsText -notmatch ("part\s+def\s+" + $part + "\b")) {
@@ -110,7 +110,7 @@ foreach ($field in @(
 }
 
 $firmwareText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "implementation\FirmwareArchitecture.sysml"
+    Join-Path $resolvedModelPath "30_architecture\FirmwareArchitecture.sysml"
 )
 if ([regex]::Matches($firmwareText, "part\s+def\s+\w+Task\s*:>\s*FirmwareTask").Count -ne 7) {
     Add-Failure "FirmwareArchitecture must define exactly seven concrete firmware tasks"

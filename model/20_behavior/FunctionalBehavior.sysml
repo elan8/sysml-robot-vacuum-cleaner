@@ -212,6 +212,7 @@ package OperationalScenarios {
   private import FunctionalArchitecture::*;
   private import ProductContext::*;
   private import SystemRequirements::*;
+  private import Elan8Method::*;
 
   action def ObserveSafeStop {
     in stopCommand : DriveCommand;
@@ -219,6 +220,11 @@ package OperationalScenarios {
   }
 
   action def CliffSafeStopGoldenThread {
+    @EngineeringConcern { concern = behavior; }
+    @EngineeringIncrement {
+      incrementId = "INC-CLIFF-001";
+      objective = "Detect cliff and stop safely";
+    }
     in cliffStimulus : CliffObservation;
     out reportedStatus : MissionStatus;
 
