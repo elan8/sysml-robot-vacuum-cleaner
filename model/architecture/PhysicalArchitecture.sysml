@@ -7,10 +7,13 @@
 package PhysicalArchitecture {
   private import BehaviorStates::*;
   private import DomainModel::*;
+  private import ElectronicsCore::*;
+  private import EmbeddedComputeDomain::*;
   private import FirmwareArchitecture::*;
   private import PurchasedParts::*;
   private import SystemRequirements::*;
   private import SoftwareCore::*;
+  private import WirelessDomain::*;
   private import VacuumCleanerQuantitiesAndUnits::*;
   private import ISQ::*;
   private import SI::*;
@@ -57,16 +60,20 @@ package PhysicalArchitecture {
     port fault : GpioPort;
   }
 
-  part def RobotTofSensor :> VL53L1CX {
+  part def RobotTofSensor :> ElectronicsComponent {
     attribute range : LengthValue = 1200 [mm];
     port bus : I2cPort;
+    dependency selectedImplementation
+      from RobotTofSensor to VL53L1CX;
   }
 
-  part def RobotLidar :> RPLIDARC1 {
+  part def RobotLidar :> ElectronicsComponent {
     attribute scanRate : FrequencyValue = 10 [Hz];
     attribute range : LengthValue = 6000 [mm];
     port serial : UartPort;
     port power : PowerRailPort;
+    dependency selectedImplementation
+      from RobotLidar to RPLIDARC1;
   }
 
   part def InertialMeasurementUnit {
@@ -118,11 +125,13 @@ package PhysicalArchitecture {
     port output : PowerRailPort;
   }
 
-  part def RobotBms :> BQ40Z50R2 {
+  part def RobotBms :> ElectronicsComponent {
     attribute maxChargeCurrent : ElectricCurrentValue = 2 [A];
     attribute maxCellTemperature : ThermodynamicTemperatureValue = 328.15 [K];
     port bus : I2cPort;
     port alert : GpioPort;
+    dependency selectedImplementation
+      from RobotBms to BQ40Z50R2;
   }
 
   part def PowerRegulator {
@@ -159,7 +168,7 @@ package PhysicalArchitecture {
     connect bms.alert to hazard;
   }
 
-  part def RobotMainMcu :> STM32U575VGT6 {
+  part def RobotMainMcu :> Microcontroller {
     port sensorI2c : I2cPort;
     port lidarUart : UartPort;
     port bmsSmbus : I2cPort;
@@ -169,17 +178,23 @@ package PhysicalArchitecture {
     port brushPwm : PwmPort;
     port vacuumPwm : PwmPort;
     port safetyGpio : GpioPort;
+    dependency selectedImplementation
+      from RobotMainMcu to STM32U575VGT6;
   }
 
-  part def RobotMotorDriver :> DRV8316R {
+  part def RobotMotorDriver :> ElectronicsComponent {
     port power : PowerRailPort;
     port command : PwmPort;
     port phases : ThreePhaseMotorPort;
     port fault : GpioPort;
+    dependency selectedImplementation
+      from RobotMotorDriver to DRV8316R;
   }
 
-  part def RobotWirelessModule :> ESP32C3MINI1 {
+  part def RobotWirelessModule :> WirelessModule {
     port serial : UartPort;
+    dependency selectedImplementation
+      from RobotWirelessModule to ESP32C3MINI1;
   }
 
   part def MainControlPcb :> PhysicalAssembly {

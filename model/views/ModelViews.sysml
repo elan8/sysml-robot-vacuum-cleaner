@@ -49,7 +49,10 @@ package ModelViews {
     stakeholder :>> systemsEngineer;
   }
   concern selectedCatalogParts {
-    doc /* Which catalog definitions are selected in the physical baseline? */
+    doc /*
+      Which catalog definitions are selected by explicit catalog-selection
+      dependencies in the physical baseline?
+    */
     subject;
     stakeholder :>> productEngineer;
     stakeholder :>> systemsEngineer;
@@ -124,11 +127,23 @@ package ModelViews {
 
   view selectedParts : GeneralView {
     satisfy selectedCatalogPartsPerspective;
+    expose PhysicalArchitecture::RobotMainMcu;
+    expose PhysicalArchitecture::RobotMainMcu::selectedImplementation;
     expose PurchasedParts::STM32U575VGT6;
+    expose PhysicalArchitecture::RobotMotorDriver;
+    expose PhysicalArchitecture::RobotMotorDriver::selectedImplementation;
     expose PurchasedParts::DRV8316R;
+    expose PhysicalArchitecture::RobotTofSensor;
+    expose PhysicalArchitecture::RobotTofSensor::selectedImplementation;
     expose PurchasedParts::VL53L1CX;
+    expose PhysicalArchitecture::RobotLidar;
+    expose PhysicalArchitecture::RobotLidar::selectedImplementation;
     expose PurchasedParts::RPLIDARC1;
+    expose PhysicalArchitecture::RobotWirelessModule;
+    expose PhysicalArchitecture::RobotWirelessModule::selectedImplementation;
     expose PurchasedParts::ESP32C3MINI1;
+    expose PhysicalArchitecture::RobotBms;
+    expose PhysicalArchitecture::RobotBms::selectedImplementation;
     expose PurchasedParts::BQ40Z50R2;
     expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.mcu;
     expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.leftMotorDriver;

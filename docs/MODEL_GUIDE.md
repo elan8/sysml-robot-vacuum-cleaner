@@ -16,7 +16,8 @@ the workspace; SysML packages remain the semantic ownership boundary.
    product behavior. `RobotOperatingBehavior` and `PrivacyConsentBehavior` are
    the only state definitions.
 3. Open `PhysicalArchitecture.sysml`: the selected baseline contains the major
-   LRUs, typed interfaces, three power rails and concrete catalog-based parts.
+   LRUs, typed interfaces, three power rails and semantic implementation
+   selections for concrete catalog parts.
 4. Follow `Architecture::robotSystem`. Its single `operate` behavior usage is
    used for both allocation and requirement satisfaction.
 5. Inspect `FirmwareArchitecture.sysml`: seven task definitions carry timing,
@@ -36,7 +37,7 @@ flowchart LR
   N["Stakeholder need"] -->|derive| R["System requirement"]
   R -->|satisfy by| B["robotSystem.operate behavior usage"]
   B -->|allocate to| P["Physical LRU / firmware task"]
-  T["Purchased part definition"] -->|specialized by| P
+  P -->|selected implementation dependency| T["Purchased part definition"]
   P -->|typed connect / flow| P
   V["Verification case / analysis"] -->|verify| R
   W["View"] -->|expose| R
@@ -66,9 +67,17 @@ flowchart LR
 `BuyPart` is metadata for `SysML::PartDefinition`, not a project-specific
 record table. It stores manufacturer identity and document provenance.
 Voltage and temperature limits remain typed quantities on the catalog
-definitions. Project definitions such as `RobotMainMcu` specialize catalog
-definitions such as `STM32U575VGT6`; the physical product uses the project
-definitions directly.
+definitions. Project definitions such as `RobotMainMcu` specialize only their
+stable domain kind, such as `Microcontroller`. A named `dependency` records the
+selected catalog implementation, for example from `RobotMainMcu` to
+`STM32U575VGT6`. This keeps “is a kind of” separate from “is implemented by”,
+while retaining semantic navigation to the selected buy part.
+
+Each selection dependency is owned by its project-specific definition and uses
+the local name `selectedImplementation`, for example
+`PhysicalArchitecture::RobotMainMcu::selectedImplementation`. This ownership
+keeps the implementation decision with the definition it qualifies, while the
+same convention remains unambiguous across all selected parts.
 
 The library imports only standard and domain libraries. It therefore has no
 references to the vacuum-cleaner architecture and can later be extracted to a

@@ -24,7 +24,8 @@ requirements, behavior, architecture and verification elements.
 - Requirements satisfied by concrete behavior usages and verified by nine
   verification cases plus three quantitative analyses.
 - A reusable `PurchasedParts` library whose `BuyPart` metadata annotates
-  `SysML::PartDefinition`; project definitions specialize catalog definitions.
+  `SysML::PartDefinition`; named dependencies select catalog implementations
+  without turning procurement choice into type specialization.
 - A seven-task runtime with formal timing/resources, five typed queues and
   allocations to concrete MCU peripherals.
 - Six curated views: `productDecomposition`, `interconnections`,

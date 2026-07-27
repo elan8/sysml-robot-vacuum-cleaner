@@ -63,22 +63,38 @@ foreach ($requirement in $requirementNames) {
     }
 }
 
-$catalogParts = @(
-    "STM32U575VGT6", "DRV8316R", "VL53L1CX",
-    "RPLIDARC1", "ESP32C3MINI1", "BQ40Z50R2"
-)
+$catalogSelections = [ordered]@{
+    "RobotMainMcu" = "STM32U575VGT6"
+    "RobotMotorDriver" = "DRV8316R"
+    "RobotTofSensor" = "VL53L1CX"
+    "RobotLidar" = "RPLIDARC1"
+    "RobotWirelessModule" = "ESP32C3MINI1"
+    "RobotBms" = "BQ40Z50R2"
+}
 $purchasedPartsText = Get-Content -Raw (
     Join-Path $resolvedModelPath "libraries\PurchasedParts.sysml"
 )
 $physicalText = Get-Content -Raw (
     Join-Path $resolvedModelPath "architecture\PhysicalArchitecture.sysml"
 )
-foreach ($part in $catalogParts) {
+foreach ($part in $catalogSelections.Values) {
     if ($purchasedPartsText -notmatch ("part\s+def\s+" + $part + "\b")) {
         Add-Failure "catalog part '$part' is missing"
     }
-    if ($physicalText -notmatch (":>\s*" + $part + "\b")) {
-        Add-Failure "catalog part '$part' has no project specialization"
+    if ($physicalText -match (":>\s*" + $part + "\b")) {
+        Add-Failure "catalog part '$part' must be selected, not specialized"
+    }
+}
+foreach ($selection in $catalogSelections.GetEnumerator()) {
+    $partBodyPattern = "part\s+def\s+" + [regex]::Escape($selection.Key) +
+        "\b[^{]*\{(?<body>[\s\S]*?)\n\s*\}"
+    $partMatch = [regex]::Match($physicalText, $partBodyPattern)
+    $dependencyPattern = "dependency\s+selectedImplementation\s+from\s+" +
+        [regex]::Escape($selection.Key) + "\s+to\s+" +
+        [regex]::Escape($selection.Value) + "\s*;"
+    if (-not $partMatch.Success -or
+        $partMatch.Groups["body"].Value -notmatch $dependencyPattern) {
+        Add-Failure "project part '$($selection.Key)' must own a 'selectedImplementation' dependency to '$($selection.Value)'"
     }
 }
 if ([regex]::Matches($purchasedPartsText, "@BuyPart\s*\{").Count -ne 6) {

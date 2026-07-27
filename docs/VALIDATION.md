@@ -33,7 +33,8 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1 `
 ```
 
 The guards reject removed layers and types, handoff names, internal path-string
-identity, missing catalog specialization, incomplete `BuyPart` metadata,
+identity, missing semantic catalog selection, specialization of catalog parts,
+incomplete `BuyPart` metadata,
 missing queue flows and requirements without satisfaction or verification.
 
 ## Diagram smoke check
