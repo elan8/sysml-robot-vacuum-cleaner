@@ -6,7 +6,7 @@
  */
 package AutonomousFloorCleaningRobotDemo {
   private import Project::*;
-  private import VacuumCleanerQuantitiesAndUnits::*;
+  private import EngineeringUnits::*;
   private import PurchasedParts::*;
   private import DomainModel::*;
   private import DesignLimits::*;

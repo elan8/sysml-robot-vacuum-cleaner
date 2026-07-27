@@ -7,7 +7,7 @@
 package AnalysisCases {
   private import Architecture::*;
   private import DesignLimits::*;
-  private import VacuumCleanerQuantitiesAndUnits::*;
+  private import EngineeringUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import Elan8Method::*;

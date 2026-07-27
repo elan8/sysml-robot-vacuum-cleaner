@@ -14,7 +14,7 @@ package PhysicalArchitecture {
   private import SystemRequirements::*;
   private import SoftwareCore::*;
   private import WirelessDomain::*;
-  private import VacuumCleanerQuantitiesAndUnits::*;
+  private import EngineeringUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

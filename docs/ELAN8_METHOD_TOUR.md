@@ -18,7 +18,7 @@ This showcase is laid out with Elan8 Method folders and imports `mbse-methodolog
 | `40_analysis/` | Mission energy, safety reaction, localization analyses |
 | `50_verification/` | Nine verification cases including `verifyCliffSafeStop` |
 | `60_views/` | Six curated views |
-| `90_library/` | Quantities/units and purchased parts |
+| `90_library/` | Purchased parts catalog (`EngineeringUnits` from domain libraries) |
 | `Root.sysml` | Import hub |
 
 ## Increment spine

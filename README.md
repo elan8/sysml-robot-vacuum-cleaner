@@ -46,7 +46,7 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `40_analysis/` | Three quantitative analyses |
 | `50_verification/` | Nine verification cases |
 | `60_views/` | Six projections |
-| `90_library/` | Units and purchased parts |
+| `90_library/` | Purchased parts (units via domain `EngineeringUnits`) |
 | `Root.sysml` | Workspace import hub |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).

@@ -48,7 +48,7 @@ flowchart LR
 | Package | Owns |
 | --- | --- |
 | `Project` | Tailoring and method profile |
-| `VacuumCleanerQuantitiesAndUnits` | Project-specific units |
+| `EngineeringUnits` (domain libraries) | Shared Ah/mAh/ms unit literals |
 | `PurchasedParts` | `BuyPart` metadata and catalog definitions |
 | `DomainModel` | Protocol vocabulary, items, ports, buses |
 | `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |

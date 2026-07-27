@@ -7,7 +7,7 @@
 package FirmwareArchitecture {
   private import DomainModel::*;
   private import SoftwareCore::*;
-  private import VacuumCleanerQuantitiesAndUnits::*;
+  private import EngineeringUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
