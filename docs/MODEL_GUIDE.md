@@ -16,7 +16,7 @@ vertical increment.
 1. Start in `10_purpose/Requirements.sysml`: six stakeholder needs derive twelve
    testable requirements with quantities, constraints, and Elan8 requirement roles.
 2. Read `20_behavior/FunctionalBehavior.sysml`: `OperateCleaningRobot` decomposes
-   product behavior. Follow `CliffSafeStopGoldenThread` (`INC-CLIFF-001`).
+   product behavior. Follow `CliffSafeStopGoldenThread`.
 3. Open `30_architecture/PhysicalArchitecture.sysml`: the selected baseline
    contains the major LRUs, typed interfaces, power rails, and catalog selections.
 4. Follow `Architecture::robotSystem`. Its `operate` behavior usage is used for
@@ -69,6 +69,6 @@ domain kinds; a named `dependency selectedImplementation` points at catalog part
 ## Deliberate boundaries
 
 This baseline omits product-line engineering, trade studies, and handoff record
-tables. It **does** use Elan8 Method libraries for requirement roles, concerns,
-and increment identity on the cliff-safe-stop spine. Narrative guidance beyond
-semantics belongs in `doc` and markdown tours.
+tables. It **does** use Elan8 Method libraries for requirement roles and concerns
+on the cliff-safe-stop engineering increment. Narrative guidance beyond semantics belongs
+in `doc` and markdown tours.

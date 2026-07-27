@@ -7,10 +7,10 @@
 package Project {
   private import Elan8Method::*;
 
-  part projectInfo : ProjectTailoring {
+  part projectInfo : ProjectInfo {
     attribute :>> projectName = "AutonomousFloorCleaningRobot";
     attribute :>> profile = small;
-    attribute :>> notes = "Lean showcase; Elan8 Method compliant folder layout with cliff-safe-stop vertical increment.";
+    attribute :>> notes = "Lean showcase; Elan8 Method folder layout with cliff-safe-stop engineering increment.";
   }
 
   doc /*

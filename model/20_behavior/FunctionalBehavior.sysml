@@ -221,10 +221,7 @@ package OperationalScenarios {
 
   action def CliffSafeStopGoldenThread {
     @EngineeringConcern { concern = behavior; }
-    @EngineeringIncrement {
-      incrementId = "INC-CLIFF-001";
-      objective = "Detect cliff and stop safely";
-    }
+    doc /* Engineering increment scenario: detect cliff and stop safely. */
     in cliffStimulus : CliffObservation;
     out reportedStatus : MissionStatus;
 

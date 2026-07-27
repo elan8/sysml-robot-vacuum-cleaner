@@ -98,10 +98,7 @@ package Verification {
 
   verification verifyCliffSafeStop {
     @EngineeringConcern { concern = verification; }
-    @EngineeringIncrement {
-      incrementId = "INC-CLIFF-001";
-      objective = "Detect cliff and stop safely with verified reaction time";
-    }
+    doc /* Verifies the cliff safe-stop engineering increment reaction time. */
     subject thread : CliffSafeStopGoldenThread;
     objective {
       verify requirement detectCliffs;

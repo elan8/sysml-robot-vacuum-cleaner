@@ -49,13 +49,13 @@ if (-not $MethodLibraryRoot) {
     }
 }
 
-if (-not $MethodLibraryRoot -or -not (Test-Path $MethodLibraryRoot)) {
-    throw "Required Elan8 Method library not found. Set ELAN8_METHOD_LIBRARY_ROOT or check out sibling mbse-methodology/library."
-}
+# Prefer Spec42's bundled domain + method libraries. Optional --library-path overrides
+# are only added when sibling checkouts (or env vars) are present for local iteration.
+$arguments = @()
 
-$arguments = @(
-    "--library-path", (Resolve-Path $MethodLibraryRoot)
-)
+if ($MethodLibraryRoot -and (Test-Path $MethodLibraryRoot)) {
+    $arguments += @("--library-path", (Resolve-Path $MethodLibraryRoot))
+}
 
 if ($DomainLibrariesRoot) {
     foreach ($subdir in @("domain", "technical", "generic")) {
@@ -66,8 +66,6 @@ if ($DomainLibrariesRoot) {
             Write-Warning "Domain library path not found: $libraryPath"
         }
     }
-} else {
-    Write-Warning "Domain libraries root not found; Spec42 may fail to resolve domain imports."
 }
 
 $arguments += @("check", $resolvedModelPath, "--format", $Format)

@@ -26,7 +26,7 @@ jobs:
         run: ./scripts/check-model-guards.ps1
 
       - name: Validate model
-        uses: elan8/spec42@v0.47.1
+        uses: elan8/spec42@v0.47.2
         with:
           path: model
           format: sarif

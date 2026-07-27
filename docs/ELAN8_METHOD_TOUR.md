@@ -5,13 +5,13 @@ SPDX-License-Identifier: MIT
 
 # Elan8 Method tour (cliff safe-stop)
 
-This showcase is laid out with Elan8 Method folders and imports `mbse-methodology/library` alongside `sysml-domain-libraries`. The **cliff safe-stop golden thread** is one vertical engineering increment (`INC-CLIFF-001`).
+This showcase is laid out with Elan8 Method folders and imports `mbse-methodology/library` alongside `sysml-domain-libraries`. The **cliff safe-stop engineering increment** is one end-to-end capability slice through the model (scenario element: `CliffSafeStopGoldenThread`).
 
 ## Folder map
 
 | Folder | Content |
 | --- | --- |
-| `00_project/` | Tailoring (`ProjectTailoring`, small profile) |
+| `00_project/` | Project info (`ProjectInfo`, small profile) |
 | `10_purpose/` | Context, stakeholder needs, design limits, system requirements |
 | `20_behavior/` | Functional actions, states, cliff scenario |
 | `30_architecture/` | Domain model, physical + firmware architecture, SOI allocations |
@@ -37,7 +37,7 @@ This showcase is laid out with Elan8 Method folders and imports `mbse-methodolog
 
 1. Purpose / concerns — user need `operateSafely`
 2. Context — `ProductContext::ResidentialCleaningContext`
-3. Scenario — cliff golden thread
+3. Scenario — cliff increment (`CliffSafeStopGoldenThread`)
 4. Derive requirements — safety system requirements with subjects
 5. Logical/physical — actions allocated to LRUs/firmware (no parallel logical tree)
 6. Verification — `verifyCliffSafeStop` + reaction analysis
