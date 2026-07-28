@@ -57,11 +57,13 @@ flowchart LR
 | `ProductContext` | Users, app, network, dock, home, robot boundary |
 | `RealtimeRuntime` (domain libraries) | `RealtimeTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
 | `FirmwareArchitecture` | Vacuum-specific tasks, queues, and `StartupPhase` (specializes `RealtimeRuntime`) |
-| `ElectronicActuationDomain` (domain libraries) | `Motor`/`BldcMotor`, `Encoder`/`QuadratureEncoder`, `MotorDriver` |
-| `SensingDomain` (domain libraries) | `InertialMeasurementUnit` |
+| `ElectronicActuationDomain` (domain libraries) | `Motor`/`BldcMotor`/`PwmMotor`, `Encoder`/`QuadratureEncoder`, `MotorDriver` |
+| `SensingDomain` (domain libraries) | `InertialMeasurementUnit`, `BumperSwitch`, `LiftSwitch` |
 | `ElectricalPowerDomain` (domain libraries) | `BatteryPack`, `BatteryManagementSystem`, `VoltageRegulator` (ports + `outputVoltage` + `quiescentPower`) |
 | `BoardIntegrationDomain` (domain libraries) | `BoardAssembly` (`boardName`/`layerCount`) |
-| `PhysicalArchitecture` | Selected physical baseline; vacuum-specific motor/sensor/regulator specializations (`DriveMotor`, `RobotTofSensor`, `RobotBms`, ...) specialize `ElectronicsComponent` directly (`MainControlPcb` specializes `BoardAssembly`) — there is no local "physical module" base type; `mass`/`powerDraw` on composite assemblies are `sum()`-derived from real children, not hand-typed totals; `PowerRailBudget` is an `attribute def` (voltage/current numbers only, no ports/behavior), declared as a sibling `attribute` next to each rail port it characterizes |
+| `MechanicalCore` (domain libraries) | `MechanicalComponent` (`mass` only, purely mechanical parts — no ports, no `powerDraw`) |
+| `DrivetrainDomain` (domain libraries) | `Gearbox`, `Wheel`, `CasterWheel` |
+| `PhysicalArchitecture` | Selected physical baseline, organized around how the robot is actually assembled/serviced: `BaseModule` (chassis, both `DriveTrain`s — motor+gearbox+wheel+encoder+lift switch — cleaning head, power module, dock interface), `MainPcbModule` (MCU, motor drivers, wireless, IMU — screws into Base; merges the former `MainControlPcb`+`MainElectronicsAssembly` wrapper since Base/Top now form the real enclosure), `TopModule` (LiDAR, front ToF sensors, bumper switch — snaps onto Base last), `DustBin` (lid + filter, tool-free-removable, independent of Base/Top). `BaseModule`/`TopModule` specialize `MechanicalCore::MechanicalComponent` and are not `ElectronicsComponent`, so each carries its own non-inherited `baseElectronicsPowerDraw`/`topElectronicsPowerDraw` attribute aggregating its electronics children instead of an inherited `powerDraw`. `mass`/`powerDraw` on every composite are `sum()`-derived from real children, not hand-typed totals. `PowerRailBudget` is an `attribute def` (voltage/current numbers only, no ports/behavior), declared as a sibling `attribute` next to each rail port it characterizes. |
 | `Architecture` | Concrete system, allocations, satisfaction |
 | `AnalysisCases` | Three analyses |
 | `Verification` | Nine verification cases |

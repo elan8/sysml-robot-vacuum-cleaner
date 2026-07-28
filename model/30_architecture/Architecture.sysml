@@ -17,16 +17,17 @@ package Architecture {
     perform action nominalMission : AutonomousCleaningMission;
     exhibit state operatingBehavior : RobotOperatingBehavior;
 
-    allocate operate.locomotion to physical.driveModule;
+    allocate operate.locomotion to physical.base;
     allocate operate.locomotion to physical.firmwareTasks.actuatorControl;
-    allocate operate.cleaning to physical.cleaningHead;
+    allocate operate.cleaning to physical.base.cleaningHead;
     allocate operate.cleaning to physical.firmwareTasks.actuatorControl;
-    allocate operate.perception to physical.sensorAssembly;
+    allocate operate.perception to physical.base;
+    allocate operate.perception to physical.top;
     allocate operate.perception to physical.firmwareTasks.sensorAcquisition;
     allocate operate.navigation to physical.firmwareTasks.navigation;
-    allocate operate.powerManagement to physical.powerModule;
+    allocate operate.powerManagement to physical.base.powerModule;
     allocate operate.powerManagement to physical.firmwareTasks.powerManager;
-    allocate operate.docking to physical.dockInterface;
+    allocate operate.docking to physical.base.dockInterface;
     allocate operate.missionControl to physical.firmwareTasks.missionController;
     allocate operate.safetySupervision
       to physical.firmwareTasks.safetySupervisor;

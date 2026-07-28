@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: MIT
  *
  * Selected physical product baseline and its authoritative interconnections.
+ *
+ * Assembly-oriented breakdown: BaseModule (chassis, drivetrain, cleaning head,
+ * power, dock interface) is built first; MainPcbModule screws into it and is
+ * wired to its motors/sensors/power; TopModule (LiDAR, front ToF, bumper)
+ * snaps onto BaseModule last, enclosing everything; DustBin is a separate,
+ * tool-free-removable module.
  */
 package PhysicalArchitecture {
   private import BehaviorStates::*;
@@ -12,6 +18,8 @@ package PhysicalArchitecture {
   private import SensingDomain::*;
   private import ElectricalPowerDomain::*;
   private import BoardIntegrationDomain::*;
+  private import MechanicalCore::*;
+  private import DrivetrainDomain::*;
   private import EmbeddedComputeDomain::*;
   private import FirmwareArchitecture::*;
   private import PurchasedParts::*;
@@ -28,37 +36,59 @@ package PhysicalArchitecture {
     attribute :>> mass = 0.5 [kg]; /* illustrative estimate */
   }
 
-  part def DriveModule :> ElectronicsComponent {
-    attribute :>> powerDraw = sum(leftMotor.ratedPower, rightMotor.ratedPower);
+  part def DriveTrain :> MechanicalComponent {
     attribute :>> mass =
-      sum(leftMotor.mass, rightMotor.mass, leftEncoder.mass, rightEncoder.mass);
-    port leftPhases : ThreePhaseMotorPort;
-    port rightPhases : ThreePhaseMotorPort;
-    port leftOdometry : QuadratureEncoderPort;
-    port rightOdometry : QuadratureEncoderPort;
-    port bumperHazard : GpioPort;
-    part leftMotor : DriveMotor;
-    part rightMotor : DriveMotor;
-    part leftEncoder : QuadratureEncoder {
+      sum(motor.mass, gearbox.mass, wheel.mass, encoder.mass, lift.mass);
+    port phases : ThreePhaseMotorPort;
+    port odometry : QuadratureEncoderPort;
+    port liftHazard : GpioPort;
+
+    part motor : DriveMotor;
+    part gearbox : Gearbox {
+      attribute :>> gearRatio = 30; /* illustrative estimate */
+      attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
+    }
+    part wheel : Wheel {
+      attribute :>> diameter = 65 [mm]; /* illustrative estimate */
+      attribute :>> mass = 0.08 [kg]; /* illustrative estimate */
+    }
+    part encoder : QuadratureEncoder {
       attribute :>> mass = 0.1 [kg]; /* illustrative estimate */
     }
-    part rightEncoder : QuadratureEncoder {
-      attribute :>> mass = 0.1 [kg]; /* illustrative estimate */
+    part lift : LiftSwitch {
+      attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
     }
-    connect leftMotor.phases to leftPhases;
-    connect rightMotor.phases to rightPhases;
-    connect leftEncoder.odometry to leftOdometry;
-    connect rightEncoder.odometry to rightOdometry;
+
+    connect motor.phases to phases;
+    connect encoder.odometry to odometry;
+    connect lift.hazard to liftHazard;
   }
 
   part def CleaningHeadModule :> ElectronicsComponent {
-    doc /* Atomic module; no internal part decomposition modeled here. */
-    attribute :>> powerDraw = 18 [W];
-    attribute :>> mass = 0.9 [kg];
+    attribute :>> powerDraw = sum(brushMotor.ratedPower, vacuumMotor.ratedPower);
+    attribute :>> mass = sum(brushMotor.mass, vacuumMotor.mass, housingMass);
+    attribute housingMass : MassValue = 0.4 [kg]; /* illustrative estimate residual */
+    doc /*
+      housingMass is a named residual for unmodeled housing, brush-assembly, and
+      vacuum duct/impeller housing mass, following the enclosureMass/binMass
+      residual pattern used elsewhere in this file.
+    */
     port power : PowerRailPort;
     port brushCommand : PwmPort;
     port vacuumCommand : PwmPort;
     port fault : GpioPort;
+
+    part brushMotor : PwmMotor {
+      attribute :>> ratedPower = 8 [W]; /* illustrative estimate */
+      attribute :>> mass = 0.25 [kg]; /* illustrative estimate */
+    }
+    part vacuumMotor : PwmMotor {
+      attribute :>> ratedPower = 10 [W]; /* illustrative estimate */
+      attribute :>> mass = 0.25 [kg]; /* illustrative estimate */
+    }
+
+    connect brushMotor.command to brushCommand;
+    connect vacuumMotor.command to vacuumCommand;
   }
 
   part def RobotTofSensor :> ElectronicsComponent {
@@ -86,53 +116,6 @@ package PhysicalArchitecture {
     attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 0.25 [W]; /* illustrative estimate */
     port hazard : GpioPort;
-  }
-
-  part def SensorAssembly :> ElectronicsComponent {
-    attribute :>> powerDraw = sum(
-      frontTof.powerDraw, leftTof.powerDraw, rightTof.powerDraw,
-      imu.powerDraw, lidar.powerDraw,
-      frontLeftCliff.powerDraw, frontRightCliff.powerDraw,
-      rearLeftCliff.powerDraw, rearRightCliff.powerDraw
-    );
-    attribute :>> mass = sum(
-      frontTof.mass, leftTof.mass, rightTof.mass,
-      imu.mass, lidar.mass,
-      frontLeftCliff.mass, frontRightCliff.mass,
-      rearLeftCliff.mass, rearRightCliff.mass
-    );
-    port power : PowerRailPort;
-    port sensorBus : I2cPort;
-    port lidarSerial : UartPort;
-    port cliffHazard : GpioPort;
-
-    part frontTof : RobotTofSensor;
-    part leftTof : RobotTofSensor;
-    part rightTof : RobotTofSensor;
-    part imu : InertialMeasurementUnit {
-      attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
-      attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate */
-    }
-    part lidar : RobotLidar;
-    part frontLeftCliff : CliffSensor;
-    part frontRightCliff : CliffSensor;
-    part rearLeftCliff : CliffSensor;
-    part rearRightCliff : CliffSensor;
-    part i2c : SensorI2cBus;
-    part uart : LidarUartBus;
-
-    connect sensorBus to i2c.host;
-    connect frontTof.bus to i2c.frontTof;
-    connect leftTof.bus to i2c.leftTof;
-    connect rightTof.bus to i2c.rightTof;
-    connect imu.bus to i2c.imu;
-    connect lidarSerial to uart.host;
-    connect lidar.serial to uart.lidar;
-    connect lidar.power to power;
-    connect frontLeftCliff.hazard to cliffHazard;
-    connect frontRightCliff.hazard to cliffHazard;
-    connect rearLeftCliff.hazard to cliffHazard;
-    connect rearRightCliff.hazard to cliffHazard;
   }
 
   part def RobotBms :> BatteryManagementSystem {
@@ -198,6 +181,92 @@ package PhysicalArchitecture {
     connect bms.alert to hazard;
   }
 
+  part def DockInterfaceModule :> ElectronicsComponent {
+    doc /* Atomic module; no internal part decomposition modeled here. */
+    attribute :>> powerDraw = 2 [W];
+    attribute :>> mass = 0.38 [kg];
+    port chargePower : PowerRailPort;
+    port beacon : GpioPort;
+  }
+
+  part def Chassis :> MechanicalComponent {
+    doc /* Bare structural tub; everything else in BaseModule mounts on it. */
+    attribute :>> mass = 0.3 [kg]; /* illustrative estimate */
+  }
+
+  part def BaseModule :> MechanicalComponent {
+    attribute :>> mass = sum(
+      chassis.mass, leftDriveTrain.mass, rightDriveTrain.mass, casterWheel.mass,
+      frontLeftCliff.mass, frontRightCliff.mass, rearLeftCliff.mass, rearRightCliff.mass,
+      cleaningHead.mass, powerModule.mass, dockInterface.mass
+    );
+    attribute baseElectronicsPowerDraw : PowerValue = sum(
+      leftDriveTrain.motor.ratedPower, rightDriveTrain.motor.ratedPower,
+      frontLeftCliff.powerDraw, frontRightCliff.powerDraw,
+      rearLeftCliff.powerDraw, rearRightCliff.powerDraw,
+      cleaningHead.powerDraw, powerModule.powerDraw, dockInterface.powerDraw
+    );
+    doc /*
+      baseElectronicsPowerDraw is an ordinary (non-inherited) attribute, not an
+      ElectronicsComponent::powerDraw override — BaseModule specializes
+      MechanicalComponent and is not itself an ElectronicsComponent. It aggregates
+      the current draw of every electronics child mounted in/on the base tub.
+    */
+    port leftPhases : ThreePhaseMotorPort;
+    port rightPhases : ThreePhaseMotorPort;
+    port leftOdometry : QuadratureEncoderPort;
+    port rightOdometry : QuadratureEncoderPort;
+    port brushCommand : PwmPort;
+    port vacuumCommand : PwmPort;
+    port hazard : GpioPort;
+    port batteryRail : PowerRailPort;
+    port logicRail : PowerRailPort;
+    port sensorRail : PowerRailPort;
+    port bmsBus : I2cPort;
+    port chargePower : PowerRailPort;
+    port beacon : GpioPort;
+
+    part chassis : Chassis;
+    part leftDriveTrain : DriveTrain;
+    part rightDriveTrain : DriveTrain;
+    part casterWheel : CasterWheel {
+      attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+    }
+    part frontLeftCliff : CliffSensor;
+    part frontRightCliff : CliffSensor;
+    part rearLeftCliff : CliffSensor;
+    part rearRightCliff : CliffSensor;
+    part cleaningHead : CleaningHeadModule;
+    part powerModule : PowerModule;
+    part dockInterface : DockInterfaceModule;
+
+    connect leftDriveTrain.phases to leftPhases;
+    connect rightDriveTrain.phases to rightPhases;
+    connect leftDriveTrain.odometry to leftOdometry;
+    connect rightDriveTrain.odometry to rightOdometry;
+
+    connect powerModule.batteryRail to batteryRail;
+    connect powerModule.logicRail to logicRail;
+    connect powerModule.sensorRail to sensorRail;
+    connect powerModule.bmsBus to bmsBus;
+    connect powerModule.batteryRail to cleaningHead.power;
+
+    connect brushCommand to cleaningHead.brushCommand;
+    connect vacuumCommand to cleaningHead.vacuumCommand;
+
+    connect chargePower to dockInterface.chargePower;
+    connect beacon to dockInterface.beacon;
+
+    connect leftDriveTrain.liftHazard to hazard;
+    connect rightDriveTrain.liftHazard to hazard;
+    connect frontLeftCliff.hazard to hazard;
+    connect frontRightCliff.hazard to hazard;
+    connect rearLeftCliff.hazard to hazard;
+    connect rearRightCliff.hazard to hazard;
+    connect powerModule.hazard to hazard;
+    connect cleaningHead.fault to hazard;
+  }
+
   part def RobotMainMcu :> Microcontroller {
     attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 3 [W]; /* illustrative estimate */
@@ -229,13 +298,20 @@ package PhysicalArchitecture {
       from RobotWirelessModule to ESP32C3MINI1;
   }
 
-  part def MainControlPcb :> BoardAssembly {
+  part def MainPcbModule :> BoardAssembly {
     attribute :>> powerDraw =
-      sum(mcu.powerDraw, leftMotorDriver.powerDraw, rightMotorDriver.powerDraw, wireless.powerDraw);
+      sum(mcu.powerDraw, leftMotorDriver.powerDraw, rightMotorDriver.powerDraw,
+          wireless.powerDraw, imu.powerDraw);
     attribute :>> mass =
-      sum(mcu.mass, leftMotorDriver.mass, rightMotorDriver.mass, wireless.mass, boardMass);
+      sum(mcu.mass, leftMotorDriver.mass, rightMotorDriver.mass, wireless.mass,
+          imu.mass, boardMass);
     attribute boardMass : MassValue = 0.155 [kg];
-    doc /* boardMass covers PCB substrate, connectors, and passives not individually modeled. */
+    doc /*
+      boardMass covers PCB substrate, connectors, and passives not individually
+      modeled. Merges the former MainControlPcb + MainElectronicsAssembly wrapper
+      into one module — Base and Top now form the real enclosure, so a separate
+      PCB-housing level is no longer needed.
+    */
     port batteryPower : PowerRailPort;
     port logicPower : PowerRailPort;
     port sensorBus : I2cPort;
@@ -253,10 +329,15 @@ package PhysicalArchitecture {
     part rightMotorDriver : RobotMotorDriver;
     part wireless : RobotWirelessModule;
     part wirelessUart : WirelessUartBus;
+    part imu : InertialMeasurementUnit {
+      attribute :>> mass = 0.03 [kg]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
+      attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
+    }
 
     connect batteryPower to leftMotorDriver.power;
     connect batteryPower to rightMotorDriver.power;
     connect sensorBus to mcu.sensorI2c;
+    connect sensorBus to imu.bus;
     connect lidarSerial to mcu.lidarUart;
     connect bmsBus to mcu.bmsSmbus;
     connect mcu.leftMotorPwm to leftMotorDriver.command;
@@ -273,45 +354,67 @@ package PhysicalArchitecture {
     connect mcu.safetyGpio to hazard;
   }
 
-  part def MainElectronicsAssembly :> ElectronicsComponent {
-    attribute :>> mass = sum(mainControlPcb.mass, enclosureMass);
-    attribute enclosureMass : MassValue = 0.10 [kg];
-    attribute :>> powerDraw = sum(mainControlPcb.powerDraw, auxiliaryPower);
-    attribute auxiliaryPower : PowerValue = 2 [W];
+  part def TopModule :> MechanicalComponent {
+    attribute :>> mass = sum(
+      lidar.mass, frontTof.mass, leftTof.mass, rightTof.mass, frontBumper.mass, shellMass
+    );
+    attribute shellMass : MassValue = 0.2 [kg]; /* illustrative estimate residual */
+    attribute topElectronicsPowerDraw : PowerValue = sum(
+      lidar.powerDraw, frontTof.powerDraw, leftTof.powerDraw, rightTof.powerDraw
+    );
     doc /*
-      enclosureMass/auxiliaryPower are named residuals for unmodeled housing and
-      wiring/connector overhead not attributable to mainControlPcb's own children.
+      topElectronicsPowerDraw is an ordinary (non-inherited) attribute, not an
+      ElectronicsComponent::powerDraw override — TopModule specializes
+      MechanicalComponent and is not itself an ElectronicsComponent. shellMass is a
+      named residual for the unmodeled outer-shell plastic. frontBumper's quiescent
+      draw is left unset (negligible), matching the ElectronicsComponent "no
+      default, not mandatory" convention already used for BatteryPack.
     */
-    port batteryPower : PowerRailPort;
-    port logicPower : PowerRailPort;
     port sensorBus : I2cPort;
     port lidarSerial : UartPort;
-    port bmsBus : I2cPort;
-    port leftPhases : ThreePhaseMotorPort;
-    port rightPhases : ThreePhaseMotorPort;
-    port brushCommand : PwmPort;
-    port vacuumCommand : PwmPort;
+    port power : PowerRailPort;
     port hazard : GpioPort;
-    part mainControlPcb : MainControlPcb;
 
-    connect batteryPower to mainControlPcb.batteryPower;
-    connect logicPower to mainControlPcb.logicPower;
-    connect sensorBus to mainControlPcb.sensorBus;
-    connect lidarSerial to mainControlPcb.lidarSerial;
-    connect bmsBus to mainControlPcb.bmsBus;
-    connect mainControlPcb.leftPhases to leftPhases;
-    connect mainControlPcb.rightPhases to rightPhases;
-    connect mainControlPcb.brushCommand to brushCommand;
-    connect mainControlPcb.vacuumCommand to vacuumCommand;
-    connect mainControlPcb.hazard to hazard;
+    part lidar : RobotLidar;
+    part frontTof : RobotTofSensor;
+    part leftTof : RobotTofSensor;
+    part rightTof : RobotTofSensor;
+    part frontBumper : BumperSwitch {
+      attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
+    }
+    part i2c : SensorI2cBus;
+    part uart : LidarUartBus;
+
+    connect sensorBus to i2c.host;
+    connect frontTof.bus to i2c.frontTof;
+    connect leftTof.bus to i2c.leftTof;
+    connect rightTof.bus to i2c.rightTof;
+    connect lidarSerial to uart.host;
+    connect lidar.serial to uart.lidar;
+    connect lidar.power to power;
+    connect frontBumper.hazard to hazard;
   }
 
-  part def DockInterfaceModule :> ElectronicsComponent {
-    doc /* Atomic module; no internal part decomposition modeled here. */
-    attribute :>> powerDraw = 2 [W];
-    attribute :>> mass = 0.38 [kg];
-    port chargePower : PowerRailPort;
-    port beacon : GpioPort;
+  part def DustBinLid :> MechanicalComponent {
+    attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+  }
+
+  part def DustFilter :> MechanicalComponent {
+    attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
+  }
+
+  part def DustBin :> MechanicalComponent {
+    doc /*
+      Tool-free-removable module, independent of Base/Top — matches it being a
+      separately replaceable real-world spare part. Purely mechanical: no ports,
+      no electronics.
+    */
+    attribute :>> mass = sum(lid.mass, filter.mass, binMass);
+    attribute binMass : MassValue = 0.15 [kg]; /* illustrative estimate residual */
+    attribute capacity : VolumeValue = 400000 [mm^3]; /* illustrative estimate, ~0.4 L */
+
+    part lid : DustBinLid;
+    part filter : DustFilter;
   }
 
   part def HumanMachineInterface :> ElectronicsComponent {
@@ -347,12 +450,10 @@ package PhysicalArchitecture {
     attribute :>> cleaningStatusReported = true;
     attribute :>> mapDataLocalUnlessConsented = true;
 
-    part driveModule : DriveModule;
-    part cleaningHead : CleaningHeadModule;
-    part sensorAssembly : SensorAssembly;
-    part mainElectronics : MainElectronicsAssembly;
-    part powerModule : PowerModule;
-    part dockInterface : DockInterfaceModule;
+    part base : BaseModule;
+    part mainPcb : MainPcbModule;
+    part top : TopModule;
+    part dustBin : DustBin;
     part hmi : HumanMachineInterface;
     part firmwareTasks : FirmwareTaskArchitecture;
 
@@ -360,56 +461,54 @@ package PhysicalArchitecture {
     port dockPower : PowerRailPort;
     port dockBeacon : GpioPort;
 
-    connect powerModule.batteryRail to mainElectronics.batteryPower;
-    connect powerModule.batteryRail to cleaningHead.power;
-    connect powerModule.logicRail to mainElectronics.logicPower;
-    connect powerModule.sensorRail to sensorAssembly.power;
-    connect mainElectronics.leftPhases to driveModule.leftPhases;
-    connect mainElectronics.rightPhases to driveModule.rightPhases;
-    connect mainElectronics.brushCommand to cleaningHead.brushCommand;
-    connect mainElectronics.vacuumCommand to cleaningHead.vacuumCommand;
-    connect sensorAssembly.sensorBus to mainElectronics.sensorBus;
-    connect sensorAssembly.lidarSerial to mainElectronics.lidarSerial;
-    connect powerModule.bmsBus to mainElectronics.bmsBus;
-    connect sensorAssembly.cliffHazard to mainElectronics.hazard;
-    connect powerModule.hazard to mainElectronics.hazard;
-    connect mainElectronics.hazard to cleaningHead.fault;
+    connect mainPcb.batteryPower to base.batteryRail;
+    connect mainPcb.logicPower to base.logicRail;
+    connect top.power to base.sensorRail;
+    connect mainPcb.leftPhases to base.leftPhases;
+    connect mainPcb.rightPhases to base.rightPhases;
+    connect mainPcb.brushCommand to base.brushCommand;
+    connect mainPcb.vacuumCommand to base.vacuumCommand;
+    connect mainPcb.sensorBus to top.sensorBus;
+    connect mainPcb.lidarSerial to top.lidarSerial;
+    connect mainPcb.bmsBus to base.bmsBus;
+    connect base.hazard to mainPcb.hazard;
+    connect top.hazard to mainPcb.hazard;
     connect hmi.app to app;
-    connect dockPower to dockInterface.chargePower;
-    connect dockBeacon to dockInterface.beacon;
+    connect dockPower to base.chargePower;
+    connect dockBeacon to base.beacon;
 
     allocate firmwareTasks.missionController
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
     allocate firmwareTasks.safetySupervisor
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
     allocate firmwareTasks.actuatorControl
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
     allocate firmwareTasks.sensorAcquisition
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
     allocate firmwareTasks.navigation
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
     allocate firmwareTasks.powerManager
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
     allocate firmwareTasks.appService
-      to mainElectronics.mainControlPcb.mcu;
+      to mainPcb.mcu;
 
     allocation sensorBusAccess : TaskToPeripheralAccess
       allocate firmwareTasks.sensorAcquisition
-      to mainElectronics.mainControlPcb.mcu.sensorI2c;
+      to mainPcb.mcu.sensorI2c;
     allocation lidarAccess : TaskToPeripheralAccess
       allocate firmwareTasks.sensorAcquisition
-      to mainElectronics.mainControlPcb.mcu.lidarUart;
+      to mainPcb.mcu.lidarUart;
     allocation actuatorPwmAccess : TaskToPeripheralAccess
       allocate firmwareTasks.actuatorControl
-      to mainElectronics.mainControlPcb.mcu.leftMotorPwm;
+      to mainPcb.mcu.leftMotorPwm;
     allocation safetyGpioAccess : TaskToPeripheralAccess
       allocate firmwareTasks.safetySupervisor
-      to mainElectronics.mainControlPcb.mcu.safetyGpio;
+      to mainPcb.mcu.safetyGpio;
     allocation powerBusAccess : TaskToPeripheralAccess
       allocate firmwareTasks.powerManager
-      to mainElectronics.mainControlPcb.mcu.bmsSmbus;
+      to mainPcb.mcu.bmsSmbus;
     allocation appWirelessAccess : TaskToPeripheralAccess
       allocate firmwareTasks.appService
-      to mainElectronics.mainControlPcb.wirelessUart;
+      to mainPcb.wirelessUart;
   }
 }

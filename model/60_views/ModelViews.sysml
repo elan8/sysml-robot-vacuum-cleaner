@@ -69,24 +69,20 @@ package ModelViews {
     satisfy productStructurePerspective;
     expose Architecture::robotSystem;
     expose Architecture::robotSystem.physical;
-    expose Architecture::robotSystem.physical.driveModule;
-    expose Architecture::robotSystem.physical.cleaningHead;
-    expose Architecture::robotSystem.physical.sensorAssembly;
-    expose Architecture::robotSystem.physical.mainElectronics;
-    expose Architecture::robotSystem.physical.powerModule;
-    expose Architecture::robotSystem.physical.dockInterface;
+    expose Architecture::robotSystem.physical.base;
+    expose Architecture::robotSystem.physical.mainPcb;
+    expose Architecture::robotSystem.physical.top;
+    expose Architecture::robotSystem.physical.dustBin;
     expose Architecture::robotSystem.physical.hmi;
     expose Architecture::robotSystem.physical.firmwareTasks;
   }
 
   view interconnections : InterconnectionView {
     satisfy productConnectionsPerspective;
-    expose Architecture::robotSystem.physical.driveModule;
-    expose Architecture::robotSystem.physical.cleaningHead;
-    expose Architecture::robotSystem.physical.sensorAssembly;
-    expose Architecture::robotSystem.physical.mainElectronics;
-    expose Architecture::robotSystem.physical.powerModule;
-    expose Architecture::robotSystem.physical.dockInterface;
+    expose Architecture::robotSystem.physical.base;
+    expose Architecture::robotSystem.physical.mainPcb;
+    expose Architecture::robotSystem.physical.top;
+    expose Architecture::robotSystem.physical.dustBin;
     expose Architecture::robotSystem.physical.hmi;
   }
 
@@ -105,7 +101,7 @@ package ModelViews {
     expose Architecture::robotSystem.physical.firmwareTasks.plannerCommandQueue;
     expose Architecture::robotSystem.physical.firmwareTasks.safetyCommandQueue;
     expose Architecture::robotSystem.physical.firmwareTasks.mapUpdateQueue;
-    expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.mcu;
+    expose Architecture::robotSystem.physical.mainPcb.mcu;
   }
 
   view requirementsTraceability : GeneralView {
@@ -145,12 +141,12 @@ package ModelViews {
     expose PhysicalArchitecture::RobotBms;
     expose PhysicalArchitecture::RobotBms::selectedImplementation;
     expose PurchasedParts::BQ40Z50R2;
-    expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.mcu;
-    expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.leftMotorDriver;
-    expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.rightMotorDriver;
-    expose Architecture::robotSystem.physical.mainElectronics.mainControlPcb.wireless;
-    expose Architecture::robotSystem.physical.sensorAssembly.frontTof;
-    expose Architecture::robotSystem.physical.sensorAssembly.lidar;
-    expose Architecture::robotSystem.physical.powerModule.bms;
+    expose Architecture::robotSystem.physical.mainPcb.mcu;
+    expose Architecture::robotSystem.physical.mainPcb.leftMotorDriver;
+    expose Architecture::robotSystem.physical.mainPcb.rightMotorDriver;
+    expose Architecture::robotSystem.physical.mainPcb.wireless;
+    expose Architecture::robotSystem.physical.top.frontTof;
+    expose Architecture::robotSystem.physical.top.lidar;
+    expose Architecture::robotSystem.physical.base.powerModule.bms;
   }
 }

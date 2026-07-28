@@ -275,11 +275,11 @@ package OperationalScenarios {
   }
 
   allocate cliffSafeStopGoldenThread.detectCliff
-    to robotSystem.physical.sensorAssembly;
+    to robotSystem.physical.base;
   allocate cliffSafeStopGoldenThread.superviseHazard
     to robotSystem.physical.firmwareTasks.safetySupervisor;
   allocate cliffSafeStopGoldenThread.applySafeStop
-    to robotSystem.physical.driveModule;
+    to robotSystem.physical.base;
   allocate cliffSafeStopGoldenThread.reportSafeStop
     to robotSystem.physical.firmwareTasks.appService;
 
