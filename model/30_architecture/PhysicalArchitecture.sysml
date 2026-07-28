@@ -11,6 +11,7 @@ package PhysicalArchitecture {
   private import ElectronicActuationDomain::*;
   private import SensingDomain::*;
   private import ElectricalPowerDomain::*;
+  private import BoardIntegrationDomain::*;
   private import EmbeddedComputeDomain::*;
   private import FirmwareArchitecture::*;
   private import PurchasedParts::*;
@@ -22,17 +23,12 @@ package PhysicalArchitecture {
   private import SI::*;
   private import ScalarValues::*;
 
-  part def PhysicalAssembly {
-    attribute powerDraw : PowerValue;
-    attribute mass : MassValue;
-  }
-
   part def DriveMotor :> BldcMotor {
     attribute :>> ratedPower = 14 [W];
     attribute :>> mass = 0.5 [kg]; /* illustrative estimate */
   }
 
-  part def DriveModule :> PhysicalAssembly {
+  part def DriveModule :> ElectronicsComponent {
     attribute :>> powerDraw = sum(leftMotor.ratedPower, rightMotor.ratedPower);
     attribute :>> mass =
       sum(leftMotor.mass, rightMotor.mass, leftEncoder.mass, rightEncoder.mass);
@@ -55,7 +51,7 @@ package PhysicalArchitecture {
     connect rightEncoder.odometry to rightOdometry;
   }
 
-  part def CleaningHeadModule :> PhysicalAssembly {
+  part def CleaningHeadModule :> ElectronicsComponent {
     doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 18 [W];
     attribute :>> mass = 0.9 [kg];
@@ -92,7 +88,7 @@ package PhysicalArchitecture {
     port hazard : GpioPort;
   }
 
-  part def SensorAssembly :> PhysicalAssembly {
+  part def SensorAssembly :> ElectronicsComponent {
     attribute :>> powerDraw = sum(
       frontTof.powerDraw, leftTof.powerDraw, rightTof.powerDraw,
       imu.powerDraw, lidar.powerDraw,
@@ -148,7 +144,7 @@ package PhysicalArchitecture {
       from RobotBms to BQ40Z50R2;
   }
 
-  part def PowerModule :> PhysicalAssembly {
+  part def PowerModule :> ElectronicsComponent {
     attribute :>> powerDraw =
       sum(bms.quiescentPower, logicRegulator.quiescentPower, sensorRegulator.quiescentPower);
     attribute :>> mass =
@@ -158,6 +154,22 @@ package PhysicalArchitecture {
     port sensorRail : PowerRailPort;
     port bmsBus : I2cPort;
     port hazard : GpioPort;
+
+    attribute batteryRailBudget : PowerRailBudget {
+      attribute :>> nominalVoltage = 14.4 [V];
+      attribute :>> continuousCurrentBudget = 5 [A];
+      attribute :>> peakCurrentBudget = 8 [A];
+    }
+    attribute logicRailBudget : PowerRailBudget {
+      attribute :>> nominalVoltage = 3.3 [V];
+      attribute :>> continuousCurrentBudget = 1 [A];
+      attribute :>> peakCurrentBudget = 1.5 [A];
+    }
+    attribute sensorRailBudget : PowerRailBudget {
+      attribute :>> nominalVoltage = 5 [V];
+      attribute :>> continuousCurrentBudget = 0.8 [A];
+      attribute :>> peakCurrentBudget = 1.2 [A];
+    }
     part battery : BatteryPack {
       attribute :>> nominalCapacity = 12500 [mAh];
       attribute :>> nominalVoltage = 14.4 [V];
@@ -217,7 +229,7 @@ package PhysicalArchitecture {
       from RobotWirelessModule to ESP32C3MINI1;
   }
 
-  part def MainControlPcb :> PhysicalAssembly {
+  part def MainControlPcb :> BoardAssembly {
     attribute :>> powerDraw =
       sum(mcu.powerDraw, leftMotorDriver.powerDraw, rightMotorDriver.powerDraw, wireless.powerDraw);
     attribute :>> mass =
@@ -261,7 +273,7 @@ package PhysicalArchitecture {
     connect mcu.safetyGpio to hazard;
   }
 
-  part def MainElectronicsAssembly :> PhysicalAssembly {
+  part def MainElectronicsAssembly :> ElectronicsComponent {
     attribute :>> mass = sum(mainControlPcb.mass, enclosureMass);
     attribute enclosureMass : MassValue = 0.10 [kg];
     attribute :>> powerDraw = sum(mainControlPcb.powerDraw, auxiliaryPower);
@@ -294,7 +306,7 @@ package PhysicalArchitecture {
     connect mainControlPcb.hazard to hazard;
   }
 
-  part def DockInterfaceModule :> PhysicalAssembly {
+  part def DockInterfaceModule :> ElectronicsComponent {
     doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 2 [W];
     attribute :>> mass = 0.38 [kg];
@@ -302,14 +314,14 @@ package PhysicalArchitecture {
     port beacon : GpioPort;
   }
 
-  part def HumanMachineInterface :> PhysicalAssembly {
+  part def HumanMachineInterface :> ElectronicsComponent {
     doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 1 [W];
     attribute :>> mass = 0.08 [kg];
     port app : ~AppServicePort;
   }
 
-  part def PowerRailBudget {
+  attribute def PowerRailBudget {
     attribute nominalVoltage : ElectricPotentialValue;
     attribute continuousCurrentBudget : ElectricCurrentValue;
     attribute peakCurrentBudget : ElectricCurrentValue;
@@ -348,30 +360,8 @@ package PhysicalArchitecture {
     port dockPower : PowerRailPort;
     port dockBeacon : GpioPort;
 
-    part batteryRailBudget : PowerRailBudget {
-      attribute :>> nominalVoltage = 14.4 [V];
-      attribute :>> continuousCurrentBudget = 5 [A];
-      attribute :>> peakCurrentBudget = 8 [A];
-      ref source = powerModule.battery.output;
-      ref computeLoad = mainElectronics.batteryPower;
-      ref cleaningLoad = cleaningHead.power;
-    }
-    part logicRailBudget : PowerRailBudget {
-      attribute :>> nominalVoltage = 3.3 [V];
-      attribute :>> continuousCurrentBudget = 1 [A];
-      attribute :>> peakCurrentBudget = 1.5 [A];
-      ref source = powerModule.logicRegulator.output;
-      ref computeLoad = mainElectronics.logicPower;
-    }
-    part sensorRailBudget : PowerRailBudget {
-      attribute :>> nominalVoltage = 5 [V];
-      attribute :>> continuousCurrentBudget = 0.8 [A];
-      attribute :>> peakCurrentBudget = 1.2 [A];
-      ref source = powerModule.sensorRegulator.output;
-      ref sensorLoad = sensorAssembly.power;
-    }
-
     connect powerModule.batteryRail to mainElectronics.batteryPower;
+    connect powerModule.batteryRail to cleaningHead.power;
     connect powerModule.logicRail to mainElectronics.logicPower;
     connect powerModule.sensorRail to sensorAssembly.power;
     connect mainElectronics.leftPhases to driveModule.leftPhases;

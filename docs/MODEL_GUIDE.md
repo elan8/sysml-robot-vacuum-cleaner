@@ -60,7 +60,8 @@ flowchart LR
 | `ElectronicActuationDomain` (domain libraries) | `Motor`/`BldcMotor`, `Encoder`/`QuadratureEncoder`, `MotorDriver` |
 | `SensingDomain` (domain libraries) | `InertialMeasurementUnit` |
 | `ElectricalPowerDomain` (domain libraries) | `BatteryPack`, `BatteryManagementSystem`, `VoltageRegulator` (ports + `outputVoltage` + `quiescentPower`) |
-| `PhysicalArchitecture` | Selected physical baseline; vacuum-specific motor/sensor/regulator specializations (`DriveMotor`, `RobotTofSensor`, `RobotBms`, ...); `mass`/`powerDraw` on composite assemblies are `sum()`-derived from real children (via `mass`/`powerDraw` on `ElectronicsComponent`), not hand-typed totals |
+| `BoardIntegrationDomain` (domain libraries) | `BoardAssembly` (`boardName`/`layerCount`) |
+| `PhysicalArchitecture` | Selected physical baseline; vacuum-specific motor/sensor/regulator specializations (`DriveMotor`, `RobotTofSensor`, `RobotBms`, ...) specialize `ElectronicsComponent` directly (`MainControlPcb` specializes `BoardAssembly`) — there is no local "physical module" base type; `mass`/`powerDraw` on composite assemblies are `sum()`-derived from real children, not hand-typed totals; `PowerRailBudget` is an `attribute def` (voltage/current numbers only, no ports/behavior), declared as a sibling `attribute` next to each rail port it characterizes |
 | `Architecture` | Concrete system, allocations, satisfaction |
 | `AnalysisCases` | Three analyses |
 | `Verification` | Nine verification cases |
