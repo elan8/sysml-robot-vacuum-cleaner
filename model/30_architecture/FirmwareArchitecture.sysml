@@ -7,40 +7,16 @@
 package FirmwareArchitecture {
   private import DomainModel::*;
   private import SoftwareCore::*;
+  private import RealtimeRuntime::*;
   private import EngineeringUnits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
 
-  enum def TaskCriticality {
-    nonCritical;
-    missionCritical;
-    safetyCritical;
-  }
   enum def StartupPhase { platform; safety; mission; services; }
-  enum def QueueDiscipline {
-    fifoDropNewest;
-    fifoDropOldest;
-    overwriteLatest;
-  }
-  enum def SchedulingPolicy { fixedPriorityCooperative; }
 
-  part def FirmwareTask :> SoftwareComponent {
-    attribute period : DurationValue;
-    attribute deadline : DurationValue;
-    attribute worstCaseExecutionTime : DurationValue;
-    attribute stackBudgetBytes : Integer;
-    attribute heapBudgetBytes : Integer;
-    attribute priority : Integer;
-    attribute criticality : TaskCriticality;
+  part def FirmwareTask :> RealtimeTask {
     attribute startupPhase : StartupPhase;
-  }
-
-  part def SoftwareQueue {
-    attribute depth : Integer;
-    attribute discipline : QueueDiscipline;
-    attribute maxAge : DurationValue;
-    assert constraint { depth > 0 }
   }
 
   part def HazardEventQueue :> SoftwareQueue {
@@ -66,15 +42,6 @@ package FirmwareArchitecture {
       in item enqueue : MapUpdate;
       out item dequeue : MapUpdate;
     }
-  }
-
-  part def SchedulerModel {
-    attribute tickPeriod : DurationValue;
-    attribute schedulingPolicy : SchedulingPolicy;
-    doc /*
-      Safety and actuator loops execute before mission and app work. Overload
-      sheds noncritical app/status work before safety or control work.
-    */
   }
 
   part def MissionControllerTask :> FirmwareTask {
@@ -201,6 +168,10 @@ package FirmwareArchitecture {
 
   part def FirmwareTaskArchitecture {
     part scheduler : SchedulerModel {
+      doc /*
+        Safety and actuator loops execute before mission and app work. Overload
+        sheds noncritical app/status work before safety or control work.
+      */
       attribute :>> tickPeriod = 1 [ms];
       attribute :>> schedulingPolicy =
         SchedulingPolicy::fixedPriorityCooperative;

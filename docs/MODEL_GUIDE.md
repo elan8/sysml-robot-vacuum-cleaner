@@ -49,13 +49,18 @@ flowchart LR
 | --- | --- |
 | `Project` | Tailoring and method profile |
 | `EngineeringUnits` (domain libraries) | Shared Ah/mAh/ms unit literals |
-| `PurchasedParts` | `BuyPart` metadata and catalog definitions |
+| `PartProcurement` (domain libraries) | `BuyPart` metadata and `PartLifecycleStatus` |
+| `PurchasedParts` | Concrete catalog part selections (specializes `PartProcurement`-annotated definitions) |
 | `DomainModel` | Protocol vocabulary, items, ports, buses |
 | `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
 | `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
 | `ProductContext` | Users, app, network, dock, home, robot boundary |
-| `FirmwareArchitecture` | Runtime tasks and queues |
-| `PhysicalArchitecture` | Selected physical baseline |
+| `RealtimeRuntime` (domain libraries) | `RealtimeTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
+| `FirmwareArchitecture` | Vacuum-specific tasks, queues, and `StartupPhase` (specializes `RealtimeRuntime`) |
+| `ElectronicActuationDomain` (domain libraries) | `Motor`/`BldcMotor`, `Encoder`/`QuadratureEncoder`, `MotorDriver` |
+| `SensingDomain` (domain libraries) | `InertialMeasurementUnit` |
+| `ElectricalPowerDomain` (domain libraries) | `BatteryPack`, `BatteryManagementSystem`, `VoltageRegulator` (ports + `outputVoltage` + `quiescentPower`) |
+| `PhysicalArchitecture` | Selected physical baseline; vacuum-specific motor/sensor/regulator specializations (`DriveMotor`, `RobotTofSensor`, `RobotBms`, ...); `mass`/`powerDraw` on composite assemblies are `sum()`-derived from real children (via `mass`/`powerDraw` on `ElectronicsComponent`), not hand-typed totals |
 | `Architecture` | Concrete system, allocations, satisfaction |
 | `AnalysisCases` | Three analyses |
 | `Verification` | Nine verification cases |

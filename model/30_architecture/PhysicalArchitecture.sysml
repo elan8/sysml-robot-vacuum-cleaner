@@ -8,6 +8,9 @@ package PhysicalArchitecture {
   private import BehaviorStates::*;
   private import DomainModel::*;
   private import ElectronicsCore::*;
+  private import ElectronicActuationDomain::*;
+  private import SensingDomain::*;
+  private import ElectricalPowerDomain::*;
   private import EmbeddedComputeDomain::*;
   private import FirmwareArchitecture::*;
   private import PurchasedParts::*;
@@ -24,18 +27,15 @@ package PhysicalArchitecture {
     attribute mass : MassValue;
   }
 
-  part def DriveMotor {
-    attribute ratedPower : PowerValue = 14 [W];
-    port phases : ~ThreePhaseMotorPort;
-  }
-
-  part def WheelEncoder {
-    port odometry : QuadratureEncoderPort;
+  part def DriveMotor :> BldcMotor {
+    attribute :>> ratedPower = 14 [W];
+    attribute :>> mass = 0.5 [kg]; /* illustrative estimate */
   }
 
   part def DriveModule :> PhysicalAssembly {
-    attribute :>> powerDraw = 28 [W];
-    attribute :>> mass = 1.2 [kg];
+    attribute :>> powerDraw = sum(leftMotor.ratedPower, rightMotor.ratedPower);
+    attribute :>> mass =
+      sum(leftMotor.mass, rightMotor.mass, leftEncoder.mass, rightEncoder.mass);
     port leftPhases : ThreePhaseMotorPort;
     port rightPhases : ThreePhaseMotorPort;
     port leftOdometry : QuadratureEncoderPort;
@@ -43,8 +43,12 @@ package PhysicalArchitecture {
     port bumperHazard : GpioPort;
     part leftMotor : DriveMotor;
     part rightMotor : DriveMotor;
-    part leftEncoder : WheelEncoder;
-    part rightEncoder : WheelEncoder;
+    part leftEncoder : QuadratureEncoder {
+      attribute :>> mass = 0.1 [kg]; /* illustrative estimate */
+    }
+    part rightEncoder : QuadratureEncoder {
+      attribute :>> mass = 0.1 [kg]; /* illustrative estimate */
+    }
     connect leftMotor.phases to leftPhases;
     connect rightMotor.phases to rightPhases;
     connect leftEncoder.odometry to leftOdometry;
@@ -52,6 +56,7 @@ package PhysicalArchitecture {
   }
 
   part def CleaningHeadModule :> PhysicalAssembly {
+    doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 18 [W];
     attribute :>> mass = 0.9 [kg];
     port power : PowerRailPort;
@@ -62,6 +67,8 @@ package PhysicalArchitecture {
 
   part def RobotTofSensor :> ElectronicsComponent {
     attribute range : LengthValue = 1200 [mm];
+    attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+    attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
     port bus : I2cPort;
     dependency selectedImplementation
       from RobotTofSensor to VL53L1CX;
@@ -70,24 +77,34 @@ package PhysicalArchitecture {
   part def RobotLidar :> ElectronicsComponent {
     attribute scanRate : FrequencyValue = 10 [Hz];
     attribute range : LengthValue = 6000 [mm];
+    attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
+    attribute :>> powerDraw = 3.5 [W]; /* illustrative estimate */
     port serial : UartPort;
     port power : PowerRailPort;
     dependency selectedImplementation
       from RobotLidar to RPLIDARC1;
   }
 
-  part def InertialMeasurementUnit {
-    port bus : I2cPort;
-  }
-
-  part def CliffSensor {
+  part def CliffSensor :> ElectronicsComponent {
     attribute triggerHeight : LengthValue = 50 [mm];
+    attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
+    attribute :>> powerDraw = 0.25 [W]; /* illustrative estimate */
     port hazard : GpioPort;
   }
 
   part def SensorAssembly :> PhysicalAssembly {
-    attribute :>> powerDraw = 5 [W];
-    attribute :>> mass = 0.35 [kg];
+    attribute :>> powerDraw = sum(
+      frontTof.powerDraw, leftTof.powerDraw, rightTof.powerDraw,
+      imu.powerDraw, lidar.powerDraw,
+      frontLeftCliff.powerDraw, frontRightCliff.powerDraw,
+      rearLeftCliff.powerDraw, rearRightCliff.powerDraw
+    );
+    attribute :>> mass = sum(
+      frontTof.mass, leftTof.mass, rightTof.mass,
+      imu.mass, lidar.mass,
+      frontLeftCliff.mass, frontRightCliff.mass,
+      rearLeftCliff.mass, rearRightCliff.mass
+    );
     port power : PowerRailPort;
     port sensorBus : I2cPort;
     port lidarSerial : UartPort;
@@ -96,7 +113,10 @@ package PhysicalArchitecture {
     part frontTof : RobotTofSensor;
     part leftTof : RobotTofSensor;
     part rightTof : RobotTofSensor;
-    part imu : InertialMeasurementUnit;
+    part imu : InertialMeasurementUnit {
+      attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+      attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate */
+    }
     part lidar : RobotLidar;
     part frontLeftCliff : CliffSensor;
     part frontRightCliff : CliffSensor;
@@ -119,42 +139,40 @@ package PhysicalArchitecture {
     connect rearRightCliff.hazard to cliffHazard;
   }
 
-  part def BatteryPack {
-    attribute nominalCapacity : ElectricChargeValue = 12500 [mAh];
-    attribute nominalVoltage : ElectricPotentialValue = 14.4 [V];
-    port output : PowerRailPort;
-  }
-
-  part def RobotBms :> ElectronicsComponent {
-    attribute maxChargeCurrent : ElectricCurrentValue = 2 [A];
-    attribute maxCellTemperature : ThermodynamicTemperatureValue = 328.15 [K];
-    port bus : I2cPort;
-    port alert : GpioPort;
+  part def RobotBms :> BatteryManagementSystem {
+    attribute :>> maxChargeCurrent = 2 [A];
+    attribute :>> maxCellTemperature = 328.15 [K];
+    attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+    attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
     dependency selectedImplementation
       from RobotBms to BQ40Z50R2;
   }
 
-  part def PowerRegulator {
-    attribute outputVoltage : ElectricPotentialValue;
-    port input : PowerRailPort;
-    port output : PowerRailPort;
-  }
-
   part def PowerModule :> PhysicalAssembly {
-    attribute :>> powerDraw = 3 [W];
-    attribute :>> mass = 0.72 [kg];
+    attribute :>> powerDraw =
+      sum(bms.quiescentPower, logicRegulator.quiescentPower, sensorRegulator.quiescentPower);
+    attribute :>> mass =
+      sum(battery.mass, bms.mass, logicRegulator.mass, sensorRegulator.mass);
     port batteryRail : PowerRailPort;
     port logicRail : PowerRailPort;
     port sensorRail : PowerRailPort;
     port bmsBus : I2cPort;
     port hazard : GpioPort;
-    part battery : BatteryPack;
-    part bms : RobotBms;
-    part logicRegulator : PowerRegulator {
-      attribute :>> outputVoltage = 3.3 [V];
+    part battery : BatteryPack {
+      attribute :>> nominalCapacity = 12500 [mAh];
+      attribute :>> nominalVoltage = 14.4 [V];
+      attribute :>> mass = 0.65 [kg]; /* illustrative estimate */
     }
-    part sensorRegulator : PowerRegulator {
+    part bms : RobotBms;
+    part logicRegulator : VoltageRegulator {
+      attribute :>> outputVoltage = 3.3 [V];
+      attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
+      attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
+    }
+    part sensorRegulator : VoltageRegulator {
       attribute :>> outputVoltage = 5 [V];
+      attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
+      attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
     }
     part smbus : BmsSmbusBus;
 
@@ -169,6 +187,8 @@ package PhysicalArchitecture {
   }
 
   part def RobotMainMcu :> Microcontroller {
+    attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
+    attribute :>> powerDraw = 3 [W]; /* illustrative estimate */
     port sensorI2c : I2cPort;
     port lidarUart : UartPort;
     port bmsSmbus : I2cPort;
@@ -182,24 +202,28 @@ package PhysicalArchitecture {
       from RobotMainMcu to STM32U575VGT6;
   }
 
-  part def RobotMotorDriver :> ElectronicsComponent {
-    port power : PowerRailPort;
-    port command : PwmPort;
-    port phases : ThreePhaseMotorPort;
-    port fault : GpioPort;
+  part def RobotMotorDriver :> MotorDriver {
+    attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
+    attribute :>> powerDraw = 1.5 [W]; /* illustrative estimate */
     dependency selectedImplementation
       from RobotMotorDriver to DRV8316R;
   }
 
   part def RobotWirelessModule :> WirelessModule {
+    attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
+    attribute :>> powerDraw = 1 [W]; /* illustrative estimate */
     port serial : UartPort;
     dependency selectedImplementation
       from RobotWirelessModule to ESP32C3MINI1;
   }
 
   part def MainControlPcb :> PhysicalAssembly {
-    attribute :>> powerDraw = 7 [W];
-    attribute :>> mass = 0.18 [kg];
+    attribute :>> powerDraw =
+      sum(mcu.powerDraw, leftMotorDriver.powerDraw, rightMotorDriver.powerDraw, wireless.powerDraw);
+    attribute :>> mass =
+      sum(mcu.mass, leftMotorDriver.mass, rightMotorDriver.mass, wireless.mass, boardMass);
+    attribute boardMass : MassValue = 0.155 [kg];
+    doc /* boardMass covers PCB substrate, connectors, and passives not individually modeled. */
     port batteryPower : PowerRailPort;
     port logicPower : PowerRailPort;
     port sensorBus : I2cPort;
@@ -238,8 +262,14 @@ package PhysicalArchitecture {
   }
 
   part def MainElectronicsAssembly :> PhysicalAssembly {
-    attribute :>> powerDraw = 9 [W];
-    attribute :>> mass = 0.28 [kg];
+    attribute :>> mass = sum(mainControlPcb.mass, enclosureMass);
+    attribute enclosureMass : MassValue = 0.10 [kg];
+    attribute :>> powerDraw = sum(mainControlPcb.powerDraw, auxiliaryPower);
+    attribute auxiliaryPower : PowerValue = 2 [W];
+    doc /*
+      enclosureMass/auxiliaryPower are named residuals for unmodeled housing and
+      wiring/connector overhead not attributable to mainControlPcb's own children.
+    */
     port batteryPower : PowerRailPort;
     port logicPower : PowerRailPort;
     port sensorBus : I2cPort;
@@ -265,6 +295,7 @@ package PhysicalArchitecture {
   }
 
   part def DockInterfaceModule :> PhysicalAssembly {
+    doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 2 [W];
     attribute :>> mass = 0.38 [kg];
     port chargePower : PowerRailPort;
@@ -272,6 +303,7 @@ package PhysicalArchitecture {
   }
 
   part def HumanMachineInterface :> PhysicalAssembly {
+    doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 1 [W];
     attribute :>> mass = 0.08 [kg];
     port app : ~AppServicePort;
