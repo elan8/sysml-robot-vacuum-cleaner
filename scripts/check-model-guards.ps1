@@ -103,6 +103,34 @@ foreach ($selection in $catalogSelections.GetEnumerator()) {
         Add-Failure "project part '$($selection.Key)' must own a 'selectedImplementation' dependency to '$($selection.Value)'"
     }
 }
+
+$requiredPhysicalConnections = @(
+    "connect dockPowerInput to dockInterface.dockPowerInput;",
+    "connect dockInterface.chargePowerOutput to powerModule.charger.supplyInput;",
+    "connect charger.chargeOutput to bms.chargeInput;",
+    "connect battery.terminal to bms.batteryTerminal;",
+    "connect bms.protectedOutput to batteryRail;",
+    "connect beaconInput to dockInterface.beaconReceiver.beacon;",
+    "connect beaconReceiver.detection to beaconDetected;",
+    "connect motor.mechanicalOutput to gearbox.rotationalInput;",
+    "connect gearbox.rotationalOutput to wheel.axle;",
+    "connect base.cleaningHead.debrisOut to dustBin.debrisIn;",
+    "connect hmi.control to hmiControl;"
+)
+foreach ($connection in $requiredPhysicalConnections) {
+    if ($physicalText -notmatch [regex]::Escape($connection)) {
+        Add-Failure "required physical connection is missing: $connection"
+    }
+}
+foreach ($part in @("baseHarness : BaseWiringHarness", "topHarness : TopWiringHarness")) {
+    if ($physicalText -notmatch [regex]::Escape($part)) {
+        Add-Failure "required robot harness is missing: $part"
+    }
+}
+if ($physicalText -match "(?m)^\s*port\s+hazard\s*:\s*GpioPort") {
+    Add-Failure "independent safety signals must not be collapsed onto one generic GPIO net"
+}
+
 if ([regex]::Matches($purchasedPartsText, "@BuyPart\s*\{").Count -ne 6) {
     Add-Failure "PurchasedParts must contain exactly six BuyPart annotations"
 }
@@ -141,4 +169,4 @@ if ($failures.Count -gt 0) {
     exit 1
 }
 
-Write-Host "Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean."
+Write-Host "Model guards passed: physical paths, purchased parts, runtime queues, and traceability are clean."

@@ -112,6 +112,8 @@ package DomainModel {
     attribute debrisKind : String;
   }
 
+  item def CleaningAirflow;
+
   item def BatteryTelemetry {
     attribute stateOfChargePercent : Real;
     attribute packVoltageV : Real;
@@ -176,6 +178,16 @@ package DomainModel {
     out item obstacle : Obstacle;
     out item dropOff : DropOff;
     out item debris : Debris;
+  }
+
+  port def CleaningFlowPort {
+    out item airflow : CleaningAirflow;
+    out item debris : Debris;
+  }
+
+  port def LocalHmiControllerPort {
+    in item userInput : UserIntent;
+    out item feedback : UserFeedback;
   }
 
   part def SensorI2cBus :> I2cBus {

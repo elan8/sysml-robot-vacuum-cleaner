@@ -25,6 +25,8 @@ requirements, behavior, architecture and verification elements.
 - Definition/usage separation and one concrete `robotSystem` usage.
 - Typed items, ports, connections, flows and allocations instead of internal
   identity encoded as strings.
+- Explicit dock charging, protected battery distribution, homing-beacon reception,
+  module wiring harnesses, and mechanical mounting relationships.
 - Requirements satisfied by concrete behavior usages and verified by nine
   verification cases plus three quantitative analyses.
 - A reusable `PurchasedParts` library; named dependencies select catalog

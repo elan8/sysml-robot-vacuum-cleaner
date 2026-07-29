@@ -71,9 +71,11 @@ package ModelViews {
     expose Architecture::robotSystem.physical;
     expose Architecture::robotSystem.physical.base;
     expose Architecture::robotSystem.physical.mainPcb;
+    expose Architecture::robotSystem.physical.baseHarness;
+    expose Architecture::robotSystem.physical.topHarness;
     expose Architecture::robotSystem.physical.top;
     expose Architecture::robotSystem.physical.dustBin;
-    expose Architecture::robotSystem.physical.hmi;
+    expose Architecture::robotSystem.physical.top.hmi;
     expose Architecture::robotSystem.physical.firmwareTasks;
   }
 
@@ -81,9 +83,15 @@ package ModelViews {
     satisfy productConnectionsPerspective;
     expose Architecture::robotSystem.physical.base;
     expose Architecture::robotSystem.physical.mainPcb;
+    expose Architecture::robotSystem.physical.baseHarness;
+    expose Architecture::robotSystem.physical.topHarness;
     expose Architecture::robotSystem.physical.top;
     expose Architecture::robotSystem.physical.dustBin;
-    expose Architecture::robotSystem.physical.hmi;
+    expose Architecture::robotSystem.physical.top.hmi;
+    expose Architecture::robotSystem.physical.base.powerModule.battery;
+    expose Architecture::robotSystem.physical.base.powerModule.charger;
+    expose Architecture::robotSystem.physical.base.powerModule.bms;
+    expose Architecture::robotSystem.physical.base.dockInterface.beaconReceiver;
   }
 
   view firmwareRuntime : GeneralView {

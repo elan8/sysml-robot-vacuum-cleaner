@@ -9,6 +9,7 @@ package ProductContext {
   private import SystemRequirements::*;
   private import ScalarValues::*;
   private import Elan8::Method::Core::*;
+  private import Elan8::Electronics::Sensing::*;
 
   part def User {
     port app : ~UserInteractionPort;
@@ -22,7 +23,7 @@ package ProductContext {
 
   part def DockingStation {
     port chargePowerOut : PowerRailPort;
-    port homingBeaconOut : GpioPort;
+    part homingBeacon : HomingBeaconTransmitter;
   }
 
   part def ResidentialEnvironment {
@@ -31,8 +32,8 @@ package ProductContext {
 
   abstract part def CleaningRobot :> SystemRequirementSubject {
     port app : RobotServicePort;
-    port dockPower : PowerRailPort;
-    port dockBeacon : GpioPort;
+    port dockPower : ~PowerRailPort;
+    port dockBeacon : ~HomingBeaconPort;
     port environment : ~EnvironmentStimulusPort;
   }
 
@@ -48,7 +49,7 @@ package ProductContext {
     connect user.app to app.user;
     connect app.robot to robot.app;
     connect dock.chargePowerOut to robot.dockPower;
-    connect dock.homingBeaconOut to robot.dockBeacon;
+    connect dock.homingBeacon.beacon to robot.dockBeacon;
     connect home.stimulus to robot.environment;
   }
 

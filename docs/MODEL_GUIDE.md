@@ -60,11 +60,11 @@ flowchart LR
 | `FirmwareArchitecture` | Vacuum-specific tasks, queues, and `StartupPhase` |
 | `Elan8::Electronics::Actuation` | BLDC and brushed-DC motors, H-bridge and three-phase drivers, and mechanical outputs |
 | `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, passive bumper/lift switches, and typed measurements |
-| `Elan8::Electronics::Power` | `BatteryPack`, `BatteryManagementSystem`, and `VoltageRegulator` |
+| `Elan8::Electronics::Power` | `BatteryPack`, `BatteryCharger`, protected `BatteryManagementSystem` power paths, and `VoltageRegulator` |
 | `Elan8::Electronics::{Board, Assembly}` | Bare `PrintedCircuitBoard` versus populated `PrintedCircuitBoardAssembly` |
 | `Elan8::Mechanical::Core` | `MechanicalComponent` (`mass` only, purely mechanical parts — no ports, no `powerDraw`) |
 | `Elan8::Mechanical::Drivetrain` | `Gearbox`, `Wheel`, `CasterWheel` |
-| `PhysicalArchitecture` | Assembly-oriented baseline. Drive motors use `ThreePhaseDrivePort`; cleaning motors use brushed-DC motors with H-bridge drivers; powered sensors expose power plus protocol-specific `data`, while passive switches expose only `signal`. `MainPcbModule` is the populated PCB assembly. |
+| `PhysicalArchitecture` | Assembly-oriented baseline with an end-to-end dock/charger/BMS/battery path, explicit base and top wiring harnesses, separate safety GPIOs, mechanically connected drivetrains, a powered beacon receiver, debris transfer to the removable bin, and the local HMI integrated into `TopModule`. `MainPcbModule` is the populated PCB assembly. |
 | `Architecture` | Concrete system, allocations, satisfaction |
 | `AnalysisCases` | Three analyses |
 | `Verification` | Nine verification cases |

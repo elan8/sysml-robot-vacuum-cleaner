@@ -30,7 +30,7 @@ package Architecture {
     allocate operate.missionControl to physical.firmwareTasks.missionController;
     allocate operate.safetySupervision
       to physical.firmwareTasks.safetySupervisor;
-    allocate operate.userInteraction to physical.hmi;
+    allocate operate.userInteraction to physical.top.hmi;
     allocate operate.userInteraction to physical.firmwareTasks.appService;
   }
 
