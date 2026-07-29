@@ -42,7 +42,7 @@ package ModelViews {
     stakeholder :>> verificationEngineer;
     stakeholder :>> systemsEngineer;
   }
-  concern safeStopThread {
+  concern safeStopScenario {
     doc /* How does a cliff observation lead to a verified safe stop? */
     subject;
     stakeholder :>> verificationEngineer;
@@ -62,7 +62,7 @@ package ModelViews {
   viewpoint productConnectionsPerspective { frame productConnections; }
   viewpoint runtimeStructurePerspective { frame runtimeStructure; }
   viewpoint requirementCoveragePerspective { frame requirementCoverage; }
-  viewpoint safeStopThreadPerspective { frame safeStopThread; }
+  viewpoint safeStopScenarioPerspective { frame safeStopScenario; }
   viewpoint selectedCatalogPartsPerspective { frame selectedCatalogParts; }
 
   view productDecomposition : GeneralView {
@@ -111,12 +111,12 @@ package ModelViews {
     expose Verification::*;
   }
 
-  view cliffSafeStopGoldenThread : ActionFlowView {
-    satisfy safeStopThreadPerspective;
-    expose OperationalScenarios::CliffSafeStopGoldenThread;
-    expose OperationalScenarios::cliffSafeStopGoldenThread;
-    expose SystemRequirements::detectCliffs;
-    expose SystemRequirements::superviseHazards;
+  view cliffSafeStopScenario : ActionFlowView {
+    satisfy safeStopScenarioPerspective;
+    expose OperationalScenarios::CliffSafeStopScenario;
+    expose OperationalScenarios::cliffSafeStop;
+    expose SystemRequirements::robotSystemSpecification.detectCliffs;
+    expose SystemRequirements::robotSystemSpecification.superviseHazards;
     expose AnalysisCases::SafetyReactionAnalysis;
     expose Verification::verifyCliffSafeStop;
   }

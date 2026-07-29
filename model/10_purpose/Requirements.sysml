@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * Stakeholder needs, measurable design limits, system requirements, and their
- * native derivation relationships.
+ * requirement hierarchy and refinement traceability.
  */
 package DesignLimits {
   private import Elan8::Units::Engineering::*;
@@ -73,6 +73,7 @@ package SystemRequirements {
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
+  private import ModelingMetadata::*;
 
   abstract part def SystemRequirementSubject {
     attribute cleanedAreaPerCharge : AreaValue;
@@ -90,8 +91,11 @@ package SystemRequirements {
     attribute mapDataLocalUnlessConsented : Boolean;
   }
 
-  requirement cleanAtLeastEighty {
+  requirement robotSystemSpecification {
     subject robot : SystemRequirementSubject;
+    @RequirementRole { role = system; }
+
+  requirement cleanAtLeastEighty {
     @RequirementRole { role = performance; }
     @RequirementIdentity { requirementId = "SYS-001"; }
     require constraint { robot.cleanedAreaPerCharge >= cleaningAreaTarget }
@@ -99,7 +103,6 @@ package SystemRequirements {
   }
 
   requirement coverFloor {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = performance; }
     @RequirementIdentity { requirementId = "SYS-002"; }
     require constraint {
@@ -109,7 +112,6 @@ package SystemRequirements {
   }
 
   requirement avoidObstacles {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = safety; }
     @RequirementIdentity { requirementId = "SYS-003"; }
     require constraint {
@@ -119,7 +121,6 @@ package SystemRequirements {
   }
 
   requirement detectCliffs {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = safety; }
     @RequirementIdentity { requirementId = "SYS-SAFE-010"; }
     @EngineeringConcern { concern = purpose; }
@@ -130,7 +131,6 @@ package SystemRequirements {
   }
 
   requirement superviseHazards {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = safety; }
     @RequirementIdentity { requirementId = "SYS-SAFE-011"; }
     @EngineeringConcern { concern = purpose; }
@@ -139,7 +139,6 @@ package SystemRequirements {
   }
 
   requirement localizeReliably {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = performance; }
     @RequirementIdentity { requirementId = "SYS-004"; }
     require constraint { robot.localizationError <= maxLocalizationError }
@@ -147,7 +146,6 @@ package SystemRequirements {
   }
 
   requirement updateCoverageMap {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = functional; }
     @RequirementIdentity { requirementId = "SYS-005"; }
     require constraint { robot.coverageMapMaintained == true }
@@ -155,7 +153,6 @@ package SystemRequirements {
   }
 
   requirement recoverFromStall {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = functional; }
     @RequirementIdentity { requirementId = "SYS-006"; }
     require constraint {
@@ -165,7 +162,6 @@ package SystemRequirements {
   }
 
   requirement returnToDock {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = functional; }
     @RequirementIdentity { requirementId = "SYS-007"; }
     require constraint {
@@ -176,7 +172,6 @@ package SystemRequirements {
   }
 
   requirement chargeSafely {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = safety; }
     @RequirementIdentity { requirementId = "SYS-008"; }
     require constraint {
@@ -187,7 +182,6 @@ package SystemRequirements {
   }
 
   requirement reportCleaningStatus {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = interface; }
     @RequirementIdentity { requirementId = "SYS-009"; }
     require constraint { robot.cleaningStatusReported == true }
@@ -195,55 +189,59 @@ package SystemRequirements {
   }
 
   requirement protectMapPrivacy {
-    subject robot : SystemRequirementSubject;
     @RequirementRole { role = security; }
     @RequirementIdentity { requirementId = "SYS-010"; }
     require constraint { robot.mapDataLocalUnlessConsented == true }
     doc /* Keep raw home-map data local unless the user explicitly consents. */
   }
+  }
 
-  #derivation connection cleanAreaFromNeed {
-    end #original ::> cleanLargeAreas;
-    end #derive ::> cleanAtLeastEighty;
+  dependency cleanAreaRefinement
+    from robotSystemSpecification::cleanAtLeastEighty to cleanLargeAreas {
+    @Refinement;
   }
-  #derivation connection coverageFromNeed {
-    end #original ::> cleanLargeAreas;
-    end #derive ::> coverFloor;
+  dependency coverageRefinement
+    from robotSystemSpecification::coverFloor to cleanLargeAreas {
+    @Refinement;
   }
-  #derivation connection obstacleFromSafety {
-    end #original ::> operateSafely;
-    end #derive ::> avoidObstacles;
+  dependency obstacleRefinement
+    from robotSystemSpecification::avoidObstacles to operateSafely {
+    @Refinement;
   }
-  #derivation connection cliffFromSafety {
-    end #original ::> operateSafely;
-    end #derive ::> detectCliffs;
+  dependency cliffRefinement
+    from robotSystemSpecification::detectCliffs to operateSafely {
+    @Refinement;
   }
-  #derivation connection supervisionFromSafety {
-    end #original ::> operateSafely;
-    end #derive ::> superviseHazards;
+  dependency supervisionRefinement
+    from robotSystemSpecification::superviseHazards to operateSafely {
+    @Refinement;
   }
-  #derivation connection localizationFromNavigation {
-    end #original ::> navigateReliably;
-    end #derive ::> localizeReliably;
+  dependency stallRecoveryRefinement
+    from robotSystemSpecification::recoverFromStall to operateSafely {
+    @Refinement;
   }
-  #derivation connection mappingFromNavigation {
-    end #original ::> navigateReliably;
-    end #derive ::> updateCoverageMap;
+  dependency localizationRefinement
+    from robotSystemSpecification::localizeReliably to navigateReliably {
+    @Refinement;
   }
-  #derivation connection dockingFromNeed {
-    end #original ::> reliableDocking;
-    end #derive ::> returnToDock;
+  dependency mappingRefinement
+    from robotSystemSpecification::updateCoverageMap to navigateReliably {
+    @Refinement;
   }
-  #derivation connection chargingFromNeed {
-    end #original ::> reliableDocking;
-    end #derive ::> chargeSafely;
+  dependency dockingRefinement
+    from robotSystemSpecification::returnToDock to reliableDocking {
+    @Refinement;
   }
-  #derivation connection statusFromNeed {
-    end #original ::> missionFeedback;
-    end #derive ::> reportCleaningStatus;
+  dependency chargingRefinement
+    from robotSystemSpecification::chargeSafely to reliableDocking {
+    @Refinement;
   }
-  #derivation connection privacyFromNeed {
-    end #original ::> respectPrivacy;
-    end #derive ::> protectMapPrivacy;
+  dependency statusRefinement
+    from robotSystemSpecification::reportCleaningStatus to missionFeedback {
+    @Refinement;
+  }
+  dependency privacyRefinement
+    from robotSystemSpecification::protectMapPrivacy to respectPrivacy {
+    @Refinement;
   }
 }

@@ -84,6 +84,34 @@ package DomainModel {
     attribute cloudBackupConsent : Boolean = false;
   }
 
+  item def UserIntent {
+    attribute commandKind : UserCommandKind;
+    attribute cloudBackupConsent : Boolean = false;
+  }
+
+  item def UserFeedback {
+    attribute operatingState : String;
+    attribute cleanedAreaPercent : Real;
+    attribute userAttentionRequired : Boolean = false;
+  }
+
+  item def FloorSurface {
+    attribute surfaceKind : String;
+  }
+
+  item def Obstacle {
+    attribute heightMm : Real;
+    attribute movable : Boolean = false;
+  }
+
+  item def DropOff {
+    attribute dropHeightMm : Real;
+  }
+
+  item def Debris {
+    attribute debrisKind : String;
+  }
+
   item def BatteryTelemetry {
     attribute stateOfChargePercent : Real;
     attribute packVoltageV : Real;
@@ -121,9 +149,9 @@ package DomainModel {
     attribute requiresConsent : Boolean = false;
   }
 
-  port def UserServicePort {
-    in item command : UserCommand;
-    out item status : MissionStatus;
+  port def UserInteractionPort {
+    in item intent : UserIntent;
+    out item feedback : UserFeedback;
   }
 
   port def HazardPort {
@@ -138,14 +166,16 @@ package DomainModel {
     out item telemetry : BatteryTelemetry;
   }
 
-  port def AppServicePort {
+  port def RobotServicePort {
     in item command : UserCommand;
     out item status : MissionStatus;
   }
 
-  port def EnvironmentPort {
-    out item obstacle : ObstacleObservation;
-    out item cliff : CliffObservation;
+  port def EnvironmentStimulusPort {
+    out item floor : FloorSurface;
+    out item obstacle : Obstacle;
+    out item dropOff : DropOff;
+    out item debris : Debris;
   }
 
   part def SensorI2cBus :> I2cBus {

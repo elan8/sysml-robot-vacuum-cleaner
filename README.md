@@ -13,15 +13,15 @@ SPDX-License-Identifier: MIT
 
 A compact, graph-first SysML v2 showcase for an autonomous vacuum cleaner,
 organized with the **Elan8 Method** folder layout. It uses one selected product
-baseline, seven firmware tasks, six catalog parts and one cliff-safe-stop
-engineering increment. Every view projects the same authoritative
+baseline, seven firmware tasks, six catalog parts and four representative
+operational scenarios. Every view projects the same authoritative
 requirements, behavior, architecture and verification elements.
 
 ## What the showcase demonstrates
 
 - Elan8 Method concerns via folders `00_project` … `90_library`.
-- Elan8 requirement roles/identities and engineering concerns on the
-  cliff-safe-stop increment.
+- Elan8 requirement roles, identities, engineering concerns, and folder conventions
+  without exposing methodology jargon as product-domain behavior.
 - Definition/usage separation and one concrete `robotSystem` usage.
 - Typed items, ports, connections, flows and allocations instead of internal
   identity encoded as strings.

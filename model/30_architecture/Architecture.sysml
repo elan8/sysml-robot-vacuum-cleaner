@@ -14,7 +14,6 @@ package Architecture {
   part def CleaningRobotSystemOfInterest {
     part physical : AutonomousFloorCleaningRobot;
     perform action operate : OperateCleaningRobot;
-    perform action nominalMission : AutonomousCleaningMission;
     exhibit state operatingBehavior : RobotOperatingBehavior;
 
     allocate operate.locomotion to physical.base;
@@ -37,16 +36,28 @@ package Architecture {
 
   part robotSystem : CleaningRobotSystemOfInterest;
 
-  satisfy cleanAtLeastEighty by robotSystem.operate.cleaning;
-  satisfy coverFloor by robotSystem.operate.navigation;
-  satisfy avoidObstacles by robotSystem.operate.perception;
-  satisfy detectCliffs by robotSystem.operate.perception;
-  satisfy superviseHazards by robotSystem.operate.safetySupervision;
-  satisfy localizeReliably by robotSystem.operate.navigation;
-  satisfy updateCoverageMap by robotSystem.operate.navigation;
-  satisfy recoverFromStall by robotSystem.operate.missionControl;
-  satisfy returnToDock by robotSystem.operate.docking;
-  satisfy chargeSafely by robotSystem.operate.powerManagement;
-  satisfy reportCleaningStatus by robotSystem.operate.userInteraction;
-  satisfy protectMapPrivacy by robotSystem.operate.userInteraction;
+  satisfy robotSystemSpecification.cleanAtLeastEighty
+    by robotSystem.operate.cleaning;
+  satisfy robotSystemSpecification.coverFloor
+    by robotSystem.operate.navigation;
+  satisfy robotSystemSpecification.avoidObstacles
+    by robotSystem.operate.perception;
+  satisfy robotSystemSpecification.detectCliffs
+    by robotSystem.operate.perception;
+  satisfy robotSystemSpecification.superviseHazards
+    by robotSystem.operate.safetySupervision;
+  satisfy robotSystemSpecification.localizeReliably
+    by robotSystem.operate.navigation;
+  satisfy robotSystemSpecification.updateCoverageMap
+    by robotSystem.operate.navigation;
+  satisfy robotSystemSpecification.recoverFromStall
+    by robotSystem.operate.missionControl;
+  satisfy robotSystemSpecification.returnToDock
+    by robotSystem.operate.docking;
+  satisfy robotSystemSpecification.chargeSafely
+    by robotSystem.operate.powerManagement;
+  satisfy robotSystemSpecification.reportCleaningStatus
+    by robotSystem.operate.userInteraction;
+  satisfy robotSystemSpecification.protectMapPrivacy
+    by robotSystem.operate.userInteraction;
 }

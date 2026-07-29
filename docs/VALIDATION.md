@@ -13,13 +13,13 @@ From the repository root:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The script runs Spec42 over all twelve model documents, supplies local Elan8
+The script runs Spec42 over all thirteen model documents, supplies local Elan8
 domain-library paths when available, and then runs static model guards.
 
 Expected result:
 
 ```text
-Checked 12 document(s): 0 error(s), 0 warning(s), 0 info(s)
+Checked 13 document(s): 0 error(s), 0 warning(s), 0 info(s)
 Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean.
 ```
 
@@ -45,7 +45,7 @@ $views = @(
   "interconnections",
   "firmwareRuntime",
   "requirementsTraceability",
-  "cliffSafeStopGoldenThread",
+  "cliffSafeStopScenario",
   "selectedParts"
 )
 foreach ($view in $views) {

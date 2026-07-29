@@ -13,6 +13,7 @@
 package PhysicalArchitecture {
   private import BehaviorStates::*;
   private import DomainModel::*;
+  private import ProductContext::CleaningRobot;
   private import Elan8::Electronics::Core::*;
   private import Elan8::Electronics::Actuation::*;
   private import Elan8::Electronics::Sensing::*;
@@ -432,7 +433,6 @@ package PhysicalArchitecture {
     doc /* Atomic module; no internal part decomposition modeled here. */
     attribute :>> powerDraw = 1 [W];
     attribute :>> mass = 0.08 [kg];
-    port app : ~AppServicePort;
   }
 
   attribute def PowerRailBudget {
@@ -446,7 +446,7 @@ package PhysicalArchitecture {
     end peripheral;
   }
 
-  part def AutonomousFloorCleaningRobot :> SystemRequirementSubject {
+  part def AutonomousFloorCleaningRobot :> CleaningRobot {
     attribute :>> cleanedAreaPerCharge = 80 [m^2];
     attribute :>> reachableFloorCoveragePercent = 90;
     attribute :>> avoidedObstacleHeight = 30 [mm];
@@ -468,10 +468,6 @@ package PhysicalArchitecture {
     part hmi : HumanMachineInterface;
     part firmwareTasks : FirmwareTaskArchitecture;
 
-    port app : AppServicePort;
-    port dockPower : PowerRailPort;
-    port dockBeacon : GpioPort;
-
     connect mainPcb.batteryPower to base.batteryRail;
     connect mainPcb.logicPower to base.logicRail;
     connect top.power to base.sensorRail;
@@ -484,7 +480,6 @@ package PhysicalArchitecture {
     connect mainPcb.bmsBus to base.bmsBus;
     connect base.hazard to mainPcb.hazard;
     connect top.hazard to mainPcb.hazard;
-    connect hmi.app to app;
     connect dockPower to base.chargePower;
     connect dockBeacon to base.beacon;
 

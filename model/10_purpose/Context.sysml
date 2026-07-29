@@ -6,24 +6,18 @@
  */
 package ProductContext {
   private import DomainModel::*;
-  private import PhysicalArchitecture::*;
+  private import SystemRequirements::*;
   private import ScalarValues::*;
   private import Elan8::Method::Core::*;
 
   part def User {
-    port app : ~AppServicePort;
+    port app : ~UserInteractionPort;
   }
 
   part def MobileApp {
     attribute localOnlyModeDefault : Boolean = true;
-    port user : AppServicePort;
-    port robot : ~AppServicePort;
-  }
-
-  part def HomeNetwork {
-    port app : AppServicePort;
-    port robot : ~AppServicePort;
-    connect app to robot;
+    port user : UserInteractionPort;
+    port robot : ~RobotServicePort;
   }
 
   part def DockingStation {
@@ -31,36 +25,31 @@ package ProductContext {
     port homingBeaconOut : GpioPort;
   }
 
-  part def HomeEnvironment {
-    attribute includesStairEdge : Boolean = true;
-    attribute includesMovableObstacles : Boolean = true;
-    port stimulus : EnvironmentPort;
+  part def ResidentialEnvironment {
+    port stimulus : EnvironmentStimulusPort;
   }
 
-  part def RobotContextBoundary {
-    ref robot : AutonomousFloorCleaningRobot;
-    port app : AppServicePort;
+  abstract part def CleaningRobot :> SystemRequirementSubject {
+    port app : RobotServicePort;
     port dockPower : PowerRailPort;
     port dockBeacon : GpioPort;
-    port environment : ~EnvironmentPort;
+    port environment : ~EnvironmentStimulusPort;
   }
 
   part def ResidentialCleaningContext {
     @EngineeringConcern { concern = purpose; }
     @AbstractionLevel { level = operational; }
-    part robotBoundary : RobotContextBoundary;
+    ref part robot : CleaningRobot;
     part user : User;
     part app : MobileApp;
-    part network : HomeNetwork;
     part dock : DockingStation;
-    part home : HomeEnvironment;
+    part home : ResidentialEnvironment;
 
     connect user.app to app.user;
-    connect app.robot to network.app;
-    connect network.robot to robotBoundary.app;
-    connect dock.chargePowerOut to robotBoundary.dockPower;
-    connect dock.homingBeaconOut to robotBoundary.dockBeacon;
-    connect home.stimulus to robotBoundary.environment;
+    connect app.robot to robot.app;
+    connect dock.chargePowerOut to robot.dockPower;
+    connect dock.homingBeaconOut to robot.dockBeacon;
+    connect home.stimulus to robot.environment;
   }
 
   part residentialCleaningContext : ResidentialCleaningContext;

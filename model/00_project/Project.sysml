@@ -10,7 +10,7 @@ package Project {
   part projectInfo : ProjectInfo {
     attribute :>> projectName = "AutonomousFloorCleaningRobot";
     attribute :>> profile = small;
-    attribute :>> notes = "Lean showcase; Elan8 Method folder layout with cliff-safe-stop engineering increment.";
+    attribute :>> notes = "Lean showcase using the Elan8 Method folder layout and domain-oriented SysML names.";
   }
 
   doc /*

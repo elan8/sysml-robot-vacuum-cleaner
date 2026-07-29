@@ -44,6 +44,9 @@ foreach ($name in $removedNames) {
 if ($modelText -match "\b[A-Za-z_][A-Za-z0-9_]*Handoff[A-Za-z0-9_]*\b") {
     Add-Failure "handoff record/view elements must not return"
 }
+if ($modelText -match "(?i)golden[\s_-]*thread|engineering\s+increment") {
+    Add-Failure "methodology workflow terminology must not appear as product-model vocabulary"
+}
 if ($modelText -match "(?m)^\s*(?:part|item|metadata)\s+def\s+Hazard\b") {
     Add-Failure "the removed custom Hazard record must not return; HazardEvent is allowed"
 }
@@ -55,10 +58,13 @@ $requirementNames = @(
     "reportCleaningStatus", "protectMapPrivacy"
 )
 foreach ($requirement in $requirementNames) {
-    if ($modelText -notmatch ("(?m)^\s*satisfy\s+" + [regex]::Escape($requirement) + "\s+by\s+")) {
+    $qualifiedPrefix = "(?:[A-Za-z_][A-Za-z0-9_]*(?:::|\.))*"
+    if ($modelText -notmatch ("(?m)^\s*satisfy\s+" + $qualifiedPrefix +
+            [regex]::Escape($requirement) + "\s+by\s+")) {
         Add-Failure "requirement '$requirement' has no satisfaction path"
     }
-    if ($modelText -notmatch ("(?m)^\s*verify\s+requirement\s+" + [regex]::Escape($requirement) + "\s*;")) {
+    if ($modelText -notmatch ("(?m)^\s*verify\s+requirement\s+" + $qualifiedPrefix +
+            [regex]::Escape($requirement) + "\s*;")) {
         Add-Failure "requirement '$requirement' has no verification path"
     }
 }

@@ -8,15 +8,16 @@ SPDX-License-Identifier: MIT
 The model is intentionally small enough to read end to end. File paths follow
 the Elan8 Method layout; SysML packages remain the semantic ownership boundary.
 
-Start with the [Elan8 Method tour](ELAN8_METHOD_TOUR.md) for the cliff-safe-stop
-vertical increment.
+Start with the [Elan8 Method tour](ELAN8_METHOD_TOUR.md) to see how the method
+organizes a model while the SysML elements retain product-domain names.
 
 ## Recommended tour
 
 1. Start in `10_purpose/Requirements.sysml`: six stakeholder needs derive twelve
    testable requirements with quantities, constraints, and Elan8 requirement roles.
 2. Read `20_behavior/FunctionalBehavior.sysml`: `OperateCleaningRobot` decomposes
-   product behavior. Follow `CliffSafeStopGoldenThread`.
+   product behavior. Compare the autonomous-cleaning, obstacle-avoidance,
+   low-battery-return, and cliff-safe-stop scenarios.
 3. Open `30_architecture/PhysicalArchitecture.sysml`: the selected baseline
    contains the major LRUs, typed interfaces, power rails, and catalog selections.
 4. Follow `Architecture::robotSystem`. Its `operate` behavior usage is used for
@@ -77,6 +78,7 @@ domain kinds; a named `dependency selectedImplementation` points at catalog part
 ## Deliberate boundaries
 
 This baseline omits product-line engineering, trade studies, and handoff record
-tables. It **does** use Elan8 Method libraries for requirement roles and concerns
-on the cliff-safe-stop engineering increment. Narrative guidance beyond semantics belongs
-in `doc` and markdown tours.
+tables. It **does** use Elan8 Method libraries for requirement roles and concerns.
+Engineering increments organize the work and its review; the resulting SysML model
+uses domain-oriented names. Narrative guidance beyond semantics belongs in `doc`
+and markdown tours.
