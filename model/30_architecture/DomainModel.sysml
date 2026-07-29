@@ -5,12 +5,12 @@
  * Shared items, ports, protocol media, and closed-set vocabulary.
  */
 package DomainModel {
-  public import ElectronicsInterconnection::*;
-  public import ElectronicBusDomain::*;
-  public import ElectronicIoDomain::*;
-  public import ElectricalPowerDomain::*;
-  public import EmbeddedComputeDomain::*;
-  public import WirelessDomain::*;
+  public import Elan8::Electronics::Interconnection::*;
+  public import Elan8::Electronics::Buses::*;
+  public import Elan8::Electronics::Io::*;
+  public import Elan8::Electronics::Power::*;
+  public import Elan8::Electronics::Compute::*;
+  public import Elan8::Electronics::Wireless::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
@@ -149,16 +149,16 @@ package DomainModel {
   }
 
   part def SensorI2cBus :> I2cBus {
-    port host : I2cPort;
-    port frontTof : I2cPort;
-    port leftTof : I2cPort;
-    port rightTof : I2cPort;
-    port imu : I2cPort;
+    port host : ~I2cControllerPort;
+    port frontTof : ~I2cTargetPort;
+    port leftTof : ~I2cTargetPort;
+    port rightTof : ~I2cTargetPort;
+    port imu : ~I2cTargetPort;
   }
 
   part def BmsSmbusBus :> SmbusBus {
-    port host : I2cPort;
-    port bms : I2cPort;
+    port host : I2cControllerPort;
+    port bms : ~I2cTargetPort;
   }
 
   part def LidarUartBus :> UartBus {

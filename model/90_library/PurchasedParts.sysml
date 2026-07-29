@@ -9,10 +9,10 @@
  * vacuum-specific catalog part selections.
  */
 library package PurchasedParts {
-  private import EmbeddedComputeDomain::*;
-  private import ElectronicsCore::*;
-  private import WirelessDomain::*;
-  private import PartProcurement::*;
+  private import Elan8::Electronics::Compute::*;
+  private import Elan8::Electronics::Core::*;
+  private import Elan8::Electronics::Wireless::*;
+  private import Elan8::Procurement::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

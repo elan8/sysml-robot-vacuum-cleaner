@@ -212,7 +212,7 @@ package OperationalScenarios {
   private import FunctionalArchitecture::*;
   private import ProductContext::*;
   private import SystemRequirements::*;
-  private import Elan8Method::*;
+  private import Elan8::Method::Core::*;
 
   action def ObserveSafeStop {
     in stopCommand : DriveCommand;

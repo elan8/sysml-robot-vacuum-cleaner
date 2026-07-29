@@ -7,10 +7,10 @@
 package AnalysisCases {
   private import Architecture::*;
   private import DesignLimits::*;
-  private import EngineeringUnits::*;
+  private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
-  private import Elan8Method::*;
+  private import Elan8::Method::Core::*;
 
   analysis def MissionEnergyAnalysis {
     @EngineeringConcern { concern = evidence; }

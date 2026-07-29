@@ -6,7 +6,7 @@
  * native derivation relationships.
  */
 package DesignLimits {
-  private import EngineeringUnits::*;
+  private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
@@ -23,8 +23,8 @@ package DesignLimits {
 }
 
 package StakeholderNeeds {
-  private import Elan8RequirementMetadata::*;
-  private import Elan8Method::*;
+  private import Elan8::Method::Metadata::*;
+  private import Elan8::Method::Core::*;
 
   requirement cleanLargeAreas {
     @RequirementRole { role = user; }
@@ -65,9 +65,9 @@ package StakeholderNeeds {
 }
 
 package SystemRequirements {
-  private import Elan8RequirementManagement::*;
-  private import Elan8RequirementMetadata::*;
-  private import Elan8Method::*;
+  private import Elan8::Method::Requirements::*;
+  private import Elan8::Method::Metadata::*;
+  private import Elan8::Method::Core::*;
   private import DesignLimits::*;
   private import StakeholderNeeds::*;
   private import ISQ::*;

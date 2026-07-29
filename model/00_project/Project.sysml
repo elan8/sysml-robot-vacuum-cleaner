@@ -5,7 +5,7 @@
  * Project metadata and Elan8 Method tailoring for the vacuum showcase.
  */
 package Project {
-  private import Elan8Method::*;
+  private import Elan8::Method::Core::*;
 
   part projectInfo : ProjectInfo {
     attribute :>> projectName = "AutonomousFloorCleaningRobot";
@@ -15,7 +15,7 @@ package Project {
 
   doc /*
     Library imports (via Spec42):
-    - mbse-methodology/library (Elan8Method, Elan8Requirement*)
+    - mbse-methodology/library (Elan8::Method::*)
     - sysml-domain-libraries domain/technical/generic
   */
 }

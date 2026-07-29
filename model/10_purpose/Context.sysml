@@ -8,7 +8,7 @@ package ProductContext {
   private import DomainModel::*;
   private import PhysicalArchitecture::*;
   private import ScalarValues::*;
-  private import Elan8Method::*;
+  private import Elan8::Method::Core::*;
 
   part def User {
     port app : ~AppServicePort;

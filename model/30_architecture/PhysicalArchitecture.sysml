@@ -13,20 +13,22 @@
 package PhysicalArchitecture {
   private import BehaviorStates::*;
   private import DomainModel::*;
-  private import ElectronicsCore::*;
-  private import ElectronicActuationDomain::*;
-  private import SensingDomain::*;
-  private import ElectricalPowerDomain::*;
-  private import BoardIntegrationDomain::*;
-  private import MechanicalCore::*;
-  private import DrivetrainDomain::*;
-  private import EmbeddedComputeDomain::*;
+  private import Elan8::Electronics::Core::*;
+  private import Elan8::Electronics::Actuation::*;
+  private import Elan8::Electronics::Sensing::*;
+  private import Elan8::Electronics::Power::*;
+  private import Elan8::Electronics::Assembly::*;
+  private import Elan8::Electronics::Buses::*;
+  private import Elan8::Electronics::Interconnection::*;
+  private import Elan8::Mechanical::Core::*;
+  private import Elan8::Mechanical::Drivetrain::*;
+  private import Elan8::Electronics::Compute::*;
   private import FirmwareArchitecture::*;
   private import PurchasedParts::*;
   private import SystemRequirements::*;
-  private import SoftwareCore::*;
-  private import WirelessDomain::*;
-  private import EngineeringUnits::*;
+  private import Elan8::Software::Core::*;
+  private import Elan8::Electronics::Wireless::*;
+  private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
@@ -39,7 +41,7 @@ package PhysicalArchitecture {
   part def DriveTrain :> MechanicalComponent {
     attribute :>> mass =
       sum(motor.mass, gearbox.mass, wheel.mass, encoder.mass, lift.mass);
-    port phases : ThreePhaseMotorPort;
+    port phases : ThreePhaseDrivePort;
     port odometry : QuadratureEncoderPort;
     port liftHazard : GpioPort;
 
@@ -59,9 +61,9 @@ package PhysicalArchitecture {
       attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
     }
 
-    connect motor.phases to phases;
+    connect motor.electricalInput to phases;
     connect encoder.odometry to odometry;
-    connect lift.hazard to liftHazard;
+    connect lift.signal to liftHazard;
   }
 
   part def CleaningHeadModule :> ElectronicsComponent {
@@ -78,44 +80,47 @@ package PhysicalArchitecture {
     port vacuumCommand : PwmPort;
     port fault : GpioPort;
 
-    part brushMotor : PwmMotor {
+    part brushMotor : BrushedDcMotor {
       attribute :>> ratedPower = 8 [W]; /* illustrative estimate */
       attribute :>> mass = 0.25 [kg]; /* illustrative estimate */
     }
-    part vacuumMotor : PwmMotor {
+    part brushDriver : HBridgeMotorDriver;
+    part vacuumMotor : BrushedDcMotor {
       attribute :>> ratedPower = 10 [W]; /* illustrative estimate */
       attribute :>> mass = 0.25 [kg]; /* illustrative estimate */
     }
+    part vacuumDriver : HBridgeMotorDriver;
 
-    connect brushMotor.command to brushCommand;
-    connect vacuumMotor.command to vacuumCommand;
+    connect power to brushDriver.supply;
+    connect power to vacuumDriver.supply;
+    connect brushCommand to brushDriver.command;
+    connect vacuumCommand to vacuumDriver.command;
+    connect brushDriver.driveOutput to brushMotor.electricalInput;
+    connect vacuumDriver.driveOutput to vacuumMotor.electricalInput;
   }
 
-  part def RobotTofSensor :> ElectronicsComponent {
+  part def RobotTofSensor :> DcPoweredSensor, I2cDataSensor {
     attribute range : LengthValue = 1200 [mm];
     attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
-    port bus : I2cPort;
     dependency selectedImplementation
       from RobotTofSensor to VL53L1CX;
   }
 
-  part def RobotLidar :> ElectronicsComponent {
+  part def RobotLidar :> DcPoweredSensor, UartDataSensor {
     attribute scanRate : FrequencyValue = 10 [Hz];
     attribute range : LengthValue = 6000 [mm];
     attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 3.5 [W]; /* illustrative estimate */
-    port serial : UartPort;
-    port power : PowerRailPort;
     dependency selectedImplementation
       from RobotLidar to RPLIDARC1;
   }
 
-  part def CliffSensor :> ElectronicsComponent {
+  part def CliffSensor :> DcPoweredSensor {
     attribute triggerHeight : LengthValue = 50 [mm];
     attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 0.25 [W]; /* illustrative estimate */
-    port hazard : GpioPort;
+    port signal : GpioPort;
   }
 
   part def RobotBms :> BatteryManagementSystem {
@@ -135,7 +140,7 @@ package PhysicalArchitecture {
     port batteryRail : PowerRailPort;
     port logicRail : PowerRailPort;
     port sensorRail : PowerRailPort;
-    port bmsBus : I2cPort;
+    port bmsBus : ~I2cControllerPort;
     port hazard : GpioPort;
 
     attribute batteryRailBudget : PowerRailBudget {
@@ -212,8 +217,8 @@ package PhysicalArchitecture {
       MechanicalComponent and is not itself an ElectronicsComponent. It aggregates
       the current draw of every electronics child mounted in/on the base tub.
     */
-    port leftPhases : ThreePhaseMotorPort;
-    port rightPhases : ThreePhaseMotorPort;
+    port leftPhases : ThreePhaseDrivePort;
+    port rightPhases : ThreePhaseDrivePort;
     port leftOdometry : QuadratureEncoderPort;
     port rightOdometry : QuadratureEncoderPort;
     port brushCommand : PwmPort;
@@ -222,7 +227,7 @@ package PhysicalArchitecture {
     port batteryRail : PowerRailPort;
     port logicRail : PowerRailPort;
     port sensorRail : PowerRailPort;
-    port bmsBus : I2cPort;
+    port bmsBus : I2cControllerPort;
     port chargePower : PowerRailPort;
     port beacon : GpioPort;
 
@@ -259,10 +264,10 @@ package PhysicalArchitecture {
 
     connect leftDriveTrain.liftHazard to hazard;
     connect rightDriveTrain.liftHazard to hazard;
-    connect frontLeftCliff.hazard to hazard;
-    connect frontRightCliff.hazard to hazard;
-    connect rearLeftCliff.hazard to hazard;
-    connect rearRightCliff.hazard to hazard;
+    connect frontLeftCliff.signal to hazard;
+    connect frontRightCliff.signal to hazard;
+    connect rearLeftCliff.signal to hazard;
+    connect rearRightCliff.signal to hazard;
     connect powerModule.hazard to hazard;
     connect cleaningHead.fault to hazard;
   }
@@ -270,9 +275,9 @@ package PhysicalArchitecture {
   part def RobotMainMcu :> Microcontroller {
     attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 3 [W]; /* illustrative estimate */
-    port sensorI2c : I2cPort;
+    port sensorI2c : I2cControllerPort;
     port lidarUart : UartPort;
-    port bmsSmbus : I2cPort;
+    port bmsSmbus : I2cControllerPort;
     port wirelessUart : UartPort;
     port leftMotorPwm : PwmPort;
     port rightMotorPwm : PwmPort;
@@ -283,7 +288,7 @@ package PhysicalArchitecture {
       from RobotMainMcu to STM32U575VGT6;
   }
 
-  part def RobotMotorDriver :> MotorDriver {
+  part def RobotMotorDriver :> ThreePhaseMotorDriver {
     attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 1.5 [W]; /* illustrative estimate */
     dependency selectedImplementation
@@ -293,12 +298,12 @@ package PhysicalArchitecture {
   part def RobotWirelessModule :> WirelessModule {
     attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 1 [W]; /* illustrative estimate */
-    port serial : UartPort;
+    port hostLink : UartPort :>> hostLink;
     dependency selectedImplementation
       from RobotWirelessModule to ESP32C3MINI1;
   }
 
-  part def MainPcbModule :> BoardAssembly {
+  part def MainPcbModule :> PrintedCircuitBoardAssembly {
     attribute :>> powerDraw =
       sum(mcu.powerDraw, leftMotorDriver.powerDraw, rightMotorDriver.powerDraw,
           wireless.powerDraw, imu.powerDraw);
@@ -314,12 +319,12 @@ package PhysicalArchitecture {
     */
     port batteryPower : PowerRailPort;
     port logicPower : PowerRailPort;
-    port sensorBus : I2cPort;
+    port sensorBus : ~I2cControllerPort;
     port lidarSerial : UartPort;
-    port bmsBus : I2cPort;
+    port bmsBus : ~I2cControllerPort;
     port wirelessService : UartPort;
-    port leftPhases : ThreePhaseMotorPort;
-    port rightPhases : ThreePhaseMotorPort;
+    port leftPhases : ThreePhaseDrivePort;
+    port rightPhases : ThreePhaseDrivePort;
     port brushCommand : PwmPort;
     port vacuumCommand : PwmPort;
     port hazard : GpioPort;
@@ -329,25 +334,28 @@ package PhysicalArchitecture {
     part rightMotorDriver : RobotMotorDriver;
     part wireless : RobotWirelessModule;
     part wirelessUart : WirelessUartBus;
-    part imu : InertialMeasurementUnit {
+    part imu : I2cInertialMeasurementUnit {
       attribute :>> mass = 0.03 [kg]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
       attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
     }
 
-    connect batteryPower to leftMotorDriver.power;
-    connect batteryPower to rightMotorDriver.power;
+    connect batteryPower to leftMotorDriver.supply;
+    connect batteryPower to rightMotorDriver.supply;
+    connect logicPower to imu.power;
     connect sensorBus to mcu.sensorI2c;
-    connect sensorBus to imu.bus;
+    interface imuLink : I2cLink
+      connect controllerPort ::> mcu.sensorI2c
+      to targetPort ::> imu.data;
     connect lidarSerial to mcu.lidarUart;
     connect bmsBus to mcu.bmsSmbus;
     connect mcu.leftMotorPwm to leftMotorDriver.command;
     connect mcu.rightMotorPwm to rightMotorDriver.command;
-    connect leftMotorDriver.phases to leftPhases;
-    connect rightMotorDriver.phases to rightPhases;
+    connect leftMotorDriver.driveOutput to leftPhases;
+    connect rightMotorDriver.driveOutput to rightPhases;
     connect mcu.brushPwm to brushCommand;
     connect mcu.vacuumPwm to vacuumCommand;
     connect mcu.wirelessUart to wirelessUart.host;
-    connect wireless.serial to wirelessUart.wireless;
+    connect wireless.hostLink to wirelessUart.wireless;
     connect wirelessService to wirelessUart.wireless;
     connect leftMotorDriver.fault to hazard;
     connect rightMotorDriver.fault to hazard;
@@ -370,7 +378,7 @@ package PhysicalArchitecture {
       draw is left unset (negligible), matching the ElectronicsComponent "no
       default, not mandatory" convention already used for BatteryPack.
     */
-    port sensorBus : I2cPort;
+    port sensorBus : I2cControllerPort;
     port lidarSerial : UartPort;
     port power : PowerRailPort;
     port hazard : GpioPort;
@@ -386,13 +394,16 @@ package PhysicalArchitecture {
     part uart : LidarUartBus;
 
     connect sensorBus to i2c.host;
-    connect frontTof.bus to i2c.frontTof;
-    connect leftTof.bus to i2c.leftTof;
-    connect rightTof.bus to i2c.rightTof;
+    connect frontTof.data to i2c.frontTof;
+    connect leftTof.data to i2c.leftTof;
+    connect rightTof.data to i2c.rightTof;
     connect lidarSerial to uart.host;
-    connect lidar.serial to uart.lidar;
+    connect lidar.data to uart.lidar;
     connect lidar.power to power;
-    connect frontBumper.hazard to hazard;
+    connect frontTof.power to power;
+    connect leftTof.power to power;
+    connect rightTof.power to power;
+    connect frontBumper.signal to hazard;
   }
 
   part def DustBinLid :> MechanicalComponent {

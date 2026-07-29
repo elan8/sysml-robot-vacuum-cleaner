@@ -6,9 +6,9 @@
  */
 package FirmwareArchitecture {
   private import DomainModel::*;
-  private import SoftwareCore::*;
-  private import RealtimeRuntime::*;
-  private import EngineeringUnits::*;
+  private import Elan8::Software::Core::*;
+  private import Elan8::Software::Realtime::*;
+  private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;

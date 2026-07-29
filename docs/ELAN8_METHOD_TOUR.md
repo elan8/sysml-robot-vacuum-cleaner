@@ -18,7 +18,7 @@ This showcase is laid out with Elan8 Method folders and imports `mbse-methodolog
 | `40_analysis/` | Mission energy, safety reaction, localization analyses |
 | `50_verification/` | Nine verification cases including `verifyCliffSafeStop` |
 | `60_views/` | Six curated views |
-| `90_library/` | Purchased parts catalog (`EngineeringUnits` from domain libraries) |
+| `90_library/` | Purchased parts catalog (`Elan8::Units::Engineering`) |
 | `Root.sysml` | Import hub |
 
 ## Increment spine
@@ -45,7 +45,7 @@ This showcase is laid out with Elan8 Method folders and imports `mbse-methodolog
 
 ## Libraries
 
-- **Method:** `Elan8RequirementMetadata`, `Elan8RequirementManagement`, `Elan8Method`
-- **Domain/technical:** robotics/electronics/communication vocabulary via domain model and Spec42 library paths
+- **Method:** `Elan8::Method::{Core, Requirements, Metadata, Viewpoints}`
+- **Domain/technical:** namespaced `Elan8` electronics, mechanical, software, communication, units, and procurement vocabularies
 
 See also [MODEL_GUIDE.md](MODEL_GUIDE.md) and [mbse-methodology recipes](../../mbse-methodology/recipes/README.md).

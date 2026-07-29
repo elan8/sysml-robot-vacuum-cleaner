@@ -48,22 +48,22 @@ flowchart LR
 | Package | Owns |
 | --- | --- |
 | `Project` | Tailoring and method profile |
-| `EngineeringUnits` (domain libraries) | Shared Ah/mAh/ms unit literals |
-| `PartProcurement` (domain libraries) | `BuyPart` metadata and `PartLifecycleStatus` |
-| `PurchasedParts` | Concrete catalog part selections (specializes `PartProcurement`-annotated definitions) |
+| `Elan8::Units::Engineering` | Shared Ah/mAh/ms unit literals |
+| `Elan8::Procurement` | `BuyPart` metadata and `PartLifecycleStatus` |
+| `PurchasedParts` | Concrete catalog part selections annotated with `Elan8::Procurement::BuyPart` |
 | `DomainModel` | Protocol vocabulary, items, ports, buses |
 | `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
 | `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
 | `ProductContext` | Users, app, network, dock, home, robot boundary |
-| `RealtimeRuntime` (domain libraries) | `RealtimeTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
-| `FirmwareArchitecture` | Vacuum-specific tasks, queues, and `StartupPhase` (specializes `RealtimeRuntime`) |
-| `ElectronicActuationDomain` (domain libraries) | `Motor`/`BldcMotor`/`PwmMotor`, `Encoder`/`QuadratureEncoder`, `MotorDriver` |
-| `SensingDomain` (domain libraries) | `InertialMeasurementUnit`, `BumperSwitch`, `LiftSwitch` |
-| `ElectricalPowerDomain` (domain libraries) | `BatteryPack`, `BatteryManagementSystem`, `VoltageRegulator` (ports + `outputVoltage` + `quiescentPower`) |
-| `BoardIntegrationDomain` (domain libraries) | `BoardAssembly` (`boardName`/`layerCount`) |
-| `MechanicalCore` (domain libraries) | `MechanicalComponent` (`mass` only, purely mechanical parts — no ports, no `powerDraw`) |
-| `DrivetrainDomain` (domain libraries) | `Gearbox`, `Wheel`, `CasterWheel` |
-| `PhysicalArchitecture` | Selected physical baseline, organized around how the robot is actually assembled/serviced: `BaseModule` (chassis, both `DriveTrain`s — motor+gearbox+wheel+encoder+lift switch — cleaning head, power module, dock interface), `MainPcbModule` (MCU, motor drivers, wireless, IMU — screws into Base; merges the former `MainControlPcb`+`MainElectronicsAssembly` wrapper since Base/Top now form the real enclosure), `TopModule` (LiDAR, front ToF sensors, bumper switch — snaps onto Base last), `DustBin` (lid + filter, tool-free-removable, independent of Base/Top). `BaseModule`/`TopModule` specialize `MechanicalCore::MechanicalComponent` and are not `ElectronicsComponent`, so each carries its own non-inherited `baseElectronicsPowerDraw`/`topElectronicsPowerDraw` attribute aggregating its electronics children instead of an inherited `powerDraw`. `mass`/`powerDraw` on every composite are `sum()`-derived from real children, not hand-typed totals. `PowerRailBudget` is an `attribute def` (voltage/current numbers only, no ports/behavior), declared as a sibling `attribute` next to each rail port it characterizes. |
+| `Elan8::Software::Realtime` | `RealtimeTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
+| `FirmwareArchitecture` | Vacuum-specific tasks, queues, and `StartupPhase` |
+| `Elan8::Electronics::Actuation` | BLDC and brushed-DC motors, H-bridge and three-phase drivers, and mechanical outputs |
+| `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, passive bumper/lift switches, and typed measurements |
+| `Elan8::Electronics::Power` | `BatteryPack`, `BatteryManagementSystem`, and `VoltageRegulator` |
+| `Elan8::Electronics::{Board, Assembly}` | Bare `PrintedCircuitBoard` versus populated `PrintedCircuitBoardAssembly` |
+| `Elan8::Mechanical::Core` | `MechanicalComponent` (`mass` only, purely mechanical parts — no ports, no `powerDraw`) |
+| `Elan8::Mechanical::Drivetrain` | `Gearbox`, `Wheel`, `CasterWheel` |
+| `PhysicalArchitecture` | Assembly-oriented baseline. Drive motors use `ThreePhaseDrivePort`; cleaning motors use brushed-DC motors with H-bridge drivers; powered sensors expose power plus protocol-specific `data`, while passive switches expose only `signal`. `MainPcbModule` is the populated PCB assembly. |
 | `Architecture` | Concrete system, allocations, satisfaction |
 | `AnalysisCases` | Three analyses |
 | `Verification` | Nine verification cases |

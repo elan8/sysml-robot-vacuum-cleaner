@@ -10,7 +10,7 @@ package Verification {
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
   private import SystemRequirements::*;
-  private import Elan8Method::*;
+  private import Elan8::Method::Core::*;
 
   action def RunPhysicalTest;
   action def RunSoftwareVerification;
