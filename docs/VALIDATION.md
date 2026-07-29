@@ -42,6 +42,10 @@ missing queue flows and requirements without satisfaction or verification.
 ```powershell
 $views = @(
   "productDecomposition",
+  "baseDecomposition",
+  "topDecomposition",
+  "mainPcbDecomposition",
+  "powerDecomposition",
   "interconnections",
   "firmwareDeployment",
   "systemRequirements",

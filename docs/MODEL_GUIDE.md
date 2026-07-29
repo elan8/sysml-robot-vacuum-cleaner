@@ -26,7 +26,7 @@ organizes a model while the SysML elements retain product-domain names.
    event-driven tasks, typed queues, scheduling priorities, and deadlines.
 6. Continue into `40_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
    `50_verification/Verification.sysml` (`verifyCliffSafeStop`).
-7. Finish with the five focused views in `60_views/ModelViews.sysml`.
+7. Finish with the nine focused views in `60_views/ModelViews.sysml`.
 
 ## Semantic backbone
 

@@ -655,7 +655,7 @@ package PhysicalArchitecture {
     part dustBin : DustBin;
     part baseHarness : BaseWiringHarness;
     part topHarness : TopWiringHarness;
-    part firmwareTasks : FirmwareTaskArchitecture;
+    ref part firmwareTasks : FirmwareTaskArchitecture;
 
     connect mainPcb.batteryPower to baseHarness.pcbBatteryPower;
     connect baseHarness.baseBatteryRail to base.batteryRail;
