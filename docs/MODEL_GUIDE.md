@@ -22,8 +22,8 @@ organizes a model while the SysML elements retain product-domain names.
    contains the major LRUs, typed interfaces, power rails, and catalog selections.
 4. Follow `Architecture::robotSystem`. Its `operate` behavior usage is used for
    allocation and requirement satisfaction.
-5. Inspect `30_architecture/FirmwareArchitecture.sysml`: seven tasks, queues, and
-   timing.
+5. Inspect `30_architecture/FirmwareArchitecture.sysml`: seven periodic or
+   event-driven tasks, typed queues, scheduling priorities, and deadlines.
 6. Continue into `40_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
    `50_verification/Verification.sysml` (`verifyCliffSafeStop`).
 7. Finish with the six views in `60_views/ModelViews.sysml`.
@@ -56,8 +56,8 @@ flowchart LR
 | `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
 | `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
 | `ProductContext` | Users, app, network, dock, home, robot boundary |
-| `Elan8::Software::Realtime` | `RealtimeTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
-| `FirmwareArchitecture` | Vacuum-specific tasks, queues, and `StartupPhase` |
+| `Elan8::Software::Realtime` | `RealtimeTask`, `PeriodicTask`, `EventDrivenTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
+| `FirmwareArchitecture` | Vacuum-specific periodic and event-driven tasks plus typed runtime queues |
 | `Elan8::Electronics::Actuation` | BLDC and brushed-DC motors, H-bridge and three-phase drivers, and mechanical outputs |
 | `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, passive bumper/lift switches, and typed measurements |
 | `Elan8::Electronics::Power` | `BatteryPack`, `BatteryCharger`, protected `BatteryManagementSystem` power paths, and `VoltageRegulator` |

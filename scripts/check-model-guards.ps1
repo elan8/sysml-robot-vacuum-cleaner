@@ -146,7 +146,10 @@ foreach ($field in @(
 $firmwareText = Get-Content -Raw (
     Join-Path $resolvedModelPath "30_architecture\FirmwareArchitecture.sysml"
 )
-if ([regex]::Matches($firmwareText, "part\s+def\s+\w+Task\s*:>\s*FirmwareTask").Count -ne 7) {
+if ([regex]::Matches(
+        $firmwareText,
+        "part\s+def\s+\w+Task\s*:>\s*(?:Periodic|EventDriven)FirmwareTask"
+    ).Count -ne 7) {
     Add-Failure "FirmwareArchitecture must define exactly seven concrete firmware tasks"
 }
 foreach ($queue in @(
@@ -156,10 +159,10 @@ foreach ($queue in @(
     if ($firmwareText -notmatch ("part\s+" + $queue + "\s*:")) {
         Add-Failure "runtime queue '$queue' is missing"
     }
-    if ($firmwareText -notmatch ([regex]::Escape($queue) + "\.transfer\.enqueue")) {
+    if ($firmwareText -notmatch ([regex]::Escape($queue) + "\.messages\.input")) {
         Add-Failure "runtime queue '$queue' has no typed producer flow"
     }
-    if ($firmwareText -notmatch ([regex]::Escape($queue) + "\.transfer\.dequeue")) {
+    if ($firmwareText -notmatch ([regex]::Escape($queue) + "\.messages\.output")) {
         Add-Failure "runtime queue '$queue' has no typed consumer flow"
     }
 }

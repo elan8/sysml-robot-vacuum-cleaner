@@ -97,6 +97,7 @@ package ModelViews {
   view firmwareRuntime : GeneralView {
     satisfy runtimeStructurePerspective;
     expose Architecture::robotSystem.physical.firmwareTasks;
+    expose Architecture::robotSystem.physical.firmwareTasks.scheduler;
     expose Architecture::robotSystem.physical.firmwareTasks.missionController;
     expose Architecture::robotSystem.physical.firmwareTasks.safetySupervisor;
     expose Architecture::robotSystem.physical.firmwareTasks.actuatorControl;
