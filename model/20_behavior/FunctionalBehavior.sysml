@@ -267,17 +267,14 @@ package OperationalScenarios {
     action observeSafeStop : ObserveSafeStop;
     action reportSafeStop : ReportMissionStatus;
 
-    flow detectCliff.hazard to superviseHazard.hazardIn;
-    flow superviseHazard.safeCommand to applySafeStop.command;
+    succession flow detectCliff.hazard to superviseHazard.hazardIn;
+    succession flow superviseHazard.safeCommand to applySafeStop.command;
     flow superviseHazard.safeCommand to observeSafeStop.stopCommand;
-    flow observeSafeStop.stoppedStatus to reportSafeStop.status;
+    succession flow observeSafeStop.stoppedStatus to reportSafeStop.status;
     bind reportedStatus = observeSafeStop.stoppedStatus;
 
     first startMission then detectCliff;
-    first detectCliff then superviseHazard;
-    first superviseHazard then applySafeStop;
     first applySafeStop then observeSafeStop;
-    first observeSafeStop then reportSafeStop;
   }
 
   action autonomousCleaning : AutonomousCleaningScenario;

@@ -43,10 +43,9 @@ missing queue flows and requirements without satisfaction or verification.
 $views = @(
   "productDecomposition",
   "interconnections",
-  "firmwareRuntime",
-  "requirementsTraceability",
-  "cliffSafeStopScenario",
-  "selectedParts"
+  "firmwareDeployment",
+  "systemRequirements",
+  "cliffSafeStopScenario"
 )
 foreach ($view in $views) {
   spec42 diagrams export model `

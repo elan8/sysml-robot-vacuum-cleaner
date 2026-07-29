@@ -62,7 +62,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
 The release criterion is 0 errors, 0 warnings and 0 information diagnostics,
-followed by successful SVG export of all six views. See
+followed by successful SVG export of all five views. See
 [validation details](docs/VALIDATION.md).
 
 ## Status and limitations

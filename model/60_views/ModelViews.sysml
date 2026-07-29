@@ -2,16 +2,14 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Six small views over the authoritative product graph.
+ * Five focused views over the authoritative product graph.
  */
 package ModelViews {
   private import Views::*;
   private import Architecture::*;
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
-  private import PurchasedParts::*;
   private import SystemRequirements::*;
-  private import Verification::*;
 
   part def StakeholderRole;
   part systemsEngineer : StakeholderRole;
@@ -30,14 +28,14 @@ package ModelViews {
     subject;
     stakeholder :>> systemsEngineer;
   }
-  concern runtimeStructure {
-    doc /* Which tasks, queues, and physical endpoints form the runtime? */
+  concern firmwareDeployment {
+    doc /* Which firmware tasks execute on which processor? */
     subject;
     stakeholder :>> firmwareEngineer;
     stakeholder :>> systemsEngineer;
   }
-  concern requirementCoverage {
-    doc /* How do requirements connect to realization and verification? */
+  concern requirementStructure {
+    doc /* Which system requirements constrain the robot? */
     subject;
     stakeholder :>> verificationEngineer;
     stakeholder :>> systemsEngineer;
@@ -48,25 +46,15 @@ package ModelViews {
     stakeholder :>> verificationEngineer;
     stakeholder :>> systemsEngineer;
   }
-  concern selectedCatalogParts {
-    doc /*
-      Which catalog definitions are selected by explicit catalog-selection
-      dependencies in the physical baseline?
-    */
-    subject;
-    stakeholder :>> productEngineer;
-    stakeholder :>> systemsEngineer;
-  }
-
   viewpoint productStructurePerspective { frame productStructure; }
   viewpoint productConnectionsPerspective { frame productConnections; }
-  viewpoint runtimeStructurePerspective { frame runtimeStructure; }
-  viewpoint requirementCoveragePerspective { frame requirementCoverage; }
+  viewpoint firmwareDeploymentPerspective { frame firmwareDeployment; }
+  viewpoint requirementStructurePerspective { frame requirementStructure; }
   viewpoint safeStopScenarioPerspective { frame safeStopScenario; }
-  viewpoint selectedCatalogPartsPerspective { frame selectedCatalogParts; }
 
   view productDecomposition : GeneralView {
     satisfy productStructurePerspective;
+    filter @SysML::PartUsage or @SysML::PartDefinition;
     expose Architecture::robotSystem;
     expose Architecture::robotSystem.physical;
     expose Architecture::robotSystem.physical.base;
@@ -76,7 +64,6 @@ package ModelViews {
     expose Architecture::robotSystem.physical.top;
     expose Architecture::robotSystem.physical.dustBin;
     expose Architecture::robotSystem.physical.top.hmi;
-    expose Architecture::robotSystem.physical.firmwareTasks;
   }
 
   view interconnections : InterconnectionView {
@@ -87,17 +74,11 @@ package ModelViews {
     expose Architecture::robotSystem.physical.topHarness;
     expose Architecture::robotSystem.physical.top;
     expose Architecture::robotSystem.physical.dustBin;
-    expose Architecture::robotSystem.physical.top.hmi;
-    expose Architecture::robotSystem.physical.base.powerModule.battery;
-    expose Architecture::robotSystem.physical.base.powerModule.charger;
-    expose Architecture::robotSystem.physical.base.powerModule.bms;
-    expose Architecture::robotSystem.physical.base.dockInterface.beaconReceiver;
   }
 
-  view firmwareRuntime : GeneralView {
-    satisfy runtimeStructurePerspective;
-    expose Architecture::robotSystem.physical.firmwareTasks;
-    expose Architecture::robotSystem.physical.firmwareTasks.scheduler;
+  view firmwareDeployment : GeneralView {
+    satisfy firmwareDeploymentPerspective;
+    filter @SysML::PartUsage or @SysML::AllocationUsage;
     expose Architecture::robotSystem.physical.firmwareTasks.missionController;
     expose Architecture::robotSystem.physical.firmwareTasks.safetySupervisor;
     expose Architecture::robotSystem.physical.firmwareTasks.actuatorControl;
@@ -105,57 +86,29 @@ package ModelViews {
     expose Architecture::robotSystem.physical.firmwareTasks.navigation;
     expose Architecture::robotSystem.physical.firmwareTasks.powerManager;
     expose Architecture::robotSystem.physical.firmwareTasks.appService;
-    expose Architecture::robotSystem.physical.firmwareTasks.hazardQueue;
-    expose Architecture::robotSystem.physical.firmwareTasks.userCommandQueue;
-    expose Architecture::robotSystem.physical.firmwareTasks.plannerCommandQueue;
-    expose Architecture::robotSystem.physical.firmwareTasks.safetyCommandQueue;
-    expose Architecture::robotSystem.physical.firmwareTasks.mapUpdateQueue;
     expose Architecture::robotSystem.physical.mainPcb.mcu;
   }
 
-  view requirementsTraceability : GeneralView {
-    satisfy requirementCoveragePerspective;
-    expose SystemRequirements::*;
-    expose Architecture::robotSystem.operate;
-    expose Verification::*;
+  view systemRequirements : GeneralView {
+    satisfy requirementStructurePerspective;
+    filter @SysML::RequirementUsage;
+    expose SystemRequirements::robotSystemSpecification;
+    expose SystemRequirements::robotSystemSpecification::cleanAtLeastEighty;
+    expose SystemRequirements::robotSystemSpecification::coverFloor;
+    expose SystemRequirements::robotSystemSpecification::avoidObstacles;
+    expose SystemRequirements::robotSystemSpecification::detectCliffs;
+    expose SystemRequirements::robotSystemSpecification::superviseHazards;
+    expose SystemRequirements::robotSystemSpecification::localizeReliably;
+    expose SystemRequirements::robotSystemSpecification::updateCoverageMap;
+    expose SystemRequirements::robotSystemSpecification::recoverFromStall;
+    expose SystemRequirements::robotSystemSpecification::returnToDock;
+    expose SystemRequirements::robotSystemSpecification::chargeSafely;
+    expose SystemRequirements::robotSystemSpecification::reportCleaningStatus;
+    expose SystemRequirements::robotSystemSpecification::protectMapPrivacy;
   }
 
   view cliffSafeStopScenario : ActionFlowView {
     satisfy safeStopScenarioPerspective;
     expose OperationalScenarios::CliffSafeStopScenario;
-    expose OperationalScenarios::cliffSafeStop;
-    expose SystemRequirements::robotSystemSpecification.detectCliffs;
-    expose SystemRequirements::robotSystemSpecification.superviseHazards;
-    expose AnalysisCases::SafetyReactionAnalysis;
-    expose Verification::verifyCliffSafeStop;
-  }
-
-  view selectedParts : GeneralView {
-    satisfy selectedCatalogPartsPerspective;
-    expose PhysicalArchitecture::RobotMainMcu;
-    expose PhysicalArchitecture::RobotMainMcu::selectedImplementation;
-    expose PurchasedParts::STM32U575VGT6;
-    expose PhysicalArchitecture::RobotMotorDriver;
-    expose PhysicalArchitecture::RobotMotorDriver::selectedImplementation;
-    expose PurchasedParts::DRV8316R;
-    expose PhysicalArchitecture::RobotTofSensor;
-    expose PhysicalArchitecture::RobotTofSensor::selectedImplementation;
-    expose PurchasedParts::VL53L1CX;
-    expose PhysicalArchitecture::RobotLidar;
-    expose PhysicalArchitecture::RobotLidar::selectedImplementation;
-    expose PurchasedParts::RPLIDARC1;
-    expose PhysicalArchitecture::RobotWirelessModule;
-    expose PhysicalArchitecture::RobotWirelessModule::selectedImplementation;
-    expose PurchasedParts::ESP32C3MINI1;
-    expose PhysicalArchitecture::RobotBms;
-    expose PhysicalArchitecture::RobotBms::selectedImplementation;
-    expose PurchasedParts::BQ40Z50R2;
-    expose Architecture::robotSystem.physical.mainPcb.mcu;
-    expose Architecture::robotSystem.physical.mainPcb.leftMotorDriver;
-    expose Architecture::robotSystem.physical.mainPcb.rightMotorDriver;
-    expose Architecture::robotSystem.physical.mainPcb.wireless;
-    expose Architecture::robotSystem.physical.top.frontTof;
-    expose Architecture::robotSystem.physical.top.lidar;
-    expose Architecture::robotSystem.physical.base.powerModule.bms;
   }
 }
