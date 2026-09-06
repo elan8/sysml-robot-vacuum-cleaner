@@ -5,7 +5,7 @@
  * Nine verification cases (verification concern).
  */
 package Verification {
-  private import AnalysisCases::*;
+  private import RobotAnalysisCases::*;
   private import Architecture::*;
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
