@@ -19,7 +19,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import FirmwareArchitecture::*;
   private import PhysicalArchitecture::*;
   private import Architecture::*;
-  private import AnalysisCases::*;
+  private import RobotAnalysisCases::*;
   private import Verification::*;
   private import ModelViews::*;
 }

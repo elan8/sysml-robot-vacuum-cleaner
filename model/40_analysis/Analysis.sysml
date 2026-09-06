@@ -4,7 +4,7 @@
  *
  * Quantitative analysis cases (evidence concern).
  */
-package AnalysisCases {
+package RobotAnalysisCases {
   private import Architecture::*;
   private import DesignLimits::*;
   private import Elan8::Units::Engineering::*;
