@@ -390,7 +390,7 @@ package PhysicalArchitecture {
     port batteryPower : PowerRailPort;
     port logicPower : PowerRailPort;
     port sensorBus : ~I2cControllerPort;
-    port lidarSerial : UartPort;
+    port lidarSerial : ~UartPort;
     port bmsBus : ~I2cControllerPort;
     port appService : ~RobotServicePort;
     port leftPhases : ThreePhaseDrivePort;
@@ -609,7 +609,7 @@ package PhysicalArchitecture {
     port pcbSensorBus : I2cControllerPort;
     port topSensorBus : I2cControllerPort;
     port pcbLidarSerial : UartPort;
-    port topLidarSerial : UartPort;
+    port topLidarSerial : ~UartPort;
     port baseSensorPower : PowerRailPort;
     port topSensorPower : PowerRailPort;
     port pcbBumperHazard : GpioPort;
