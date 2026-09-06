@@ -6,6 +6,7 @@
  */
 package ModelViews {
   private import Views::*;
+  private import StandardViewDefinitions::*; // GeneralView and the other standard view definitions
   private import Architecture::*;
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
