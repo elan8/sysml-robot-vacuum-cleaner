@@ -64,7 +64,7 @@ fallback labels.
 
 ## CI
 
-`.github/workflows/validate.yml` runs Spec42 **v0.47.1** (`elan8/spec42@v0.47.1`) for
+`.github/workflows/validate.yml` runs Spec42 **v0.51.0** (`elan8/spec42@v0.51.0`) for
 pushes and pull requests. Warnings remain visible in SARIF; this showcase treats
 any error, warning or information diagnostic as a release blocker.
 
