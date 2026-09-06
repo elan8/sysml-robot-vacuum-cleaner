@@ -204,12 +204,12 @@ package DomainModel {
   }
 
   part def LidarUartBus :> UartBus {
-    port host : UartPort;
-    port lidar : UartPort;
+    port host : ~UartPort;
+    port lidar : ~UartPort;
   }
 
   part def WirelessUartBus :> UartBus {
-    port host : UartPort;
-    port wireless : UartPort;
+    port host : ~UartPort;
+    port wireless : ~UartPort;
   }
 }
