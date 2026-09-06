@@ -11,6 +11,7 @@
  * tool-free-removable module.
  */
 package PhysicalArchitecture {
+  private import NumericalFunctions::*; // sum(...) in the rolled-up mass/power attributes
   private import BehaviorStates::*;
   private import DomainModel::*;
   private import ProductContext::CleaningRobot;

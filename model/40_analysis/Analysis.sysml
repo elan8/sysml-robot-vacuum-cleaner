@@ -10,6 +10,7 @@ package AnalysisCases {
   private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
+  private import NumericalFunctions::*; // sum(...) in measuredReactionTime / baseElectronicsPowerDraw
   private import Elan8::Method::Core::*;
 
   analysis def MissionEnergyAnalysis {
