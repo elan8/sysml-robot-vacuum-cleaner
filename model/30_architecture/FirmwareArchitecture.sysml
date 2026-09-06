@@ -6,86 +6,51 @@
  */
 package FirmwareArchitecture {
   private import DomainModel::*;
-  private import SoftwareCore::*;
-  private import EngineeringUnits::*;
+  private import Elan8::Software::Core::*;
+  private import Elan8::Software::Realtime::*;
+  private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
 
-  enum def TaskCriticality {
-    nonCritical;
-    missionCritical;
-    safetyCritical;
-  }
-  enum def StartupPhase { platform; safety; mission; services; }
-  enum def QueueDiscipline {
-    fifoDropNewest;
-    fifoDropOldest;
-    overwriteLatest;
-  }
-  enum def SchedulingPolicy { fixedPriorityCooperative; }
+  abstract part def FirmwareTask :> RealtimeTask;
+  abstract part def PeriodicFirmwareTask :> FirmwareTask, PeriodicTask;
+  abstract part def EventDrivenFirmwareTask :> FirmwareTask, EventDrivenTask;
 
-  part def FirmwareTask :> SoftwareComponent {
-    attribute period : DurationValue;
-    attribute deadline : DurationValue;
-    attribute worstCaseExecutionTime : DurationValue;
-    attribute stackBudgetBytes : Integer;
-    attribute heapBudgetBytes : Integer;
-    attribute priority : Integer;
-    attribute criticality : TaskCriticality;
-    attribute startupPhase : StartupPhase;
+  port def HazardEventQueuePort {
+    in item input : HazardEvent;
+    out item output : HazardEvent;
   }
-
-  part def SoftwareQueue {
-    attribute depth : Integer;
-    attribute discipline : QueueDiscipline;
-    attribute maxAge : DurationValue;
-    assert constraint { depth > 0 }
+  port def UserCommandQueuePort {
+    in item input : UserCommand;
+    out item output : UserCommand;
+  }
+  port def DriveCommandQueuePort {
+    in item input : DriveCommand;
+    out item output : DriveCommand;
+  }
+  port def MapUpdateQueuePort {
+    in item input : MapUpdate;
+    out item output : MapUpdate;
   }
 
   part def HazardEventQueue :> SoftwareQueue {
-    action transfer {
-      in item enqueue : HazardEvent;
-      out item dequeue : HazardEvent;
-    }
+    port messages : HazardEventQueuePort;
   }
   part def UserCommandQueue :> SoftwareQueue {
-    action transfer {
-      in item enqueue : UserCommand;
-      out item dequeue : UserCommand;
-    }
+    port messages : UserCommandQueuePort;
   }
   part def DriveCommandQueue :> SoftwareQueue {
-    action transfer {
-      in item enqueue : DriveCommand;
-      out item dequeue : DriveCommand;
-    }
+    port messages : DriveCommandQueuePort;
   }
   part def MapUpdateQueue :> SoftwareQueue {
-    action transfer {
-      in item enqueue : MapUpdate;
-      out item dequeue : MapUpdate;
-    }
+    port messages : MapUpdateQueuePort;
   }
 
-  part def SchedulerModel {
-    attribute tickPeriod : DurationValue;
-    attribute schedulingPolicy : SchedulingPolicy;
-    doc /*
-      Safety and actuator loops execute before mission and app work. Overload
-      sheds noncritical app/status work before safety or control work.
-    */
-  }
-
-  part def MissionControllerTask :> FirmwareTask {
-    attribute :>> period = 50 [ms];
+  part def MissionControllerTask :> EventDrivenFirmwareTask {
     attribute :>> deadline = 50 [ms];
-    attribute :>> worstCaseExecutionTime = 4 [ms];
-    attribute :>> stackBudgetBytes = 4096;
-    attribute :>> heapBudgetBytes = 4096;
     attribute :>> priority = 5;
     attribute :>> criticality = TaskCriticality::missionCritical;
-    attribute :>> startupPhase = StartupPhase::mission;
     action run {
       in item plannerCommandIn : DriveCommand;
       in item userCommandIn : UserCommand;
@@ -96,15 +61,10 @@ package FirmwareArchitecture {
     }
   }
 
-  part def SafetySupervisorTask :> FirmwareTask {
-    attribute :>> period = 10 [ms];
+  part def SafetySupervisorTask :> EventDrivenFirmwareTask {
     attribute :>> deadline = 10 [ms];
-    attribute :>> worstCaseExecutionTime = 1 [ms];
-    attribute :>> stackBudgetBytes = 3072;
-    attribute :>> heapBudgetBytes = 0;
     attribute :>> priority = 7;
     attribute :>> criticality = TaskCriticality::safetyCritical;
-    attribute :>> startupPhase = StartupPhase::safety;
     action run {
       in item hazardIn : HazardEvent;
       in item telemetryIn : BatteryTelemetry;
@@ -113,15 +73,11 @@ package FirmwareArchitecture {
     }
   }
 
-  part def ActuatorControlTask :> FirmwareTask {
+  part def ActuatorControlTask :> PeriodicFirmwareTask {
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
-    attribute :>> worstCaseExecutionTime = 3 [ms];
-    attribute :>> stackBudgetBytes = 4096;
-    attribute :>> heapBudgetBytes = 1024;
     attribute :>> priority = 6;
     attribute :>> criticality = TaskCriticality::safetyCritical;
-    attribute :>> startupPhase = StartupPhase::safety;
     action run {
       in item driveCommandIn : DriveCommand;
       in item cleaningCommandIn : CleaningCommand;
@@ -131,15 +87,11 @@ package FirmwareArchitecture {
     }
   }
 
-  part def SensorAcquisitionTask :> FirmwareTask {
+  part def SensorAcquisitionTask :> PeriodicFirmwareTask {
     attribute :>> period = 20 [ms];
     attribute :>> deadline = 20 [ms];
-    attribute :>> worstCaseExecutionTime = 3 [ms];
-    attribute :>> stackBudgetBytes = 4096;
-    attribute :>> heapBudgetBytes = 2048;
     attribute :>> priority = 6;
     attribute :>> criticality = TaskCriticality::safetyCritical;
-    attribute :>> startupPhase = StartupPhase::safety;
     action run {
       out item lidarScanOut : LidarScanFrame;
       out item obstacleOut : ObstacleObservation;
@@ -148,15 +100,11 @@ package FirmwareArchitecture {
     }
   }
 
-  part def NavigationTask :> FirmwareTask {
+  part def NavigationTask :> PeriodicFirmwareTask {
     attribute :>> period = 50 [ms];
     attribute :>> deadline = 50 [ms];
-    attribute :>> worstCaseExecutionTime = 12 [ms];
-    attribute :>> stackBudgetBytes = 8192;
-    attribute :>> heapBudgetBytes = 32768;
     attribute :>> priority = 4;
     attribute :>> criticality = TaskCriticality::missionCritical;
-    attribute :>> startupPhase = StartupPhase::mission;
     action run {
       in item lidarScanIn : LidarScanFrame;
       in item odometryIn : PoseEstimate;
@@ -166,30 +114,21 @@ package FirmwareArchitecture {
     }
   }
 
-  part def PowerManagerTask :> FirmwareTask {
+  part def PowerManagerTask :> PeriodicFirmwareTask {
     attribute :>> period = 100 [ms];
     attribute :>> deadline = 100 [ms];
-    attribute :>> worstCaseExecutionTime = 2 [ms];
-    attribute :>> stackBudgetBytes = 3072;
-    attribute :>> heapBudgetBytes = 1024;
     attribute :>> priority = 5;
     attribute :>> criticality = TaskCriticality::safetyCritical;
-    attribute :>> startupPhase = StartupPhase::safety;
     action run {
       out item telemetryOut : BatteryTelemetry;
       out item hazardOut : HazardEvent;
     }
   }
 
-  part def AppServiceTask :> FirmwareTask {
-    attribute :>> period = 100 [ms];
+  part def AppServiceTask :> EventDrivenFirmwareTask {
     attribute :>> deadline = 100 [ms];
-    attribute :>> worstCaseExecutionTime = 8 [ms];
-    attribute :>> stackBudgetBytes = 8192;
-    attribute :>> heapBudgetBytes = 16384;
     attribute :>> priority = 2;
     attribute :>> criticality = TaskCriticality::nonCritical;
-    attribute :>> startupPhase = StartupPhase::services;
     action run {
       in item missionStatusIn : MissionStatus;
       in item mapUpdateIn : MapUpdate;
@@ -201,6 +140,10 @@ package FirmwareArchitecture {
 
   part def FirmwareTaskArchitecture {
     part scheduler : SchedulerModel {
+      doc /*
+        Safety and actuator loops execute before mission and app work. Overload
+        sheds noncritical app/status work before safety or control work.
+      */
       attribute :>> tickPeriod = 1 [ms];
       attribute :>> schedulingPolicy =
         SchedulingPolicy::fixedPriorityCooperative;
@@ -214,50 +157,39 @@ package FirmwareArchitecture {
     part appService : AppServiceTask;
 
     part hazardQueue : HazardEventQueue {
-      attribute :>> depth = 8;
       attribute :>> discipline = QueueDiscipline::fifoDropNewest;
-      attribute :>> maxAge = 100 [ms];
-      doc /* Overflow produces a synthetic safety-critical hazard. */
     }
     part userCommandQueue : UserCommandQueue {
-      attribute :>> depth = 4;
       attribute :>> discipline = QueueDiscipline::overwriteLatest;
-      attribute :>> maxAge = 250 [ms];
     }
     part plannerCommandQueue : DriveCommandQueue {
-      attribute :>> depth = 4;
       attribute :>> discipline = QueueDiscipline::overwriteLatest;
-      attribute :>> maxAge = 100 [ms];
     }
     part safetyCommandQueue : DriveCommandQueue {
-      attribute :>> depth = 2;
       attribute :>> discipline = QueueDiscipline::overwriteLatest;
-      attribute :>> maxAge = 20 [ms];
     }
     part mapUpdateQueue : MapUpdateQueue {
-      attribute :>> depth = 16;
       attribute :>> discipline = QueueDiscipline::fifoDropOldest;
-      attribute :>> maxAge = 5000 [ms];
     }
 
     flow sensorAcquisition.run.lidarScanOut to navigation.run.lidarScanIn;
     flow actuatorControl.run.odometryOut to navigation.run.odometryIn;
-    flow navigation.run.plannerCommandOut to plannerCommandQueue.transfer.enqueue;
-    flow plannerCommandQueue.transfer.dequeue
+    flow navigation.run.plannerCommandOut to plannerCommandQueue.messages.input;
+    flow plannerCommandQueue.messages.output
       to missionController.run.plannerCommandIn;
-    flow appService.run.userCommandOut to userCommandQueue.transfer.enqueue;
-    flow userCommandQueue.transfer.dequeue to missionController.run.userCommandIn;
-    flow navigation.run.mapUpdateOut to mapUpdateQueue.transfer.enqueue;
-    flow mapUpdateQueue.transfer.dequeue to appService.run.mapUpdateIn;
+    flow appService.run.userCommandOut to userCommandQueue.messages.input;
+    flow userCommandQueue.messages.output to missionController.run.userCommandIn;
+    flow navigation.run.mapUpdateOut to mapUpdateQueue.messages.input;
+    flow mapUpdateQueue.messages.output to appService.run.mapUpdateIn;
     flow powerManager.run.telemetryOut to missionController.run.telemetryIn;
     flow powerManager.run.telemetryOut to safetySupervisor.run.telemetryIn;
-    flow sensorAcquisition.run.hazardOut to hazardQueue.transfer.enqueue;
-    flow actuatorControl.run.hazardOut to hazardQueue.transfer.enqueue;
-    flow powerManager.run.hazardOut to hazardQueue.transfer.enqueue;
-    flow hazardQueue.transfer.dequeue to safetySupervisor.run.hazardIn;
+    flow sensorAcquisition.run.hazardOut to hazardQueue.messages.input;
+    flow actuatorControl.run.hazardOut to hazardQueue.messages.input;
+    flow powerManager.run.hazardOut to hazardQueue.messages.input;
+    flow hazardQueue.messages.output to safetySupervisor.run.hazardIn;
     flow safetySupervisor.run.safeStopCommandOut
-      to safetyCommandQueue.transfer.enqueue;
-    flow safetyCommandQueue.transfer.dequeue
+      to safetyCommandQueue.messages.input;
+    flow safetyCommandQueue.messages.output
       to actuatorControl.run.driveCommandIn;
     flow missionController.run.driveCommandOut
       to actuatorControl.run.driveCommandIn;

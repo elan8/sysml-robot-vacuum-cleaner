@@ -2,40 +2,20 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Local purchased-parts library. It imports only reusable domain and standard
- * libraries so it can later move to a separate repository unchanged.
+ * Local purchased-parts library. Procurement/traceability metadata
+ * (`BuyPart`, `PartLifecycleStatus`) has moved to the reusable
+ * `generic/procurement` package in sysml-domain-libraries, since it carried
+ * no vacuum-specific semantics; this file now only holds the concrete,
+ * vacuum-specific catalog part selections.
  */
 library package PurchasedParts {
-  private import EmbeddedComputeDomain::*;
-  private import ElectronicsCore::*;
-  private import WirelessDomain::*;
+  private import Elan8::Electronics::Compute::*;
+  private import Elan8::Electronics::Core::*;
+  private import Elan8::Electronics::Wireless::*;
+  private import Elan8::Procurement::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
-
-  enum def PartLifecycleStatus {
-    active;
-    notRecommendedForNewDesign;
-    endOfLife;
-    unknown;
-  }
-
-  metadata def BuyPart {
-    doc /*
-      Procurement identity and authoritative external documentation for a
-      concrete, purchasable part definition. URLs identify external resources;
-      internal model identity remains semantic.
-    */
-    :> annotatedElement : SysML::PartDefinition;
-    attribute manufacturer : String;
-    attribute manufacturerPartNumber : String;
-    attribute productPageUrl : String;
-    attribute datasheetUrl : String;
-    attribute datasheetDocumentId : String;
-    attribute datasheetRevision : String;
-    attribute lifecycleStatus : PartLifecycleStatus;
-    attribute sourceCheckedOn : String;
-  }
 
   part def STM32U575VGT6 :> Microcontroller {
     @BuyPart {

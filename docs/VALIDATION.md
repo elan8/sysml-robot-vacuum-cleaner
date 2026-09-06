@@ -13,13 +13,13 @@ From the repository root:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The script runs Spec42 over all twelve model documents, supplies local Elan8
+The script runs Spec42 over all thirteen model documents, supplies local Elan8
 domain-library paths when available, and then runs static model guards.
 
 Expected result:
 
 ```text
-Checked 12 document(s): 0 error(s), 0 warning(s), 0 info(s)
+Checked 13 document(s): 0 error(s), 0 warning(s), 0 info(s)
 Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean.
 ```
 
@@ -42,11 +42,14 @@ missing queue flows and requirements without satisfaction or verification.
 ```powershell
 $views = @(
   "productDecomposition",
+  "baseDecomposition",
+  "topDecomposition",
+  "mainPcbDecomposition",
+  "powerDecomposition",
   "interconnections",
-  "firmwareRuntime",
-  "requirementsTraceability",
-  "cliffSafeStopGoldenThread",
-  "selectedParts"
+  "firmwareDeployment",
+  "systemRequirements",
+  "cliffSafeStopScenario"
 )
 foreach ($view in $views) {
   spec42 diagrams export model `
@@ -61,7 +64,7 @@ fallback labels.
 
 ## CI
 
-`.github/workflows/validate.yml` runs Spec42 **v0.47.1** (`elan8/spec42@v0.47.1`) for
+`.github/workflows/validate.yml` runs Spec42 **v0.51.0** (`elan8/spec42@v0.51.0`) for
 pushes and pull requests. Warnings remain visible in SARIF; this showcase treats
 any error, warning or information diagnostic as a release blocker.
 

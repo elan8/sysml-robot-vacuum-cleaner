@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Functional decomposition, operating states, and the two showcase scenarios.
+ * Functional decomposition, operating states, and representative operational scenarios.
  */
 package FunctionalArchitecture {
   private import DomainModel::*;
@@ -47,6 +47,7 @@ package FunctionalArchitecture {
     in telemetryIn : BatteryTelemetry;
     in hazardIn : HazardEvent;
     in plannerCommandIn : DriveCommand;
+    in safetyCommandIn : DriveCommand;
     in userCommandIn : UserCommand;
     in dockStatusIn : MissionStatus;
     out driveCommandOut : DriveCommand;
@@ -75,72 +76,22 @@ package FunctionalArchitecture {
     action safetySupervision : SuperviseSafety;
     action userInteraction : InteractWithUser;
 
-    bind navigation.mapIn = perception.map;
-    bind navigation.obstacleIn = perception.obstacle;
-    bind missionControl.plannerCommandIn = navigation.driveCommand;
-    bind missionControl.dockStatusIn = docking.dockStatus;
-    bind missionControl.telemetryIn = powerManagement.telemetry;
-    bind locomotion.command = missionControl.driveCommandOut;
-    bind cleaning.command = missionControl.cleaningCommandOut;
-    bind userInteraction.missionStatusIn = missionControl.missionStatusOut;
-    bind missionControl.userCommandIn = userInteraction.userCommandOut;
-    bind missionControl.hazardIn = perception.hazard;
-    bind missionControl.hazardIn = locomotion.fault;
-    bind missionControl.hazardIn = cleaning.fault;
-    bind missionControl.hazardIn = powerManagement.hazard;
-    bind safetySupervision.hazardIn = perception.hazard;
-    bind safetySupervision.hazardIn = locomotion.fault;
-    bind safetySupervision.hazardIn = cleaning.fault;
-    bind safetySupervision.hazardIn = powerManagement.hazard;
-  }
-
-  action def StartMission;
-
-  action def BuildMap {
-    out map : OccupancyGrid;
-  }
-
-  action def PlanCoveragePath {
-    in map : OccupancyGrid;
-    out driveCommand : DriveCommand;
-  }
-
-  action def CleanReachableArea {
-    in driveCommand : DriveCommand;
-    out status : MissionStatus;
-  }
-
-  action def ReportMissionStatus {
-    in status : MissionStatus;
-  }
-
-  action def ReturnToDock {
-    out dockStatus : MissionStatus;
-  }
-
-  action def ChargeBattery {
-    out telemetry : BatteryTelemetry;
-  }
-
-  action def AutonomousCleaningMission {
-    action startMission : StartMission;
-    action buildMap : BuildMap;
-    action planCoverage : PlanCoveragePath;
-    action cleanArea : CleanReachableArea;
-    action reportStatus : ReportMissionStatus;
-    action returnHome : ReturnToDock;
-    action charge : ChargeBattery;
-
-    flow buildMap.map to planCoverage.map;
-    flow planCoverage.driveCommand to cleanArea.driveCommand;
-    flow cleanArea.status to reportStatus.status;
-
-    first startMission then buildMap;
-    first buildMap then planCoverage;
-    first planCoverage then cleanArea;
-    first cleanArea then reportStatus;
-    first reportStatus then returnHome;
-    first returnHome then charge;
+    flow perception.map to navigation.mapIn;
+    flow perception.obstacle to navigation.obstacleIn;
+    flow locomotion.odometry to navigation.odometryIn;
+    flow navigation.driveCommand to missionControl.plannerCommandIn;
+    flow docking.dockStatus to missionControl.dockStatusIn;
+    flow powerManagement.telemetry to missionControl.telemetryIn;
+    flow missionControl.driveCommandOut to locomotion.command;
+    flow missionControl.cleaningCommandOut to cleaning.command;
+    flow missionControl.missionStatusOut to userInteraction.missionStatusIn;
+    flow userInteraction.userCommandOut to missionControl.userCommandIn;
+    flow perception.hazard to missionControl.hazardIn;
+    flow perception.hazard to safetySupervision.hazardIn;
+    flow locomotion.fault to safetySupervision.hazardIn;
+    flow cleaning.fault to safetySupervision.hazardIn;
+    flow powerManagement.hazard to safetySupervision.hazardIn;
+    flow safetySupervision.safeCommand to missionControl.safetyCommandIn;
   }
 }
 
@@ -212,17 +163,101 @@ package OperationalScenarios {
   private import FunctionalArchitecture::*;
   private import ProductContext::*;
   private import SystemRequirements::*;
-  private import Elan8Method::*;
+
+  action def StartMission;
+
+  action def BuildMap {
+    out map : OccupancyGrid;
+  }
+
+  action def PlanCoveragePath {
+    in map : OccupancyGrid;
+    out driveCommand : DriveCommand;
+  }
+
+  action def CleanReachableArea {
+    in driveCommand : DriveCommand;
+    out status : MissionStatus;
+  }
+
+  action def ReportMissionStatus {
+    in status : MissionStatus;
+  }
+
+  action def ReturnToDock {
+    out dockStatus : MissionStatus;
+  }
+
+  action def ChargeBattery {
+    out telemetry : BatteryTelemetry;
+  }
 
   action def ObserveSafeStop {
     in stopCommand : DriveCommand;
     out stoppedStatus : MissionStatus;
   }
 
-  action def CliffSafeStopGoldenThread {
-    @EngineeringConcern { concern = behavior; }
-    doc /* Engineering increment scenario: detect cliff and stop safely. */
-    in cliffStimulus : CliffObservation;
+  action def AutonomousCleaningScenario {
+    doc /* Clean the reachable floor and return to the dock when the mission completes. */
+    out finalStatus : MissionStatus;
+
+    action startMission : StartMission;
+    action buildMap : BuildMap;
+    action planCoverage : PlanCoveragePath;
+    action cleanArea : CleanReachableArea;
+    action reportStatus : ReportMissionStatus;
+    action returnHome : ReturnToDock;
+
+    flow buildMap.map to planCoverage.map;
+    flow planCoverage.driveCommand to cleanArea.driveCommand;
+    flow cleanArea.status to reportStatus.status;
+    bind finalStatus = cleanArea.status;
+
+    first startMission then buildMap;
+    first buildMap then planCoverage;
+    first planCoverage then cleanArea;
+    first cleanArea then reportStatus;
+    first reportStatus then returnHome;
+  }
+
+  action def ObstacleAvoidanceScenario {
+    doc /* Detect an unexpected obstacle, replan locally, and continue without collision. */
+
+    action observeEnvironment : SenseEnvironment;
+    action replanPath : PlanAndNavigate;
+    action updateMission : ControlMission;
+    action executeAvoidance : ProvideLocomotion;
+
+    flow observeEnvironment.map to replanPath.mapIn;
+    flow observeEnvironment.obstacle to replanPath.obstacleIn;
+    flow replanPath.driveCommand to updateMission.plannerCommandIn;
+    flow updateMission.driveCommandOut to executeAvoidance.command;
+
+    first observeEnvironment then replanPath;
+    first replanPath then updateMission;
+    first updateMission then executeAvoidance;
+  }
+
+  action def LowBatteryReturnScenario {
+    doc /* Detect low battery, end cleaning, return to the dock, and recharge. */
+
+    action monitorBattery : ManagePower;
+    action decideReturn : ControlMission;
+    action returnHome : ReturnToDock;
+    action charge : ChargeBattery;
+    action reportStatus : ReportMissionStatus;
+
+    flow monitorBattery.telemetry to decideReturn.telemetryIn;
+    flow returnHome.dockStatus to reportStatus.status;
+
+    first monitorBattery then decideReturn;
+    first decideReturn then returnHome;
+    first returnHome then charge;
+    first charge then reportStatus;
+  }
+
+  action def CliffSafeStopScenario {
+    doc /* Detect a cliff hazard, stop motion, and report the safe-stop state. */
     out reportedStatus : MissionStatus;
 
     action startMission : StartMission;
@@ -232,58 +267,85 @@ package OperationalScenarios {
     action observeSafeStop : ObserveSafeStop;
     action reportSafeStop : ReportMissionStatus;
 
-    flow detectCliff.hazard to superviseHazard.hazardIn;
-    flow superviseHazard.safeCommand to applySafeStop.command;
+    succession flow detectCliff.hazard to superviseHazard.hazardIn;
+    succession flow superviseHazard.safeCommand to applySafeStop.command;
     flow superviseHazard.safeCommand to observeSafeStop.stopCommand;
-    flow observeSafeStop.stoppedStatus to reportSafeStop.status;
+    succession flow observeSafeStop.stoppedStatus to reportSafeStop.status;
     bind reportedStatus = observeSafeStop.stoppedStatus;
 
     first startMission then detectCliff;
-    first detectCliff then superviseHazard;
-    first superviseHazard then applySafeStop;
     first applySafeStop then observeSafeStop;
-    first observeSafeStop then reportSafeStop;
   }
 
-  action cliffSafeStopGoldenThread : CliffSafeStopGoldenThread;
+  action autonomousCleaning : AutonomousCleaningScenario;
+  action obstacleAvoidance : ObstacleAvoidanceScenario;
+  action lowBatteryReturn : LowBatteryReturnScenario;
+  action cliffSafeStop : CliffSafeStopScenario;
 
   use case runAutonomousCleaning {
-    subject context : ResidentialCleaningContext;
+    subject robot : CleaningRobot;
     actor homeowner : User;
-    actor home : HomeEnvironment;
+    actor home : ResidentialEnvironment;
     objective {
       doc /*
-        Clean the reachable floor, respond safely to a cliff, report status,
-        return to the dock, and keep map data local by default.
+        Clean the reachable floor, report progress, and return to the dock
+        when the mission completes.
       */
     }
     first start;
-    then action mission : AutonomousCleaningMission;
+    then action mission : AutonomousCleaningScenario;
     then done;
   }
 
-  use case demonstrateCliffSafeStop {
-    subject context : ResidentialCleaningContext;
+  use case avoidUnexpectedObstacle {
+    subject robot : CleaningRobot;
     actor homeowner : User;
-    actor home : HomeEnvironment;
+    actor home : ResidentialEnvironment;
     objective {
-      doc /* Demonstrate requirement-to-behavior-to-verification traceability. */
+      doc /* Continue cleaning safely when furniture or another obstacle blocks the path. */
     }
     first start;
-    then action executeGoldenThread : CliffSafeStopGoldenThread;
+    then action avoidObstacle : ObstacleAvoidanceScenario;
     then done;
   }
 
-  allocate cliffSafeStopGoldenThread.detectCliff
-    to robotSystem.physical.sensorAssembly;
-  allocate cliffSafeStopGoldenThread.superviseHazard
+  use case returnForLowBattery {
+    subject robot : CleaningRobot;
+    actor homeowner : User;
+    actor dock : DockingStation;
+    objective {
+      doc /* Preserve availability by returning to the dock before the battery is depleted. */
+    }
+    first start;
+    then action returnAndCharge : LowBatteryReturnScenario;
+    then done;
+  }
+
+  use case respondToCliffHazard {
+    subject robot : CleaningRobot;
+    actor homeowner : User;
+    actor home : ResidentialEnvironment;
+    objective {
+      doc /* Prevent the robot from driving over a stair edge and inform the homeowner. */
+    }
+    first start;
+    then action stopSafely : CliffSafeStopScenario;
+    then done;
+  }
+
+  allocate cliffSafeStop.detectCliff
+    to robotSystem.physical.base;
+  allocate cliffSafeStop.superviseHazard
     to robotSystem.physical.firmwareTasks.safetySupervisor;
-  allocate cliffSafeStopGoldenThread.applySafeStop
-    to robotSystem.physical.driveModule;
-  allocate cliffSafeStopGoldenThread.reportSafeStop
+  allocate cliffSafeStop.applySafeStop
+    to robotSystem.physical.base;
+  allocate cliffSafeStop.reportSafeStop
     to robotSystem.physical.firmwareTasks.appService;
 
-  satisfy detectCliffs by cliffSafeStopGoldenThread.detectCliff;
-  satisfy superviseHazards by cliffSafeStopGoldenThread.superviseHazard;
-  satisfy reportCleaningStatus by cliffSafeStopGoldenThread.reportSafeStop;
+  satisfy robotSystemSpecification.detectCliffs
+    by cliffSafeStop.detectCliff;
+  satisfy robotSystemSpecification.superviseHazards
+    by cliffSafeStop.superviseHazard;
+  satisfy robotSystemSpecification.reportCleaningStatus
+    by cliffSafeStop.reportSafeStop;
 }

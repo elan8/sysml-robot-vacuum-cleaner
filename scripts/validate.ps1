@@ -49,9 +49,12 @@ if (-not $MethodLibraryRoot) {
     }
 }
 
-# Prefer Spec42's bundled domain + method libraries. Optional --library-path overrides
-# are only added when sibling checkouts (or env vars) are present for local iteration.
-$arguments = @()
+# Validate against the explicitly selected source libraries. Disabling managed
+# KPAR variants prevents stale installed packages from masking migration errors.
+$arguments = @(
+    "--disable-kpar-library", "domain",
+    "--disable-kpar-library", "method"
+)
 
 if ($MethodLibraryRoot -and (Test-Path $MethodLibraryRoot)) {
     $arguments += @("--library-path", (Resolve-Path $MethodLibraryRoot))

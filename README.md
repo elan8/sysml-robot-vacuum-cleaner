@@ -13,18 +13,20 @@ SPDX-License-Identifier: MIT
 
 A compact, graph-first SysML v2 showcase for an autonomous vacuum cleaner,
 organized with the **Elan8 Method** folder layout. It uses one selected product
-baseline, seven firmware tasks, six catalog parts and one cliff-safe-stop
-engineering increment. Every view projects the same authoritative
+baseline, seven firmware tasks, six catalog parts and four representative
+operational scenarios. Every view projects the same authoritative
 requirements, behavior, architecture and verification elements.
 
 ## What the showcase demonstrates
 
 - Elan8 Method concerns via folders `00_project` … `90_library`.
-- Elan8 requirement roles/identities and engineering concerns on the
-  cliff-safe-stop increment.
+- Elan8 requirement roles, identities, engineering concerns, and folder conventions
+  without exposing methodology jargon as product-domain behavior.
 - Definition/usage separation and one concrete `robotSystem` usage.
 - Typed items, ports, connections, flows and allocations instead of internal
   identity encoded as strings.
+- Explicit dock charging, protected battery distribution, homing-beacon reception,
+  module wiring harnesses, and mechanical mounting relationships.
 - Requirements satisfied by concrete behavior usages and verified by nine
   verification cases plus three quantitative analyses.
 - A reusable `PurchasedParts` library; named dependencies select catalog
@@ -46,7 +48,7 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `40_analysis/` | Three quantitative analyses |
 | `50_verification/` | Nine verification cases |
 | `60_views/` | Six projections |
-| `90_library/` | Purchased parts (units via domain `EngineeringUnits`) |
+| `90_library/` | Purchased parts (units via `Elan8::Units::Engineering`) |
 | `Root.sysml` | Workspace import hub |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).
@@ -60,7 +62,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
 The release criterion is 0 errors, 0 warnings and 0 information diagnostics,
-followed by successful SVG export of all six views. See
+followed by successful SVG export of all five views. See
 [validation details](docs/VALIDATION.md).
 
 ## Status and limitations
