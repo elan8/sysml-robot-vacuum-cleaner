@@ -63,7 +63,7 @@ foreach ($requirement in $requirementNames) {
             [regex]::Escape($requirement) + "\s+by\s+")) {
         Add-Failure "requirement '$requirement' has no satisfaction path"
     }
-    if ($modelText -notmatch ("(?m)^\s*verify\s+requirement\s+" + $qualifiedPrefix +
+    if ($modelText -notmatch ("(?m)^\s*verify\s+" + $qualifiedPrefix +
             [regex]::Escape($requirement) + "\s*;")) {
         Add-Failure "requirement '$requirement' has no verification path"
     }
