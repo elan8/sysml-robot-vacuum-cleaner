@@ -20,9 +20,9 @@ package Verification {
     @EngineeringConcern { concern = verification; }
     subject task : MissionControllerTask;
     objective {
-      verify requirement robotSystemSpecification.recoverFromStall;
-      verify requirement robotSystemSpecification.returnToDock;
-      verify requirement robotSystemSpecification.reportCleaningStatus;
+      verify robotSystemSpecification.recoverFromStall;
+      verify robotSystemSpecification.returnToDock;
+      verify robotSystemSpecification.reportCleaningStatus;
     }
     then action runMissionChecks : RunSoftwareVerification;
   }
@@ -31,9 +31,9 @@ package Verification {
     @EngineeringConcern { concern = verification; }
     subject task : SafetySupervisorTask;
     objective {
-      verify requirement robotSystemSpecification.superviseHazards;
-      verify requirement robotSystemSpecification.detectCliffs;
-      verify requirement robotSystemSpecification.chargeSafely;
+      verify robotSystemSpecification.superviseHazards;
+      verify robotSystemSpecification.detectCliffs;
+      verify robotSystemSpecification.chargeSafely;
     }
     then action runSafetyChecks : RunSoftwareVerification;
   }
@@ -41,8 +41,8 @@ package Verification {
   verification verifySensorAcquisition {
     subject task : SensorAcquisitionTask;
     objective {
-      verify requirement robotSystemSpecification.avoidObstacles;
-      verify requirement robotSystemSpecification.detectCliffs;
+      verify robotSystemSpecification.avoidObstacles;
+      verify robotSystemSpecification.detectCliffs;
     }
     then action runSensorChecks : RunSoftwareVerification;
   }
@@ -50,8 +50,8 @@ package Verification {
   verification verifyActuatorControl {
     subject task : ActuatorControlTask;
     objective {
-      verify requirement robotSystemSpecification.recoverFromStall;
-      verify requirement robotSystemSpecification.superviseHazards;
+      verify robotSystemSpecification.recoverFromStall;
+      verify robotSystemSpecification.superviseHazards;
     }
     then action runActuatorChecks : RunSoftwareVerification;
   }
@@ -59,8 +59,8 @@ package Verification {
   verification verifyAppPrivacy {
     subject task : AppServiceTask;
     objective {
-      verify requirement robotSystemSpecification.reportCleaningStatus;
-      verify requirement robotSystemSpecification.protectMapPrivacy;
+      verify robotSystemSpecification.reportCleaningStatus;
+      verify robotSystemSpecification.protectMapPrivacy;
     }
     then action runAppChecks : RunSoftwareVerification;
   }
@@ -68,8 +68,8 @@ package Verification {
   verification verifyCleaningCoverage {
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement robotSystemSpecification.cleanAtLeastEighty;
-      verify requirement robotSystemSpecification.coverFloor;
+      verify robotSystemSpecification.cleanAtLeastEighty;
+      verify robotSystemSpecification.coverFloor;
     }
     ref energyAnalysis = MissionEnergyAnalysis;
     then action runCoverageMission : RunPhysicalTest;
@@ -79,8 +79,8 @@ package Verification {
   verification verifyDockingAndCharging {
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify requirement robotSystemSpecification.returnToDock;
-      verify requirement robotSystemSpecification.chargeSafely;
+      verify robotSystemSpecification.returnToDock;
+      verify robotSystemSpecification.chargeSafely;
     }
     then action runDockingMission : RunPhysicalTest;
   }
@@ -88,8 +88,8 @@ package Verification {
   verification verifyNavigationPerformance {
     subject task : NavigationTask;
     objective {
-      verify requirement robotSystemSpecification.localizeReliably;
-      verify requirement robotSystemSpecification.updateCoverageMap;
+      verify robotSystemSpecification.localizeReliably;
+      verify robotSystemSpecification.updateCoverageMap;
     }
     ref performanceAnalysis = LocalizationPerformanceAnalysis;
     then action runNavigationChecks : RunSoftwareVerification;
@@ -101,9 +101,9 @@ package Verification {
     doc /* Verifies the reaction time and outcome of the cliff safe-stop scenario. */
     subject scenario : CliffSafeStopScenario;
     objective {
-      verify requirement robotSystemSpecification.detectCliffs;
-      verify requirement robotSystemSpecification.superviseHazards;
-      verify requirement robotSystemSpecification.reportCleaningStatus;
+      verify robotSystemSpecification.detectCliffs;
+      verify robotSystemSpecification.superviseHazards;
+      verify robotSystemSpecification.reportCleaningStatus;
     }
     ref reactionAnalysis = SafetyReactionAnalysis;
     then action executeScenario : RunPhysicalTest;
