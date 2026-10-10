@@ -95,7 +95,7 @@ jobs:
         run: mv .libraries "$RUNNER_TEMP/libraries"
 
       - name: Install Doc42
-        uses: elan8/doc42-action@v0.1.0
+        uses: elan8/doc42-action@v0.1.1
 
       - name: Check documents
         run: |
