@@ -16,7 +16,7 @@ package RobotAnalysisCases {
     subject robot : AutonomousFloorCleaningRobot;
     attribute chargeBudget : ElectricChargeValue =
       DesignLimits::batteryCapacityBudget;
-    attribute averageMissionCurrent : ElectricCurrentValue = 5 [A];
+    attribute averageMissionCurrent : ElectricCurrentValue = 2.6 [A];
     attribute missionDuration : DurationValue = 1.875 [h];
     attribute missionChargeDraw : ElectricChargeValue =
       averageMissionCurrent * missionDuration;

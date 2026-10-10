@@ -29,6 +29,7 @@ package PhysicalArchitecture {
   private import Elan8::Electronics::Compute::*;
   private import FirmwareArchitecture::*;
   private import PurchasedParts::*;
+  private import Sourcing::*;
   private import SystemRequirements::*;
   private import Elan8::Software::Core::*;
   private import Elan8::Electronics::Wireless::*;
@@ -38,8 +39,9 @@ package PhysicalArchitecture {
   private import ScalarValues::*;
 
   part def DriveMotor :> BldcMotor {
+    @BomItem { description = "Drive motor, brushless DC, 14 W"; sourcing = SourcingKind::buy; unitCostEur = 4.80; }
     attribute :>> ratedPower = 14 [W];
-    attribute :>> mass = 0.5 [kg]; /* illustrative estimate */
+    attribute :>> mass = 0.14 [kg]; /* illustrative estimate */
   }
 
   part def DriveTrain :> MechanicalComponent {
@@ -51,17 +53,21 @@ package PhysicalArchitecture {
 
     part motor : DriveMotor;
     part gearbox : Gearbox {
+      @BomItem { description = "Planetary gearbox, 30:1"; sourcing = SourcingKind::buy; unitCostEur = 1.60; }
       attribute :>> gearRatio = 30; /* illustrative estimate */
       attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
     }
     part wheel : Wheel {
+      @BomItem { description = "Drive wheel with tyre, 65 mm"; sourcing = SourcingKind::make; unitCostEur = 0.90; }
       attribute :>> diameter = 65 [mm]; /* illustrative estimate */
       attribute :>> mass = 0.08 [kg]; /* illustrative estimate */
     }
     part encoder : QuadratureEncoder {
-      attribute :>> mass = 0.1 [kg]; /* illustrative estimate */
+      @BomItem { description = "Quadrature encoder, magnetic"; sourcing = SourcingKind::buy; unitCostEur = 0.70; }
+      attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
     }
     part lift : LiftSwitch {
+      @BomItem { description = "Wheel-drop switch"; sourcing = SourcingKind::buy; unitCostEur = 0.15; }
       attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
     }
 
@@ -72,31 +78,40 @@ package PhysicalArchitecture {
     connect lift.signal to liftHazard;
   }
 
+  part def CleaningHeadHousing :> MechanicalComponent {
+    doc /* Brush chamber, main brush, suction duct and impeller housing. */
+    @BomItem { description = "Cleaning head housing with main brush and duct"; sourcing = SourcingKind::make; unitCostEur = 2.60; }
+    attribute :>> mass = 0.4 [kg]; /* illustrative estimate */
+  }
+
   part def CleaningHeadModule :> ElectronicsComponent {
     attribute :>> powerDraw = sum(brushMotor.ratedPower, vacuumMotor.ratedPower);
-    attribute :>> mass = sum(brushMotor.mass, vacuumMotor.mass, housingMass);
-    attribute housingMass : MassValue = 0.4 [kg]; /* illustrative estimate residual */
-    doc /*
-      housingMass is a named residual for unmodeled housing, brush-assembly, and
-      vacuum duct/impeller housing mass, following the enclosureMass/binMass
-      residual pattern used elsewhere in this file.
-    */
+    attribute :>> mass = sum(brushMotor.mass, brushDriver.mass, vacuumMotor.mass, vacuumDriver.mass, housing.mass);
     port power : PowerRailPort;
     port brushCommand : PwmPort;
     port vacuumCommand : PwmPort;
     port fault : GpioPort;
     port debrisOut : CleaningFlowPort;
 
+    part housing : CleaningHeadHousing;
     part brushMotor : BrushedDcMotor {
+      @BomItem { description = "Brush motor, brushed DC, 8 W"; sourcing = SourcingKind::buy; unitCostEur = 1.80; }
       attribute :>> ratedPower = 8 [W]; /* illustrative estimate */
-      attribute :>> mass = 0.25 [kg]; /* illustrative estimate */
+      attribute :>> mass = 0.07 [kg]; /* illustrative estimate */
     }
-    part brushDriver : HBridgeMotorDriver;
+    part brushDriver : HBridgeMotorDriver {
+      @BomItem { description = "H-bridge motor driver"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
+      attribute :>> mass = 0.002 [kg]; /* illustrative estimate */
+    }
     part vacuumMotor : BrushedDcMotor {
+      @BomItem { description = "Vacuum fan motor, brushed DC, 10 W"; sourcing = SourcingKind::buy; unitCostEur = 3.20; }
       attribute :>> ratedPower = 10 [W]; /* illustrative estimate */
-      attribute :>> mass = 0.25 [kg]; /* illustrative estimate */
+      attribute :>> mass = 0.16 [kg]; /* illustrative estimate */
     }
-    part vacuumDriver : HBridgeMotorDriver;
+    part vacuumDriver : HBridgeMotorDriver {
+      @BomItem { description = "H-bridge motor driver"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
+      attribute :>> mass = 0.002 [kg]; /* illustrative estimate */
+    }
 
     connect power to brushDriver.supply;
     connect power to vacuumDriver.supply;
@@ -109,6 +124,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotTofSensor :> DcPoweredSensor, I2cDataSensor {
+    @BomItem { description = "Time-of-flight distance sensor module"; sourcing = SourcingKind::buy; unitCostEur = 2.60; }
     attribute range : LengthValue = 1200 [mm];
     attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
@@ -117,6 +133,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotLidar :> DcPoweredSensor, UartDataSensor {
+    @BomItem { description = "360° laser distance scanner"; sourcing = SourcingKind::buy; unitCostEur = 35.00; }
     attribute scanRate : FrequencyValue = 10 [Hz];
     attribute range : LengthValue = 6000 [mm];
     attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
@@ -126,6 +143,7 @@ package PhysicalArchitecture {
   }
 
   part def CliffSensor :> DcPoweredSensor {
+    @BomItem { description = "Cliff sensor, infrared reflective"; sourcing = SourcingKind::buy; unitCostEur = 0.45; }
     attribute triggerHeight : LengthValue = 50 [mm];
     attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 0.25 [W]; /* illustrative estimate */
@@ -133,6 +151,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotBms :> BatteryManagementSystem {
+    @BomItem { description = "Battery gauge and protection circuit"; sourcing = SourcingKind::buy; unitCostEur = 2.90; }
     attribute :>> maxChargeCurrent = 2 [A];
     attribute :>> maxCellTemperature = 328.15 [K];
     attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
@@ -142,6 +161,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotBatteryCharger :> BatteryCharger {
+    @BomItem { description = "Battery charger stage, 2 A"; sourcing = SourcingKind::buy; unitCostEur = 1.20; }
     attribute :>> maxChargeCurrent = 2 [A];
     attribute :>> quiescentPower = 0.5 [W];
     attribute :>> powerDraw = 0.5 [W];
@@ -177,18 +197,21 @@ package PhysicalArchitecture {
       attribute :>> peakCurrentBudget = 1.2 [A];
     }
     part battery : BatteryPack {
-      attribute :>> nominalCapacity = 12500 [mAh];
+      @BomItem { description = "Lithium-ion battery pack, 4S2P, 14.4 V"; sourcing = SourcingKind::buy; unitCostEur = 16.00; }
+      attribute :>> nominalCapacity = 6400 [mAh];
       attribute :>> nominalVoltage = 14.4 [V];
-      attribute :>> mass = 0.65 [kg]; /* illustrative estimate */
+      attribute :>> mass = 0.50 [kg]; /* eight 18650 cells and pack hardware */
     }
     part charger : RobotBatteryCharger;
     part bms : RobotBms;
     part logicRegulator : VoltageRegulator {
+      @BomItem { description = "Buck regulator, 3.3 V"; sourcing = SourcingKind::buy; unitCostEur = 0.40; }
       attribute :>> outputVoltage = 3.3 [V];
       attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
       attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
     }
     part sensorRegulator : VoltageRegulator {
+      @BomItem { description = "Buck regulator, 5 V"; sourcing = SourcingKind::buy; unitCostEur = 0.40; }
       attribute :>> outputVoltage = 5 [V];
       attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
       attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
@@ -207,6 +230,12 @@ package PhysicalArchitecture {
     connect bms.alert to bmsAlert;
   }
 
+  part def DockContactAssembly :> MechanicalComponent {
+    doc /* Two sprung charging contacts in their carrier. */
+    @BomItem { description = "Charging contact assembly"; sourcing = SourcingKind::make; unitCostEur = 0.80; }
+    attribute :>> mass = 0.05 [kg]; /* illustrative estimate */
+  }
+
   part def DockInterfaceModule :> ElectronicsComponent {
     doc /*
       Robot-side docking interface with charging contacts and an optical
@@ -214,13 +243,14 @@ package PhysicalArchitecture {
       an internal GPIO indication for the main controller.
     */
     attribute :>> powerDraw = 2 [W];
-    attribute :>> mass = sum(beaconReceiver.mass, interfaceMass);
-    attribute interfaceMass : MassValue = 0.35 [kg]; /* contacts and housing */
+    attribute :>> mass = sum(beaconReceiver.mass, contacts.mass);
     port dockPowerInput : ~PowerRailPort;
     port chargePowerOutput : PowerRailPort;
     port beaconDetected : GpioPort;
 
+    part contacts : DockContactAssembly;
     part beaconReceiver : HomingBeaconReceiver {
+      @BomItem { description = "Infrared homing-beacon receiver"; sourcing = SourcingKind::buy; unitCostEur = 0.35; }
       attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
       attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
     }
@@ -231,6 +261,7 @@ package PhysicalArchitecture {
 
   part def Chassis :> MechanicalComponent {
     doc /* Bare structural tub; everything else in BaseModule mounts on it. */
+    @BomItem { description = "Chassis tub, injection moulded"; sourcing = SourcingKind::make; unitCostEur = 3.50; }
     attribute :>> mass = 0.3 [kg]; /* illustrative estimate */
   }
 
@@ -278,6 +309,7 @@ package PhysicalArchitecture {
     part leftDriveTrain : DriveTrain;
     part rightDriveTrain : DriveTrain;
     part casterWheel : CasterWheel {
+      @BomItem { description = "Front caster wheel"; sourcing = SourcingKind::buy; unitCostEur = 0.60; }
       attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
     }
     part frontLeftCliff : CliffSensor;
@@ -325,6 +357,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotMainMcu :> Microcontroller {
+    @BomItem { description = "Main microcontroller"; sourcing = SourcingKind::buy; unitCostEur = 4.60; }
     attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 3 [W]; /* illustrative estimate */
     port sensorI2c : I2cControllerPort;
@@ -355,6 +388,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotMotorDriver :> ThreePhaseMotorDriver {
+    @BomItem { description = "Three-phase motor driver"; sourcing = SourcingKind::buy; unitCostEur = 2.30; }
     attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 1.5 [W]; /* illustrative estimate */
     dependency selectedImplementation
@@ -362,6 +396,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotWirelessModule :> WirelessModule {
+    @BomItem { description = "Wi-Fi and Bluetooth LE module"; sourcing = SourcingKind::buy; unitCostEur = 1.50; }
     attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
     attribute :>> powerDraw = 1 [W]; /* illustrative estimate */
     port hostLink : UartPort :>> hostLink;
@@ -371,6 +406,7 @@ package PhysicalArchitecture {
   }
 
   part def RobotControlBoard :> PrintedCircuitBoard {
+    @BomItem { description = "Main control board, bare PCB with passives and connectors"; sourcing = SourcingKind::make; unitCostEur = 3.40; }
     attribute :>> mass = 0.155 [kg];
   }
 
@@ -418,6 +454,7 @@ package PhysicalArchitecture {
     part wireless : RobotWirelessModule :> mountedComponents;
     part wirelessUart : WirelessUartBus;
     part imu : I2cInertialMeasurementUnit :> mountedComponents {
+      @BomItem { description = "Inertial measurement unit, 6-axis"; sourcing = SourcingKind::buy; unitCostEur = 1.40; }
       attribute :>> mass = 0.03 [kg]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
       attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
     }
@@ -460,18 +497,24 @@ package PhysicalArchitecture {
   }
 
   part def HumanMachineInterface :> ElectronicsComponent {
+    @BomItem { description = "Button and indicator board"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
     attribute :>> powerDraw = 1 [W];
     attribute :>> mass = 0.08 [kg];
     port power : ~PowerRailPort;
     port control : ~LocalHmiControllerPort;
   }
 
+  part def TopShell :> MechanicalComponent {
+    doc /* Outer cover with the bumper carrier and the LiDAR turret opening. */
+    @BomItem { description = "Top shell with bumper carrier, moulded"; sourcing = SourcingKind::make; unitCostEur = 2.80; }
+    attribute :>> mass = 0.2 [kg]; /* illustrative estimate */
+  }
+
   part def TopModule :> MechanicalComponent {
     attribute :>> mass = sum(
       lidar.mass, frontTof.mass, leftTof.mass, rightTof.mass,
-      frontBumper.mass, hmi.mass, shellMass
+      frontBumper.mass, hmi.mass, shell.mass
     );
-    attribute shellMass : MassValue = 0.2 [kg]; /* illustrative estimate residual */
     attribute topElectronicsPowerDraw : PowerValue = sum(
       lidar.powerDraw, frontTof.powerDraw, leftTof.powerDraw, rightTof.powerDraw,
       hmi.powerDraw
@@ -479,8 +522,7 @@ package PhysicalArchitecture {
     doc /*
       topElectronicsPowerDraw is an ordinary (non-inherited) attribute, not an
       ElectronicsComponent::powerDraw override — TopModule specializes
-      MechanicalComponent and is not itself an ElectronicsComponent. shellMass is a
-      named residual for the unmodeled outer-shell plastic. frontBumper's quiescent
+      MechanicalComponent and is not itself an ElectronicsComponent. frontBumper's quiescent
       draw is left unset (negligible), matching the ElectronicsComponent "no
       default, not mandatory" convention already used for BatteryPack.
     */
@@ -490,11 +532,13 @@ package PhysicalArchitecture {
     port bumperHazard : GpioPort;
     port hmiControl : LocalHmiControllerPort;
 
+    part shell : TopShell;
     part lidar : RobotLidar;
     part frontTof : RobotTofSensor;
     part leftTof : RobotTofSensor;
     part rightTof : RobotTofSensor;
     part frontBumper : BumperSwitch {
+      @BomItem { description = "Bumper switch assembly"; sourcing = SourcingKind::buy; unitCostEur = 0.20; }
       attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
     }
     part hmi : HumanMachineInterface;
@@ -517,11 +561,18 @@ package PhysicalArchitecture {
   }
 
   part def DustBinLid :> MechanicalComponent {
+    @BomItem { description = "Dust bin lid, moulded"; sourcing = SourcingKind::make; unitCostEur = 0.30; }
     attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
   }
 
   part def DustFilter :> MechanicalComponent {
+    @BomItem { description = "Pleated dust filter"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
     attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
+  }
+
+  part def DustBinBody :> MechanicalComponent {
+    @BomItem { description = "Dust bin body, moulded"; sourcing = SourcingKind::make; unitCostEur = 0.70; }
+    attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
   }
 
   part def DustBin :> MechanicalComponent {
@@ -530,16 +581,17 @@ package PhysicalArchitecture {
       separately replaceable real-world spare part. Purely mechanical: no ports,
       no electronics.
     */
-    attribute :>> mass = sum(lid.mass, filter.mass, binMass);
-    attribute binMass : MassValue = 0.15 [kg]; /* illustrative estimate residual */
-    attribute capacity : VolumeValue = 400000 [mm^3]; /* illustrative estimate, ~0.4 L */
+    attribute :>> mass = sum(body.mass, lid.mass, filter.mass);
+    attribute capacity : VolumeValue = 450 [mL];
     port debrisIn : ~CleaningFlowPort;
 
+    part body : DustBinBody;
     part lid : DustBinLid;
     part filter : DustFilter;
   }
 
   part def BaseWiringHarness :> WiringHarness {
+    @BomItem { description = "Base wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.90; }
     attribute :>> mass = 0.12 [kg]; /* illustrative estimate */
     part pcbConnector : BoardConnector :> connectors;
     part baseConnector : ElectronicConnector :> connectors;
@@ -602,6 +654,7 @@ package PhysicalArchitecture {
   }
 
   part def TopWiringHarness :> WiringHarness {
+    @BomItem { description = "Top wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
     attribute :>> mass = 0.06 [kg]; /* illustrative estimate */
     part pcbConnector : BoardConnector :> connectors;
     part topConnector : ElectronicConnector :> connectors;
@@ -655,7 +708,7 @@ package PhysicalArchitecture {
     attribute :>> climbableThreshold = 20 [mm];
     attribute :>> robotMass =
       sum(base.mass, mainPcb.mass, top.mass, dustBin.mass, baseHarness.mass, topHarness.mass);
-    attribute :>> rechargeTime = 5.5 [h];
+    attribute :>> rechargeTime = 3.5 [h];
     attribute :>> batteryProtectionIndependentOfFirmware = true;
 
     part base : BaseModule;

@@ -20,13 +20,13 @@ package DesignLimits {
   attribute minimumCliffHeight : LengthValue = 50 [mm];
   attribute maxSafeStopReactionTime : DurationValue = 100 [ms];
   attribute maxWheelStallDetectionTime : DurationValue = 2 [s];
-  attribute batteryCapacityBudget : ElectricChargeValue = 12500 [mAh];
+  attribute batteryCapacityBudget : ElectricChargeValue = 6400 [mAh];
   attribute maxOverallHeight : LengthValue = 95 [mm];
   attribute maxSoundPressureLevel : SoundPressureLevelValue = 65 [dB];
   attribute minDustBinCapacity : VolumeValue = 400 [mL];
   attribute minClimbableThreshold : LengthValue = 20 [mm];
-  attribute maxRobotMass : MassValue = 5.0 [kg];
-  attribute maxRechargeTime : DurationValue = 6 [h];
+  attribute maxRobotMass : MassValue = 4.0 [kg];
+  attribute maxRechargeTime : DurationValue = 4 [h];
 }
 
 package SystemRequirements {
@@ -176,13 +176,13 @@ package SystemRequirements {
   requirement <'SYS-015'> 'Robot mass' {
     @RequirementRole { role = 'interface'; }
     require constraint { robot.robotMass <= maxRobotMass }
-    doc /* The robot shall have a mass of at most 5.0 kg with an empty dust bin. */
+    doc /* The robot shall have a mass of at most 4.0 kg with an empty dust bin. */
   }
 
   requirement <'SYS-016'> 'Recharge time' {
     @RequirementRole { role = performance; }
     require constraint { robot.rechargeTime <= maxRechargeTime }
-    doc /* The robot shall recharge from the low-battery return threshold to full charge within 6 hours on its dock. */
+    doc /* The robot shall recharge from the low-battery return threshold to full charge within 4 hours on its dock. */
   }
 
   requirement <'SYS-SAFE-012'> 'Battery protection independent of firmware' {
