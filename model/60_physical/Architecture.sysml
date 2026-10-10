@@ -10,6 +10,7 @@ package Architecture {
   public import PhysicalArchitecture::*;
   private import BehaviorStates::*;
   private import SystemRequirements::*;
+  private import ModuleRequirements::*;
 
   part def CleaningRobotSystemOfInterest {
     part physical : AutonomousFloorCleaningRobot;
@@ -76,4 +77,32 @@ package Architecture {
     by robotSystem.operate.powerManagement;
   satisfy robotSystemSpecification.'Battery protection independent of firmware'
     by robotSystem.physical.base.powerModule.bms;
+
+  // Module requirements are claimed by the module they are allocated to.
+  satisfy baseModuleSpecification.'Cliff sensing latency'
+    by robotSystem.physical.base;
+  satisfy baseModuleSpecification.'Drive braking time'
+    by robotSystem.physical.base;
+  satisfy baseModuleSpecification.'Base module mass'
+    by robotSystem.physical.base;
+  satisfy baseModuleSpecification.'Base module height'
+    by robotSystem.physical.base;
+  satisfy baseModuleSpecification.'Battery capacity'
+    by robotSystem.physical.base.powerModule;
+  satisfy baseModuleSpecification.'Charge current'
+    by robotSystem.physical.base.powerModule;
+  satisfy mainPcbSpecification.'Drive disable latency'
+    by robotSystem.physical.mainPcb;
+  satisfy mainPcbSpecification.'Main board mass'
+    by robotSystem.physical.mainPcb;
+  satisfy firmwareSpecification.'Safety supervisor deadline'
+    by robotSystem.physical.firmwareTasks.safetySupervisor;
+  satisfy topModuleSpecification.'Top module height'
+    by robotSystem.physical.top;
+  satisfy topModuleSpecification.'Top module mass'
+    by robotSystem.physical.top;
+  satisfy dustBinSpecification.'Dust bin mass'
+    by robotSystem.physical.dustBin;
+  satisfy harnessSpecification.'Wiring harness mass'
+    by robotSystem.physical;
 }

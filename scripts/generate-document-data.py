@@ -11,11 +11,14 @@ Reads one Spec42 export of `model/` and writes Markdown tables into
     mass-budget.md         mass per module against the robot mass limit
     traceability.md        customer requirement -> derived system requirements
     verification-matrix.md system requirement -> satisfied by -> verified by
+    allocation.md          system requirement -> module requirements and budgets
+    module-matrix.md       module requirement -> satisfied by -> verified by
 
 It also checks the model for gaps and fails when it finds one: a physical part
 without a bill-of-materials classification, a customer requirement without a
-derivation, a system requirement that no derivation names, or a system
-requirement without a satisfaction claim or a verification case.
+derivation, a system or module requirement that no derivation names, or a
+system or module requirement without a satisfaction claim or a verification
+case.
 
     python scripts/generate-document-data.py            regenerate
     python scripts/generate-document-data.py --check    fail if the files are stale
@@ -39,6 +42,7 @@ OUT = ROOT / "documents" / "generated"
 ROBOT = "PhysicalArchitecture::AutonomousFloorCleaningRobot"
 SPECIFICATION = "SystemRequirements::robotSystemSpecification"
 CUSTOMER = "StakeholderNeeds"
+MODULES = "ModuleRequirements"
 # Packages whose part definitions are logical, not purchasable or made items.
 LOGICAL_PACKAGES = ("DomainModel::", "FirmwareArchitecture::")
 
@@ -375,23 +379,54 @@ def requirement_tables(model: Model) -> tuple[dict[str, str], list[str]]:
         by = edges(satisfy, "outgoing", "satisfyTarget")
         for target in targets:
             satisfied.setdefault(target, []).extend(by)
-    verified: dict[str, list[str]] = {}
+    module = sorted((requirement
+                     for specification in model.owned(model.element(MODULES), "RequirementUsage")
+                     for requirement in model.owned(specification, "RequirementUsage")),
+                    key=lambda requirement: requirement["short_name"] or "")
+    module_names = {requirement["qualified_name"] for requirement in module}
+    allocation_rows, allocated = [], set()
     for requirement in system:
+        derived, rationale = derivations.get(requirement["qualified_name"], ([], ""))
+        if not derived:
+            continue
+        allocated.update(derived)
+        for name in set(derived) - module_names:
+            gaps.append("allocation names an element that is not a module requirement: " + name)
+        labels = [requirement_label(model.element(name)) for name in sorted(
+            derived, key=lambda name: model.element(name)["short_name"] or "")]
+        allocation_rows.append([requirement_label(requirement), "; ".join(labels), rationale])
+    for requirement in module:
+        if requirement["qualified_name"] not in allocated:
+            gaps.append("module requirement named by no derivation: " + requirement_label(requirement))
+
+    verified: dict[str, list[str]] = {}
+    for requirement in system + module:
         for peer in edges(requirement, "incoming", "verifyRequirementTarget"):
             verified.setdefault(requirement["qualified_name"], []).append(peer.split("::")[1])
 
-    matrix_rows = []
-    for requirement in system:
+    def matrix(requirements: list[dict], level: str) -> list[list[str]]:
+        rows = []
+        for requirement in requirements:
+            rows.append(matrix_row(requirement, level))
+        return rows
+
+    def matrix_row(requirement: dict, level: str) -> list[str]:
         name = requirement["qualified_name"]
         claims = sorted({claim.split("::", 1)[-1].replace("::", ".") for claim in satisfied.get(name, [])})
         cases = sorted(set(verified.get(name, [])))
         if not claims:
-            gaps.append("system requirement without a satisfaction claim: " + requirement_label(requirement))
+            gaps.append(f"{level} requirement without a satisfaction claim: " + requirement_label(requirement))
         if not cases:
-            gaps.append("system requirement without a verification case: " + requirement_label(requirement))
-        matrix_rows.append([requirement_label(requirement), ", ".join(claims),
-                            ", ".join(humanize(case.removeprefix("verify")) for case in cases)])
+            gaps.append(f"{level} requirement without a verification case: " + requirement_label(requirement))
+        return [requirement_label(requirement), ", ".join(claims),
+                ", ".join(humanize(case.removeprefix("verify")) for case in cases)]
+
+    matrix_rows = matrix(system, "system")
+    module_rows = matrix(module, "module")
     return {
+        "allocation.md": table(["System requirement", "Module requirements", "How the budget closes"],
+                               allocation_rows),
+        "module-matrix.md": table(["Module requirement", "Satisfied by", "Verified by"], module_rows),
         "traceability.md": table(["Customer requirement", "Derived system requirements",
                                   "Why this set is complete"], trace_rows),
         "verification-matrix.md": table(["System requirement", "Satisfied by", "Verified by"],

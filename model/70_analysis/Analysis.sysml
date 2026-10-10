@@ -33,15 +33,15 @@ package RobotAnalysisCases {
 
   analysis def SafetyReactionAnalysis {
     subject robot : AutonomousFloorCleaningRobot;
-    attribute sensorDetectionLatency : DurationValue = 25 [ms];
-    attribute queueAndSchedulingLatency : DurationValue = 10 [ms];
-    attribute safetyTaskExecutionLatency : DurationValue = 5 [ms];
-    attribute motorDisableLatency : DurationValue = 50 [ms];
+    attribute sensorDetectionLatency : DurationValue = robot.base.cliffSensingLatency;
+    attribute supervisorDecisionLatency : DurationValue = robot.firmwareTasks.safetySupervisor.deadline;
+    attribute driveDisableLatency : DurationValue = robot.mainPcb.driveDisableLatency;
+    attribute brakingTime : DurationValue = robot.base.brakingTime;
     attribute measuredReactionTime : DurationValue = sum(
       sensorDetectionLatency,
-      queueAndSchedulingLatency,
-      safetyTaskExecutionLatency,
-      motorDisableLatency
+      supervisorDecisionLatency,
+      driveDisableLatency,
+      brakingTime
     );
     attribute reactionTimeLimit : DurationValue =
       DesignLimits::maxSafeStopReactionTime;
@@ -49,7 +49,7 @@ package RobotAnalysisCases {
       return measuredReactionTime <= reactionTimeLimit;
     }
     objective estimateSafeStopTiming {
-      doc /* Demonstrate the quantitative path from sensing to motor disable. */
+      doc /* Add the design values of the four steps from hazard to standstill and compare the sum with the limit. */
     }
   }
 

@@ -13,6 +13,8 @@ package AutonomousFloorCleaningRobotDemo {
   private import DesignLimits::*;
   private import StakeholderNeeds::*;
   private import SystemRequirements::*;
+  private import ModuleBudgets::*;
+  private import ModuleRequirements::*;
   private import RequirementTraceability::*;
   private import FunctionalArchitecture::*;
   private import BehaviorStates::*;

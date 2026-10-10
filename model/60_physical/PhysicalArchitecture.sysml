@@ -271,6 +271,9 @@ package PhysicalArchitecture {
       frontLeftCliff.mass, frontRightCliff.mass, rearLeftCliff.mass, rearRightCliff.mass,
       cleaningHead.mass, powerModule.mass, dockInterface.mass
     );
+    attribute cliffSensingLatency : DurationValue = 20 [ms]; /* 100 Hz sampling, two-sample debounce */
+    attribute brakingTime : DurationValue = 40 [ms]; /* active short-circuit braking at 0.3 m/s */
+    attribute height : LengthValue = 55 [mm];
     attribute baseElectronicsPowerDraw : PowerValue = sum(
       leftDriveTrain.motor.ratedPower, rightDriveTrain.motor.ratedPower,
       frontLeftCliff.powerDraw, frontRightCliff.powerDraw,
@@ -417,6 +420,7 @@ package PhysicalArchitecture {
     attribute :>> mass =
       sum(mcu.mass, leftMotorDriver.mass, rightMotorDriver.mass, wireless.mass,
           imu.mass, bareBoard.mass);
+    attribute driveDisableLatency : DurationValue = 2 [ms]; /* gate-driver disable input, hardware path */
     doc /*
       bareBoard.mass covers PCB substrate, connectors, and passives not individually
       modeled. Merges the former MainControlPcb + MainElectronicsAssembly wrapper
@@ -515,6 +519,7 @@ package PhysicalArchitecture {
       lidar.mass, frontTof.mass, leftTof.mass, rightTof.mass,
       frontBumper.mass, hmi.mass, shell.mass
     );
+    attribute height : LengthValue = 37 [mm]; /* shell 12 mm, scanner turret 25 mm */
     attribute topElectronicsPowerDraw : PowerValue = sum(
       lidar.powerDraw, frontTof.powerDraw, leftTof.powerDraw, rightTof.powerDraw,
       hmi.powerDraw

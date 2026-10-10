@@ -10,6 +10,7 @@ package Verification {
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
   private import SystemRequirements::*;
+  private import ModuleRequirements::*;
 
   action def RunPhysicalTest;
   action def RunSoftwareVerification;
@@ -32,6 +33,7 @@ package Verification {
       verify robotSystemSpecification.'Safe stop on hazard';
       verify robotSystemSpecification.'Cliff detection';
       verify robotSystemSpecification.'Charging within the battery safe operating area';
+      verify firmwareSpecification.'Safety supervisor deadline';
     }
     then action runSafetyChecks : RunSoftwareVerification;
   }
@@ -80,6 +82,8 @@ package Verification {
       verify robotSystemSpecification.'Return to dock on low battery';
       verify robotSystemSpecification.'Charging within the battery safe operating area';
       verify robotSystemSpecification.'Recharge time';
+      verify baseModuleSpecification.'Battery capacity';
+      verify baseModuleSpecification.'Charge current';
     }
     then action runDockingMission : RunPhysicalTest;
   }
@@ -102,6 +106,9 @@ package Verification {
       verify robotSystemSpecification.'Cliff detection';
       verify robotSystemSpecification.'Safe stop on hazard';
       verify robotSystemSpecification.'Mission status reporting';
+      verify baseModuleSpecification.'Cliff sensing latency';
+      verify baseModuleSpecification.'Drive braking time';
+      verify mainPcbSpecification.'Drive disable latency';
     }
     ref reactionAnalysis = SafetyReactionAnalysis;
     then action executeScenario : RunPhysicalTest;
@@ -115,6 +122,13 @@ package Verification {
       verify robotSystemSpecification.'Overall height';
       verify robotSystemSpecification.'Robot mass';
       verify robotSystemSpecification.'Dust bin capacity';
+      verify baseModuleSpecification.'Base module mass';
+      verify baseModuleSpecification.'Base module height';
+      verify mainPcbSpecification.'Main board mass';
+      verify topModuleSpecification.'Top module height';
+      verify topModuleSpecification.'Top module mass';
+      verify dustBinSpecification.'Dust bin mass';
+      verify harnessSpecification.'Wiring harness mass';
     }
     ref massAnalysis = MassBudgetAnalysis;
     then action measureRobot : InspectAndMeasure;
