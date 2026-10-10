@@ -64,6 +64,14 @@ jobs:
             check model --warnings-as-errors | tee spec42.txt
           grep -q "0 error(s), 0 warning(s), 0 info(s)" spec42.txt
 
+      # The bill of materials, trace tables and matrices are derived from the
+      # model. This fails when they are stale or when the model has a gap.
+      - name: Check generated document data
+        env:
+          ELAN8_METHOD_LIBRARY_ROOT: .libraries/mbse-methodology/library
+          SYSML_DOMAIN_LIBRARIES_ROOT: .libraries/sysml-domain-libraries
+        run: python3 scripts/generate-document-data.py --check
+
   documents:
     name: Doc42 documents
     runs-on: ubuntu-latest
@@ -95,7 +103,7 @@ jobs:
         run: mv .libraries "$RUNNER_TEMP/libraries"
 
       - name: Install Doc42
-        uses: elan8/doc42-action@v0.1.1
+        uses: elan8/doc42-action@v0.2.0
 
       - name: Check documents
         run: |
@@ -117,5 +125,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: engineering-documents
-          path: out/*.pdf
+          path: |
+            out/*.pdf
+            documents/generated/bom.csv
           if-no-files-found: error

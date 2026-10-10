@@ -1,0 +1,3 @@
+The safe stop is the tightest chain in the design. From the moment a hazard appears, the base module has to sense it, the safety supervisor has to decide, the main board has to remove drive, and the drive trains have to come to standstill. Three modules and four steps share 100 ms.
+
+The budgets add up to 90 ms and leave 10 ms unallocated. The current design values add up to 72 ms: sensing at 100 Hz with a two-sample debounce takes 20 ms, the supervisor has a 10 ms deadline, the gate-driver disable input acts within 2 ms, and active braking from cleaning speed takes 40 ms. The design values are estimates until they are measured on hardware; braking dominates and is to be measured first.

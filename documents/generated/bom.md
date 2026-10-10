@@ -30,7 +30,7 @@
 |  **Dock interface** |  |  |  |  |  |  |
 |   Charging contact assembly | 1 | Make |  | 0.80 | 0.80 | 50 |
 |   Infrared homing-beacon receiver | 1 | Buy |  | 0.35 | 0.35 | 30 |
-| **Main pcb** |  |  |  |  |  |  |
+| **Main PCB** |  |  |  |  |  |  |
 |  Main control board, bare PCB with passives and connectors | 1 | Make |  | 3.40 | 3.40 | 155 |
 |  Main microcontroller | 1 | Buy | STMicroelectronics STM32U575VGT6 | 4.60 | 4.60 | 10 |
 |  Three-phase motor driver | 2 | Buy | Texas Instruments DRV8316RRGFR | 2.30 | 4.60 | 10 |

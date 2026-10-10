@@ -5,4 +5,6 @@ The customer is a household. Four parties take part in normal use, and each is r
 - the **docking station**, which charges the robot and emits the homing beacon it follows back ({{ProductContext::DockingStation}});
 - the **home**, with its floors, furniture, stairs, people and pets ({{ProductContext::ResidentialEnvironment}}).
 
+The figure below shows the reference home these requirements were written against.
+
 Other stakeholders are the service technician, who needs to diagnose faults, and Elan8 as manufacturer, which is accountable for the safety of the product. Their needs are covered by the safety and feedback requirements in this revision.

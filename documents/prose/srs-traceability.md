@@ -1,10 +1,3 @@
-Every system requirement refines one customer requirement of RVC-CRS-001, and every customer requirement is refined by at least one system requirement. The relationships are recorded in the model as refinement dependencies.
+Every customer requirement of RVC-CRS-001 has one derivation in the model. The derivation names all system requirements derived from the customer requirement and records why that set is complete: meeting all of them leaves nothing of the customer requirement unmet.
 
-- **USR-001, clean large areas:** SYS-001 and SYS-002.
-- **USR-SAFE-001, operate safely:** SYS-003, SYS-SAFE-010, SYS-SAFE-011 and SYS-006.
-- **USR-002, reliable docking:** SYS-007 and SYS-008.
-- **USR-003, navigate reliably:** SYS-004 and SYS-005.
-- **USR-004, mission feedback:** SYS-009.
-- **USR-005, respect privacy:** SYS-010.
-
-This list is maintained by hand from the model's refinement dependencies; it is not yet projected automatically.
+The table is generated from those derivations. The build of this document fails when a customer requirement has no derivation or when a system requirement is named by none, so a row cannot be missing.

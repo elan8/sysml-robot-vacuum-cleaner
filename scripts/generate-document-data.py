@@ -173,7 +173,8 @@ def humanize(name: str) -> str:
             word += character
     words.append(word)
     text = " ".join(words)
-    return text[0].upper() + text[1:].lower() if text else text
+    text = text[0].upper() + text[1:].lower() if text else text
+    return text.replace("pcb", "PCB")
 
 
 class Bom:

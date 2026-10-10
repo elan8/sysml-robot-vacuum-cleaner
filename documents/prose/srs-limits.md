@@ -8,4 +8,10 @@ The requirements refer to the following limit values. They are defined once in t
 - Localization error during the reference mission: at most 150 mm.
 - Time to detect a stalled wheel: at most 2 s.
 - State of charge at which the robot returns to the dock: 15 percent.
-- Battery capacity budget: 12 500 mAh.
+- Battery capacity budget: 6 400 mAh.
+- Overall height: at most 95 mm.
+- Sound pressure level while cleaning a hard floor, at 1 m: at most 65 dB(A).
+- Dust bin capacity: at least 400 mL.
+- Rigid threshold the robot crosses: at least 20 mm.
+- Robot mass with an empty dust bin: at most 4.0 kg.
+- Recharge time from the return threshold to full: at most 4 hours.

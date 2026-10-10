@@ -43,6 +43,7 @@ package RobotDocuments {
     view context {
       @Section { title = "Stakeholders and operating context"; }
       @Prose { file = "prose/crs-context.md"; }
+      @Figure { file = "figures/operating-context.svg"; caption = "The reference home, the parties in it and the conditions the robot meets"; }
       view contextDiagram : InterconnectionView {
         @Section { title = "Operating context"; }
         doc /* The robot and the external parties it exchanges power, signals and
@@ -67,6 +68,11 @@ package RobotDocuments {
       expose StakeholderNeeds::'Reliable navigation at home';
       expose StakeholderNeeds::'Mission progress and fault feedback';
       expose StakeholderNeeds::'Privacy of the home map';
+      expose StakeholderNeeds::'Cleaning under furniture';
+      expose StakeholderNeeds::'Quiet operation';
+      expose StakeholderNeeds::'Easy routine maintenance';
+      expose StakeholderNeeds::'Thresholds between rooms';
+      expose StakeholderNeeds::'Carrying between floors';
     }
 
     view constraints {
@@ -112,6 +118,7 @@ package RobotDocuments {
     view overview {
       @Section { title = "System overview"; }
       @Prose { file = "prose/srs-overview.md"; }
+      @Figure { file = "figures/product-layout.svg"; caption = "Product layout with the envelope the physical requirements refer to"; }
       view boundary : InterconnectionView {
         @Section { title = "System boundary"; }
         doc /* The system of interest is the robot. The user, the mobile application, the
@@ -144,6 +151,9 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
         expose SystemRequirements::robotSystemSpecification::'Floor coverage';
         expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
+        expose SystemRequirements::robotSystemSpecification::'Acoustic noise';
+        expose SystemRequirements::robotSystemSpecification::'Threshold climbing';
+        expose SystemRequirements::robotSystemSpecification::'Recharge time';
       }
       view safety : GeneralView {
         @Section { title = "Safety"; }
@@ -152,6 +162,7 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Cliff detection';
         expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
         expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
+        expose SystemRequirements::robotSystemSpecification::'Battery protection independent of firmware';
       }
       view functional : GeneralView {
         @Section { title = "Functional"; }
@@ -159,6 +170,7 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
         expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
         expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
+        expose SystemRequirements::robotSystemSpecification::'Dust bin capacity';
       }
       view interfaceAndSecurity : GeneralView {
         @Section { title = "Interface and security"; }
@@ -166,16 +178,24 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
         expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
       }
+      view physical : GeneralView {
+        @Section { title = "Physical characteristics"; }
+        @RequirementTable;
+        expose SystemRequirements::robotSystemSpecification::'Overall height';
+        expose SystemRequirements::robotSystemSpecification::'Robot mass';
+      }
     }
 
     view traceability {
       @Section { title = "Traceability to customer requirements"; }
       @Prose { file = "prose/srs-traceability.md"; }
+      @Prose { file = "generated/traceability.md"; }
     }
 
     view verification {
       @Section { title = "Verification approach"; }
       @Prose { file = "prose/srs-verification.md"; }
+      @Prose { file = "generated/verification-matrix.md"; }
     }
   }
 
@@ -210,6 +230,8 @@ package RobotDocuments {
     view designOverview {
       @Section { title = "Design overview"; }
       @Prose { file = "prose/sds-overview.md"; }
+      @Figure { file = "figures/system-architecture.svg"; caption = "System architecture: sensing, control, actuation and power, with the safe-stop path"; }
+      @Figure { file = "figures/product-layout.svg"; caption = "Product layout and envelope"; }
     }
 
     view functionalDesign {
@@ -268,19 +290,70 @@ package RobotDocuments {
       }
     }
 
+    view allocation {
+      @Section { title = "Requirement allocation to modules"; }
+      @Prose { file = "prose/sds-allocation.md"; }
+      @Prose { file = "generated/allocation.md"; }
+      view safeStopBudget {
+        @Section { title = "Safe-stop time budget"; }
+        @Prose { file = "prose/sds-safe-stop.md"; }
+        @Figure { file = "figures/safe-stop-timing.svg"; caption = "Safe-stop time: module budgets and current design values against the 100 ms limit"; }
+      }
+      view baseModuleRequirements : GeneralView {
+        @Section { title = "Base module requirements"; }
+        @RequirementTable;
+        expose ModuleRequirements::baseModuleSpecification::'Cliff sensing latency';
+        expose ModuleRequirements::baseModuleSpecification::'Drive braking time';
+        expose ModuleRequirements::baseModuleSpecification::'Base module mass';
+        expose ModuleRequirements::baseModuleSpecification::'Base module height';
+        expose ModuleRequirements::baseModuleSpecification::'Battery capacity';
+        expose ModuleRequirements::baseModuleSpecification::'Charge current';
+      }
+      view mainPcbRequirements : GeneralView {
+        @Section { title = "Main control board requirements"; }
+        @RequirementTable;
+        expose ModuleRequirements::mainPcbSpecification::'Drive disable latency';
+        expose ModuleRequirements::mainPcbSpecification::'Main board mass';
+      }
+      view firmwareRequirements : GeneralView {
+        @Section { title = "Firmware requirements"; }
+        @RequirementTable;
+        expose ModuleRequirements::firmwareSpecification::'Safety supervisor deadline';
+      }
+      view topAndBinRequirements : GeneralView {
+        @Section { title = "Top module, dust bin and harness requirements"; }
+        @RequirementTable;
+        expose ModuleRequirements::topModuleSpecification::'Top module height';
+        expose ModuleRequirements::topModuleSpecification::'Top module mass';
+        expose ModuleRequirements::dustBinSpecification::'Dust bin mass';
+        expose ModuleRequirements::harnessSpecification::'Wiring harness mass';
+      }
+      view moduleVerification {
+        @Section { title = "Module requirement coverage"; }
+        @Prose { file = "prose/sds-module-coverage.md"; }
+        @Prose { file = "generated/module-matrix.md"; }
+      }
+    }
+
     view firmwareArchitecture {
       @Section { title = "Firmware architecture"; }
       @Prose { file = "prose/sds-firmware.md"; }
     }
 
-    view components {
-      @Section { title = "Purchased components"; }
-      @Prose { file = "prose/sds-components.md"; }
+    view billOfMaterials {
+      @Section { title = "Bill of materials"; }
+      @Prose { file = "prose/sds-bom.md"; }
+      @Prose { file = "generated/bom.md"; }
+      view components {
+        @Section { title = "Design-determining components"; }
+        @Prose { file = "prose/sds-components.md"; }
+      }
     }
 
     view analyses {
       @Section { title = "Design analyses"; }
       @Prose { file = "prose/sds-analyses.md"; }
+      @Prose { file = "generated/mass-budget.md"; }
     }
 
     view satisfaction : GeneralView {
@@ -301,6 +374,13 @@ package RobotDocuments {
       expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
       expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
       expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
+      expose SystemRequirements::robotSystemSpecification::'Overall height';
+      expose SystemRequirements::robotSystemSpecification::'Acoustic noise';
+      expose SystemRequirements::robotSystemSpecification::'Dust bin capacity';
+      expose SystemRequirements::robotSystemSpecification::'Threshold climbing';
+      expose SystemRequirements::robotSystemSpecification::'Robot mass';
+      expose SystemRequirements::robotSystemSpecification::'Recharge time';
+      expose SystemRequirements::robotSystemSpecification::'Battery protection independent of firmware';
     }
 
     view openPoints {

@@ -29,7 +29,7 @@ level,item,model_path,quantity,sourcing,manufacturer,manufacturer_part_number,un
 2,Dock interface,base.dockInterface,,assembly,,,,,
 3,Charging contact assembly,base.dockInterface.contacts,1,make,,,0.80,0.80,0.050
 3,Infrared homing-beacon receiver,base.dockInterface.beaconReceiver,1,buy,,,0.35,0.35,0.030
-1,Main pcb,mainPcb,,assembly,,,,,
+1,Main PCB,mainPcb,,assembly,,,,,
 2,"Main control board, bare PCB with passives and connectors",mainPcb.bareBoard,1,make,,,3.40,3.40,0.155
 2,Main microcontroller,mainPcb.mcu,1,buy,STMicroelectronics,STM32U575VGT6,4.60,4.60,0.010
 2,Three-phase motor driver,mainPcb.leftMotorDriver,2,buy,Texas Instruments,DRV8316RRGFR,2.30,4.60,0.010

@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Nine verification cases (verification concern).
+ * Twelve verification cases (verification concern).
  */
 package Verification {
   private import RobotAnalysisCases::*;
