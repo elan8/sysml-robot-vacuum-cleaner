@@ -189,18 +189,18 @@ package ModelViews {
     satisfy requirementStructurePerspective;
     filter @SysML::RequirementUsage;
     expose SystemRequirements::robotSystemSpecification;
-    expose SystemRequirements::robotSystemSpecification::cleanAtLeastEighty;
-    expose SystemRequirements::robotSystemSpecification::coverFloor;
-    expose SystemRequirements::robotSystemSpecification::avoidObstacles;
-    expose SystemRequirements::robotSystemSpecification::detectCliffs;
-    expose SystemRequirements::robotSystemSpecification::superviseHazards;
-    expose SystemRequirements::robotSystemSpecification::localizeReliably;
-    expose SystemRequirements::robotSystemSpecification::updateCoverageMap;
-    expose SystemRequirements::robotSystemSpecification::recoverFromStall;
-    expose SystemRequirements::robotSystemSpecification::returnToDock;
-    expose SystemRequirements::robotSystemSpecification::chargeSafely;
-    expose SystemRequirements::robotSystemSpecification::reportCleaningStatus;
-    expose SystemRequirements::robotSystemSpecification::protectMapPrivacy;
+    expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
+    expose SystemRequirements::robotSystemSpecification::'Floor coverage';
+    expose SystemRequirements::robotSystemSpecification::'Obstacle avoidance';
+    expose SystemRequirements::robotSystemSpecification::'Cliff detection';
+    expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
+    expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
+    expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
+    expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
+    expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
+    expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
+    expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
+    expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
   }
 
   view cliffSafeStopScenario : ActionFlowView {

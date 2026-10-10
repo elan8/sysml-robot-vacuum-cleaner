@@ -65,4 +65,22 @@ package RobotAnalysisCases {
       doc /* Confirm the selected ToF, LiDAR, IMU, and odometry baseline. */
     }
   }
+
+  analysis def MassBudgetAnalysis {
+    subject robot : AutonomousFloorCleaningRobot;
+    attribute baseMass : MassValue = robot.base.mass;
+    attribute mainPcbMass : MassValue = robot.mainPcb.mass;
+    attribute topMass : MassValue = robot.top.mass;
+    attribute dustBinMass : MassValue = robot.dustBin.mass;
+    attribute harnessMass : MassValue = robot.baseHarness.mass + robot.topHarness.mass;
+    attribute totalMass : MassValue =
+      sum(baseMass, mainPcbMass, topMass, dustBinMass, harnessMass);
+    attribute massLimit : MassValue = maxRobotMass;
+    return ref massWithinLimit {
+      return totalMass <= massLimit;
+    }
+    objective massObjective {
+      doc /* Roll up the module masses and compare the total with the mass limit. */
+    }
+  }
 }

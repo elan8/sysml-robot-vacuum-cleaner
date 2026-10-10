@@ -52,10 +52,25 @@ if ($modelText -match "(?m)^\s*(?:part|item|metadata)\s+def\s+Hazard\b") {
 }
 
 $requirementNames = @(
-    "cleanAtLeastEighty", "coverFloor", "avoidObstacles", "detectCliffs",
-    "superviseHazards", "localizeReliably", "updateCoverageMap",
-    "recoverFromStall", "returnToDock", "chargeSafely",
-    "reportCleaningStatus", "protectMapPrivacy"
+    "'Cleaning area per charge'",
+    "'Floor coverage'",
+    "'Obstacle avoidance'",
+    "'Cliff detection'",
+    "'Safe stop on hazard'",
+    "'Localization accuracy'",
+    "'Coverage map maintenance'",
+    "'Wheel stall detection and recovery'",
+    "'Return to dock on low battery'",
+    "'Charging within the battery safe operating area'",
+    "'Mission status reporting'",
+    "'Local storage of map data'",
+    "'Overall height'",
+    "'Acoustic noise'",
+    "'Dust bin capacity'",
+    "'Threshold climbing'",
+    "'Robot mass'",
+    "'Recharge time'",
+    "'Battery protection independent of firmware'"
 )
 foreach ($requirement in $requirementNames) {
     $qualifiedPrefix = "(?:[A-Za-z_][A-Za-z0-9_]*(?:::|\.))*"

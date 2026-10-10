@@ -61,12 +61,12 @@ package RobotDocuments {
       @RequirementTable;
       doc /* Each requirement is a need of the household, identified by a stable number. The
            * system requirements that refine it are specified in RVC-SRS-001. */
-      expose StakeholderNeeds::cleanLargeAreas;
-      expose StakeholderNeeds::operateSafely;
-      expose StakeholderNeeds::reliableDocking;
-      expose StakeholderNeeds::navigateReliably;
-      expose StakeholderNeeds::missionFeedback;
-      expose StakeholderNeeds::respectPrivacy;
+      expose StakeholderNeeds::'Whole-home cleaning in one run';
+      expose StakeholderNeeds::'Safe operation in the household';
+      expose StakeholderNeeds::'Unattended docking and charging';
+      expose StakeholderNeeds::'Reliable navigation at home';
+      expose StakeholderNeeds::'Mission progress and fault feedback';
+      expose StakeholderNeeds::'Privacy of the home map';
     }
 
     view constraints {
@@ -141,30 +141,30 @@ package RobotDocuments {
       view performance : GeneralView {
         @Section { title = "Performance"; }
         @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::cleanAtLeastEighty;
-        expose SystemRequirements::robotSystemSpecification::coverFloor;
-        expose SystemRequirements::robotSystemSpecification::localizeReliably;
+        expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
+        expose SystemRequirements::robotSystemSpecification::'Floor coverage';
+        expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
       }
       view safety : GeneralView {
         @Section { title = "Safety"; }
         @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::avoidObstacles;
-        expose SystemRequirements::robotSystemSpecification::detectCliffs;
-        expose SystemRequirements::robotSystemSpecification::superviseHazards;
-        expose SystemRequirements::robotSystemSpecification::chargeSafely;
+        expose SystemRequirements::robotSystemSpecification::'Obstacle avoidance';
+        expose SystemRequirements::robotSystemSpecification::'Cliff detection';
+        expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
+        expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
       }
       view functional : GeneralView {
         @Section { title = "Functional"; }
         @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::updateCoverageMap;
-        expose SystemRequirements::robotSystemSpecification::recoverFromStall;
-        expose SystemRequirements::robotSystemSpecification::returnToDock;
+        expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
+        expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
+        expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
       }
       view interfaceAndSecurity : GeneralView {
         @Section { title = "Interface and security"; }
         @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::reportCleaningStatus;
-        expose SystemRequirements::robotSystemSpecification::protectMapPrivacy;
+        expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
+        expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
       }
     }
 
@@ -289,18 +289,18 @@ package RobotDocuments {
       doc /* The design element that claims each system requirement. A claim is a design
            * intent recorded in the model, not evidence; evidence comes from the verification
            * cases listed in RVC-SRS-001. */
-      expose SystemRequirements::robotSystemSpecification::cleanAtLeastEighty;
-      expose SystemRequirements::robotSystemSpecification::coverFloor;
-      expose SystemRequirements::robotSystemSpecification::avoidObstacles;
-      expose SystemRequirements::robotSystemSpecification::detectCliffs;
-      expose SystemRequirements::robotSystemSpecification::superviseHazards;
-      expose SystemRequirements::robotSystemSpecification::localizeReliably;
-      expose SystemRequirements::robotSystemSpecification::updateCoverageMap;
-      expose SystemRequirements::robotSystemSpecification::recoverFromStall;
-      expose SystemRequirements::robotSystemSpecification::returnToDock;
-      expose SystemRequirements::robotSystemSpecification::chargeSafely;
-      expose SystemRequirements::robotSystemSpecification::reportCleaningStatus;
-      expose SystemRequirements::robotSystemSpecification::protectMapPrivacy;
+      expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
+      expose SystemRequirements::robotSystemSpecification::'Floor coverage';
+      expose SystemRequirements::robotSystemSpecification::'Obstacle avoidance';
+      expose SystemRequirements::robotSystemSpecification::'Cliff detection';
+      expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
+      expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
+      expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
+      expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
+      expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
+      expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
+      expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
+      expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
     }
 
     view openPoints {

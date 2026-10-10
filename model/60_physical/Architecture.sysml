@@ -36,28 +36,44 @@ package Architecture {
 
   part robotSystem : CleaningRobotSystemOfInterest;
 
-  satisfy robotSystemSpecification.cleanAtLeastEighty
+  satisfy robotSystemSpecification.'Cleaning area per charge'
     by robotSystem.operate.cleaning;
-  satisfy robotSystemSpecification.coverFloor
+  satisfy robotSystemSpecification.'Floor coverage'
     by robotSystem.operate.navigation;
-  satisfy robotSystemSpecification.avoidObstacles
+  satisfy robotSystemSpecification.'Obstacle avoidance'
     by robotSystem.operate.perception;
-  satisfy robotSystemSpecification.detectCliffs
+  satisfy robotSystemSpecification.'Cliff detection'
     by robotSystem.operate.perception;
-  satisfy robotSystemSpecification.superviseHazards
+  satisfy robotSystemSpecification.'Safe stop on hazard'
     by robotSystem.operate.safetySupervision;
-  satisfy robotSystemSpecification.localizeReliably
+  satisfy robotSystemSpecification.'Localization accuracy'
     by robotSystem.operate.navigation;
-  satisfy robotSystemSpecification.updateCoverageMap
+  satisfy robotSystemSpecification.'Coverage map maintenance'
     by robotSystem.operate.navigation;
-  satisfy robotSystemSpecification.recoverFromStall
+  satisfy robotSystemSpecification.'Wheel stall detection and recovery'
     by robotSystem.operate.missionControl;
-  satisfy robotSystemSpecification.returnToDock
+  satisfy robotSystemSpecification.'Return to dock on low battery'
     by robotSystem.operate.docking;
-  satisfy robotSystemSpecification.chargeSafely
+  satisfy robotSystemSpecification.'Charging within the battery safe operating area'
     by robotSystem.operate.powerManagement;
-  satisfy robotSystemSpecification.reportCleaningStatus
+  satisfy robotSystemSpecification.'Mission status reporting'
     by robotSystem.operate.userInteraction;
-  satisfy robotSystemSpecification.protectMapPrivacy
+  satisfy robotSystemSpecification.'Local storage of map data'
     by robotSystem.operate.userInteraction;
+
+  // Physical properties are claimed by the element that determines them.
+  satisfy robotSystemSpecification.'Overall height'
+    by robotSystem.physical.top;
+  satisfy robotSystemSpecification.'Acoustic noise'
+    by robotSystem.physical.base.cleaningHead;
+  satisfy robotSystemSpecification.'Dust bin capacity'
+    by robotSystem.physical.dustBin;
+  satisfy robotSystemSpecification.'Threshold climbing'
+    by robotSystem.operate.locomotion;
+  satisfy robotSystemSpecification.'Robot mass'
+    by robotSystem.physical;
+  satisfy robotSystemSpecification.'Recharge time'
+    by robotSystem.operate.powerManagement;
+  satisfy robotSystemSpecification.'Battery protection independent of firmware'
+    by robotSystem.physical.base.powerModule.bms;
 }

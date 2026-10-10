@@ -649,6 +649,14 @@ package PhysicalArchitecture {
     attribute :>> chargeTemperatureWithinSafeOperatingArea = true;
     attribute :>> cleaningStatusReported = true;
     attribute :>> mapDataLocalUnlessConsented = true;
+    attribute :>> overallHeight = 92 [mm];
+    attribute :>> soundPressureLevel = 62 [dB];
+    attribute :>> dustBinCapacity = 450 [mL];
+    attribute :>> climbableThreshold = 20 [mm];
+    attribute :>> robotMass =
+      sum(base.mass, mainPcb.mass, top.mass, dustBin.mass, baseHarness.mass, topHarness.mass);
+    attribute :>> rechargeTime = 5.5 [h];
+    attribute :>> batteryProtectionIndependentOfFirmware = true;
 
     part base : BaseModule;
     part mainPcb : MainPcbModule;
