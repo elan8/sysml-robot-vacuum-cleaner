@@ -53,19 +53,48 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `90_views/` | Nine focused views |
 | `99_library/` | Purchased parts (units via `Elan8::Units::Engineering`) |
 | `Root.sysml` | Workspace import hub |
+| `../documents/` | Doc42 document definitions and prose, outside the model |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).
 
+## Engineering documents
+
+Three documents are generated from the model with [Doc42](https://github.com/elan8/doc42-action),
+with Elan8 as the engineering organization that issues them:
+
+| Document | Number | Content |
+| --- | --- | --- |
+| Customer Requirements Specification | RVC-CRS-001 | Stakeholders, operating context, scenarios and the six customer requirements |
+| System Requirements Specification | RVC-SRS-001 | System boundary, design limits, the twelve system requirements, traceability and verification approach |
+| System Design Specification | RVC-SDS-001 | Functions, physical and firmware architecture, purchased components, analyses and requirement satisfaction |
+
+They are defined in [`documents/Documents.sysml`](documents/Documents.sysml): each
+document is a SysML view, its nested views are the sections, and its requirement
+tables and diagrams are projected from the model. The surrounding text lives in
+`documents/prose/`. Every push builds the PDFs; download them from the
+`engineering-documents` artifact of the latest
+[workflow run](../../actions/workflows/validate.yml).
+
+```sh
+doc42 check . --library-path <method-library> --library-path <domain-libraries>/model
+doc42 build . --doc RobotDocuments::srs --out out --library-path ...
+```
+
+Checking the documents is free. Building them needs an Elan8 license in the
+`ELAN8_LICENSE` environment variable; the model itself needs neither Doc42 nor a
+license.
+
 ## Validation
 
-Requires sibling checkouts of `sysml-domain-libraries` and `mbse-methodology`:
+Requires [Spec42](https://github.com/elan8/spec42) 0.54.1 or later and sibling
+checkouts of `sysml-domain-libraries` and `mbse-methodology`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
 The release criterion is 0 errors, 0 warnings and 0 information diagnostics,
-followed by successful SVG export of all five views. See
+followed by successful SVG export of the views. See
 [validation details](docs/VALIDATION.md).
 
 ## Status and limitations
