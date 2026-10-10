@@ -42,7 +42,7 @@ if (-not $MethodLibraryRoot) {
     if ($env:ELAN8_METHOD_LIBRARY_ROOT) {
         $MethodLibraryRoot = $env:ELAN8_METHOD_LIBRARY_ROOT
     } else {
-        $siblingMethodLibrary = Join-Path $parentRoot "mbse-methodology\library"
+        $siblingMethodLibrary = Join-Path (Join-Path $parentRoot "mbse-methodology") "library"
         if (Test-Path $siblingMethodLibrary) {
             $MethodLibraryRoot = $siblingMethodLibrary
         }
@@ -61,13 +61,12 @@ if ($MethodLibraryRoot -and (Test-Path $MethodLibraryRoot)) {
 }
 
 if ($DomainLibrariesRoot) {
-    foreach ($subdir in @("domain", "technical", "generic")) {
-        $libraryPath = Join-Path $DomainLibrariesRoot $subdir
-        if (Test-Path $libraryPath) {
-            $arguments += @("--library-path", $libraryPath)
-        } else {
-            Write-Warning "Domain library path not found: $libraryPath"
-        }
+    # The domain libraries live under one root that Elan8.sysml ties together.
+    $libraryPath = Join-Path $DomainLibrariesRoot "model"
+    if (Test-Path $libraryPath) {
+        $arguments += @("--library-path", (Resolve-Path $libraryPath))
+    } else {
+        Write-Warning "Domain library path not found: $libraryPath"
     }
 }
 

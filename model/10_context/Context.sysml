@@ -8,7 +8,6 @@ package ProductContext {
   private import DomainModel::*;
   private import SystemRequirements::*;
   private import ScalarValues::*;
-  private import Elan8::Method::Core::*;
   private import Elan8::Electronics::Sensing::*;
 
   part def User {
@@ -38,8 +37,6 @@ package ProductContext {
   }
 
   part def ResidentialCleaningContext {
-    @EngineeringConcern { concern = purpose; }
-    @AbstractionLevel { level = operational; }
     ref part robot : CleaningRobot;
     part user : User;
     part app : MobileApp;

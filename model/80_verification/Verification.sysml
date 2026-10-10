@@ -10,14 +10,12 @@ package Verification {
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
   private import SystemRequirements::*;
-  private import Elan8::Method::Core::*;
 
   action def RunPhysicalTest;
   action def RunSoftwareVerification;
   action def RecordAnalysisResult;
 
   verification verifyMissionControl {
-    @EngineeringConcern { concern = verification; }
     subject task : MissionControllerTask;
     objective {
       verify robotSystemSpecification.recoverFromStall;
@@ -28,7 +26,6 @@ package Verification {
   }
 
   verification verifySafetySupervisor {
-    @EngineeringConcern { concern = verification; }
     subject task : SafetySupervisorTask;
     objective {
       verify robotSystemSpecification.superviseHazards;
@@ -97,7 +94,6 @@ package Verification {
   }
 
   verification verifyCliffSafeStop {
-    @EngineeringConcern { concern = verification; }
     doc /* Verifies the reaction time and outcome of the cliff safe-stop scenario. */
     subject scenario : CliffSafeStopScenario;
     objective {

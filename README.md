@@ -19,8 +19,8 @@ requirements, behavior, architecture and verification elements.
 
 ## What the showcase demonstrates
 
-- Elan8 Method concerns via folders `00_project` … `90_library`.
-- Elan8 requirement roles, identities, engineering concerns, and folder conventions
+- Elan8 Method model areas via folders `00_project` … `99_library`.
+- Elan8 requirement roles, native SysML requirement identifiers, and folder conventions
   without exposing methodology jargon as product-domain behavior.
 - Definition/usage separation and one concrete `robotSystem` usage.
 - Typed items, ports, connections, flows and allocations instead of internal
@@ -31,7 +31,7 @@ requirements, behavior, architecture and verification elements.
   verification cases plus three quantitative analyses.
 - A reusable `PurchasedParts` library; named dependencies select catalog
   implementations without turning procurement choice into type specialization.
-- Six curated views over the same graph.
+- Nine focused views over the same graph.
 
 The scope deliberately excludes product variants, trade studies, and
 implementation handoff tables. Human-facing external identifiers such as
@@ -41,14 +41,17 @@ manufacturer part numbers stay text; internal model identity is semantic.
 
 | Path | Purpose |
 | --- | --- |
-| `00_project/Project.sysml` | Tailoring / method profile |
-| `10_purpose/` | Context, needs, design limits, system requirements |
-| `20_behavior/` | Capabilities, states, scenarios |
-| `30_architecture/` | Domain, physical, firmware, SOI allocations |
-| `40_analysis/` | Three quantitative analyses |
-| `50_verification/` | Nine verification cases |
-| `60_views/` | Six projections |
-| `90_library/` | Purchased parts (units via `Elan8::Units::Engineering`) |
+| `00_project/Project.sysml` | Project information |
+| `05_requirements/` | Stakeholder needs, design limits, system requirements |
+| `10_context/` | External actors and the residential operating boundary |
+| `20_usecases/` | Four representative operational scenarios |
+| `40_functions/` | Functional decomposition and operating states |
+| `50_logical/` | Domain model and firmware architecture |
+| `60_physical/` | Physical architecture and system-of-interest allocations |
+| `70_analysis/` | Three quantitative analyses |
+| `80_verification/` | Nine verification cases |
+| `90_views/` | Nine focused views |
+| `99_library/` | Purchased parts (units via `Elan8::Units::Engineering`) |
 | `Root.sysml` | Workspace import hub |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).

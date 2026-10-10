@@ -78,10 +78,10 @@ $catalogSelections = [ordered]@{
     "RobotBms" = "BQ40Z50R2"
 }
 $purchasedPartsText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "90_library\PurchasedParts.sysml"
+    Join-Path $resolvedModelPath "99_library/PurchasedParts.sysml"
 )
 $physicalText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "30_architecture\PhysicalArchitecture.sysml"
+    Join-Path $resolvedModelPath "60_physical/PhysicalArchitecture.sysml"
 )
 foreach ($part in $catalogSelections.Values) {
     if ($purchasedPartsText -notmatch ("part\s+def\s+" + $part + "\b")) {
@@ -135,8 +135,7 @@ if ([regex]::Matches($purchasedPartsText, "@BuyPart\s*\{").Count -ne 6) {
     Add-Failure "PurchasedParts must contain exactly six BuyPart annotations"
 }
 foreach ($field in @(
-    "manufacturer", "manufacturerPartNumber", "productPageUrl", "datasheetUrl",
-    "datasheetDocumentId", "datasheetRevision", "lifecycleStatus", "sourceCheckedOn"
+    "manufacturer", "manufacturerPartNumber", "url"
 )) {
     if ([regex]::Matches($purchasedPartsText, ("\b" + $field + "\s*=")).Count -ne 6) {
         Add-Failure "every BuyPart annotation must set '$field'"
@@ -144,7 +143,7 @@ foreach ($field in @(
 }
 
 $firmwareText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "30_architecture\FirmwareArchitecture.sysml"
+    Join-Path $resolvedModelPath "50_logical/FirmwareArchitecture.sysml"
 )
 if ([regex]::Matches(
         $firmwareText,
