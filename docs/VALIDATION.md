@@ -13,13 +13,13 @@ From the repository root:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The script runs Spec42 over all fourteen model files, supplies local Elan8
+The script runs Spec42 over all model files, supplies local Elan8
 domain-library paths when available, and then runs static model guards.
 
 Expected result:
 
 ```text
-Checked 14 document(s): 0 error(s), 0 warning(s), 0 info(s)
+Checked 18 document(s): 0 error(s), 0 warning(s), 0 info(s)
 Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean.
 ```
 
@@ -36,6 +36,22 @@ The guards reject removed layers and types, handoff names, internal path-string
 identity, missing semantic catalog selection, specialization of catalog parts,
 incomplete `BuyPart` metadata,
 missing queue flows and requirements without satisfaction or verification.
+
+## Generated document data
+
+```sh
+python scripts/generate-document-data.py --check
+```
+
+The script exports the model with Spec42 and compares the tables it derives with
+the committed files in `documents/generated/`. It fails when they differ and when
+the model has a gap: a physical part without a bill-of-materials classification or
+a mass, a customer requirement without a derivation, a system or module
+requirement that no derivation names, or a requirement without a satisfaction
+claim or a verification case. Run it without `--check` to regenerate the files
+after a model change. It finds Spec42 on `PATH` or in `SPEC42_EXE`, and the
+libraries next to the repository or through `ELAN8_METHOD_LIBRARY_ROOT` and
+`SYSML_DOMAIN_LIBRARIES_ROOT`.
 
 ## Diagram smoke check
 
@@ -69,7 +85,8 @@ fallback labels.
 - **Spec42** checks out `mbse-methodology` and `sysml-domain-libraries` at pinned
   commits, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
   The libraries bundled with Spec42 are disabled so only the pinned sources are
-  used. Any error, warning or information diagnostic fails the job.
+  used. Any error, warning or information diagnostic fails the job. It then checks
+  that the generated document data is up to date and that the model has no gap.
 - **Doc42 documents** checks `documents/` against the model and builds the three
   PDFs with [Doc42](https://github.com/elan8/doc42-action), uploading them as the
   `engineering-documents` artifact. It needs the `ELAN8_LICENSE` repository

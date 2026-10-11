@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Nine verification cases (verification concern).
+ * Twelve verification cases (verification concern).
  */
 package Verification {
   private import RobotAnalysisCases::*;
@@ -10,17 +10,19 @@ package Verification {
   private import FirmwareArchitecture::*;
   private import OperationalScenarios::*;
   private import SystemRequirements::*;
+  private import ModuleRequirements::*;
 
   action def RunPhysicalTest;
   action def RunSoftwareVerification;
   action def RecordAnalysisResult;
+  action def InspectAndMeasure;
 
   verification verifyMissionControl {
     subject task : MissionControllerTask;
     objective {
-      verify robotSystemSpecification.recoverFromStall;
-      verify robotSystemSpecification.returnToDock;
-      verify robotSystemSpecification.reportCleaningStatus;
+      verify robotSystemSpecification.'Wheel stall detection and recovery';
+      verify robotSystemSpecification.'Return to dock on low battery';
+      verify robotSystemSpecification.'Mission status reporting';
     }
     then action runMissionChecks : RunSoftwareVerification;
   }
@@ -28,9 +30,10 @@ package Verification {
   verification verifySafetySupervisor {
     subject task : SafetySupervisorTask;
     objective {
-      verify robotSystemSpecification.superviseHazards;
-      verify robotSystemSpecification.detectCliffs;
-      verify robotSystemSpecification.chargeSafely;
+      verify robotSystemSpecification.'Safe stop on hazard';
+      verify robotSystemSpecification.'Cliff detection';
+      verify robotSystemSpecification.'Charging within the battery safe operating area';
+      verify firmwareSpecification.'Safety supervisor deadline';
     }
     then action runSafetyChecks : RunSoftwareVerification;
   }
@@ -38,8 +41,8 @@ package Verification {
   verification verifySensorAcquisition {
     subject task : SensorAcquisitionTask;
     objective {
-      verify robotSystemSpecification.avoidObstacles;
-      verify robotSystemSpecification.detectCliffs;
+      verify robotSystemSpecification.'Obstacle avoidance';
+      verify robotSystemSpecification.'Cliff detection';
     }
     then action runSensorChecks : RunSoftwareVerification;
   }
@@ -47,8 +50,8 @@ package Verification {
   verification verifyActuatorControl {
     subject task : ActuatorControlTask;
     objective {
-      verify robotSystemSpecification.recoverFromStall;
-      verify robotSystemSpecification.superviseHazards;
+      verify robotSystemSpecification.'Wheel stall detection and recovery';
+      verify robotSystemSpecification.'Safe stop on hazard';
     }
     then action runActuatorChecks : RunSoftwareVerification;
   }
@@ -56,8 +59,8 @@ package Verification {
   verification verifyAppPrivacy {
     subject task : AppServiceTask;
     objective {
-      verify robotSystemSpecification.reportCleaningStatus;
-      verify robotSystemSpecification.protectMapPrivacy;
+      verify robotSystemSpecification.'Mission status reporting';
+      verify robotSystemSpecification.'Local storage of map data';
     }
     then action runAppChecks : RunSoftwareVerification;
   }
@@ -65,8 +68,8 @@ package Verification {
   verification verifyCleaningCoverage {
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify robotSystemSpecification.cleanAtLeastEighty;
-      verify robotSystemSpecification.coverFloor;
+      verify robotSystemSpecification.'Cleaning area per charge';
+      verify robotSystemSpecification.'Floor coverage';
     }
     ref energyAnalysis = MissionEnergyAnalysis;
     then action runCoverageMission : RunPhysicalTest;
@@ -76,8 +79,11 @@ package Verification {
   verification verifyDockingAndCharging {
     subject robot : AutonomousFloorCleaningRobot;
     objective {
-      verify robotSystemSpecification.returnToDock;
-      verify robotSystemSpecification.chargeSafely;
+      verify robotSystemSpecification.'Return to dock on low battery';
+      verify robotSystemSpecification.'Charging within the battery safe operating area';
+      verify robotSystemSpecification.'Recharge time';
+      verify baseModuleSpecification.'Battery capacity';
+      verify baseModuleSpecification.'Charge current';
     }
     then action runDockingMission : RunPhysicalTest;
   }
@@ -85,8 +91,8 @@ package Verification {
   verification verifyNavigationPerformance {
     subject task : NavigationTask;
     objective {
-      verify robotSystemSpecification.localizeReliably;
-      verify robotSystemSpecification.updateCoverageMap;
+      verify robotSystemSpecification.'Localization accuracy';
+      verify robotSystemSpecification.'Coverage map maintenance';
     }
     ref performanceAnalysis = LocalizationPerformanceAnalysis;
     then action runNavigationChecks : RunSoftwareVerification;
@@ -97,12 +103,55 @@ package Verification {
     doc /* Verifies the reaction time and outcome of the cliff safe-stop scenario. */
     subject scenario : CliffSafeStopScenario;
     objective {
-      verify robotSystemSpecification.detectCliffs;
-      verify robotSystemSpecification.superviseHazards;
-      verify robotSystemSpecification.reportCleaningStatus;
+      verify robotSystemSpecification.'Cliff detection';
+      verify robotSystemSpecification.'Safe stop on hazard';
+      verify robotSystemSpecification.'Mission status reporting';
+      verify baseModuleSpecification.'Cliff sensing latency';
+      verify baseModuleSpecification.'Drive braking time';
+      verify mainPcbSpecification.'Drive disable latency';
     }
     ref reactionAnalysis = SafetyReactionAnalysis;
     then action executeScenario : RunPhysicalTest;
     then action recordReactionResult : RecordAnalysisResult;
+  }
+
+  verification verifyPhysicalEnvelope {
+    doc /* Inspection and measurement of the assembled robot: height, mass and dust bin volume. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify robotSystemSpecification.'Overall height';
+      verify robotSystemSpecification.'Robot mass';
+      verify robotSystemSpecification.'Dust bin capacity';
+      verify baseModuleSpecification.'Base module mass';
+      verify baseModuleSpecification.'Base module height';
+      verify mainPcbSpecification.'Main board mass';
+      verify topModuleSpecification.'Top module height';
+      verify topModuleSpecification.'Top module mass';
+      verify dustBinSpecification.'Dust bin mass';
+      verify harnessSpecification.'Wiring harness mass';
+    }
+    ref massAnalysis = MassBudgetAnalysis;
+    then action measureRobot : InspectAndMeasure;
+    then action recordMassResult : RecordAnalysisResult;
+  }
+
+  verification verifyMobilityAndAcoustics {
+    doc /* Threshold crossing in both directions and sound pressure level on a hard floor. */
+    subject robot : AutonomousFloorCleaningRobot;
+    objective {
+      verify robotSystemSpecification.'Threshold climbing';
+      verify robotSystemSpecification.'Acoustic noise';
+    }
+    then action runThresholdAndNoiseTest : RunPhysicalTest;
+  }
+
+  verification verifyBatteryProtection {
+    doc /* Fault injection on the battery pack with the application firmware halted. */
+    subject bms : RobotBms;
+    objective {
+      verify robotSystemSpecification.'Battery protection independent of firmware';
+      verify robotSystemSpecification.'Charging within the battery safe operating area';
+    }
+    then action injectBatteryFaults : RunPhysicalTest;
   }
 }

@@ -6,4 +6,4 @@ Open points:
 
 - The size and layout of the reference home used for validation are to be agreed.
 - The needs of the service technician are covered only through fault reporting; dedicated service requirements may be added.
-- Acceptable noise during cleaning has not been stated by the customer.
+- The noise the household accepts is stated as holding a conversation in the same room; the measurement condition is fixed in RVC-SRS-001 and is to be confirmed with a user panel.

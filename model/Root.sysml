@@ -8,10 +8,14 @@ package AutonomousFloorCleaningRobotDemo {
   private import Project::*;
   private import Elan8::Units::Engineering::*;
   private import PurchasedParts::*;
+  private import Sourcing::*;
   private import DomainModel::*;
   private import DesignLimits::*;
   private import StakeholderNeeds::*;
   private import SystemRequirements::*;
+  private import ModuleBudgets::*;
+  private import ModuleRequirements::*;
+  private import RequirementTraceability::*;
   private import FunctionalArchitecture::*;
   private import BehaviorStates::*;
   private import OperationalScenarios::*;

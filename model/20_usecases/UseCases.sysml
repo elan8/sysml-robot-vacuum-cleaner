@@ -189,10 +189,10 @@ package OperationalScenarios {
   allocate cliffSafeStop.reportSafeStop
     to robotSystem.physical.firmwareTasks.appService;
 
-  satisfy robotSystemSpecification.detectCliffs
+  satisfy robotSystemSpecification.'Cliff detection'
     by cliffSafeStop.detectCliff;
-  satisfy robotSystemSpecification.superviseHazards
+  satisfy robotSystemSpecification.'Safe stop on hazard'
     by cliffSafeStop.superviseHazard;
-  satisfy robotSystemSpecification.reportCleaningStatus
+  satisfy robotSystemSpecification.'Mission status reporting'
     by cliffSafeStop.reportSafeStop;
 }
