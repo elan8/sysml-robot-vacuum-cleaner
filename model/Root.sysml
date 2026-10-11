@@ -16,6 +16,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import ModuleBudgets::*;
   private import ModuleRequirements::*;
   private import RequirementTraceability::*;
+  private import RequirementAllocation::*;
   private import FunctionalArchitecture::*;
   private import BehaviorStates::*;
   private import OperationalScenarios::*;

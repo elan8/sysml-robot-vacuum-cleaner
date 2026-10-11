@@ -4,8 +4,10 @@
  *
  * Engineering documents generated from the model with Doc42: the customer
  * requirements, system requirements and system design specifications. Each
- * document is a view; its nested views are the sections, in order. Tables and
- * diagrams are projected from the model, so they cannot drift from it.
+ * document is a view; its nested views are the sections, in order. Tables,
+ * values and diagrams are read from the model, so they cannot drift from it.
+ * A short text is the `doc` of its section, written in Markdown; a long one is
+ * a Markdown file in `prose/`.
  */
 package RobotDocuments {
   private import Doc42::*;
@@ -14,11 +16,12 @@ package RobotDocuments {
   view crs {
     @Document {
       title = "Autonomous Floor Cleaning Robot";
+      subtitle = "Customer Requirements Specification";
       organization = "Elan8";
       number = "RVC-CRS-001";
       revision = "A";
       status = "Draft for review";
-      template = "crs";
+      template = "template";
     }
 
     view introduction {
@@ -89,11 +92,12 @@ package RobotDocuments {
   view srs {
     @Document {
       title = "Autonomous Floor Cleaning Robot";
+      subtitle = "System Requirements Specification";
       organization = "Elan8";
       number = "RVC-SRS-001";
       revision = "A";
       status = "Draft for review";
-      template = "srs";
+      template = "template";
     }
 
     view introduction {
@@ -107,7 +111,14 @@ package RobotDocuments {
       }
       view scope {
         @Section { title = "Scope"; }
-        @Prose { file = "prose/srs-scope.md"; }
+        doc /* The system of interest is the robot: its mechanics, electronics and firmware. The
+             * requirements apply to the robot as delivered, operating in the conditions of use
+             * stated in RVC-CRS-001.
+             *
+             * The docking station, the mobile application and the home are external to the
+             * system. They appear in this specification only through the interfaces the robot
+             * has with them. Requirements on those external systems are not part of this
+             * document. */
       }
       view conventions {
         @Section { title = "Document conventions"; }
@@ -188,25 +199,43 @@ package RobotDocuments {
 
     view traceability {
       @Section { title = "Traceability to customer requirements"; }
-      @Prose { file = "prose/srs-traceability.md"; }
-      @Prose { file = "generated/traceability.md"; }
+      doc /* Every customer requirement of RVC-CRS-001 has one derivation in the model. The
+           * derivation names all system requirements derived from the customer requirement and
+           * records why that set is complete: meeting all of them leaves nothing of the
+           * customer requirement unmet.
+           *
+           * The table shows those derivations as they are in the model. The build of the model
+           * fails when a customer requirement has no derivation or when a system requirement is
+           * named by none, so a row cannot be missing. */
+      @Table {
+        columns = "Customer requirement = original, Derived system requirements = derived, Why this set is complete = @Rationale.text";
+        kind = "connection";
+        sort = "original";
+      }
+      expose RequirementTraceability::*;
     }
 
     view verification {
       @Section { title = "Verification approach"; }
       @Prose { file = "prose/srs-verification.md"; }
-      @Prose { file = "generated/verification-matrix.md"; }
+      @Table {
+        columns = "ID = id, System requirement = name, Satisfied by = satisfied-by, Verified by = verified-by";
+        kind = "requirement";
+        sort = "id";
+      }
+      expose SystemRequirements::robotSystemSpecification::*;
     }
   }
 
   view sds {
     @Document {
       title = "Autonomous Floor Cleaning Robot";
+      subtitle = "System Design Specification";
       organization = "Elan8";
       number = "RVC-SDS-001";
       revision = "A";
       status = "Draft for review";
-      template = "sds";
+      template = "template";
     }
 
     view introduction {
@@ -219,7 +248,15 @@ package RobotDocuments {
       }
       view scope {
         @Section { title = "Scope"; }
-        @Prose { file = "prose/sds-scope.md"; }
+        doc /* The design described here is the single selected baseline of the robot. It covers
+             * the functional design, the physical architecture down to module level, the
+             * firmware task architecture and the purchased components that determine the
+             * design.
+             *
+             * It also allocates the system requirements to the modules, and lists the bill of
+             * materials at the level of the model. Detailed mechanical drawings, circuit
+             * schematics and source code are outside this document. Product variants and the
+             * trade studies that led to the baseline are not recorded. */
       }
       view conventions {
         @Section { title = "Document conventions"; }
@@ -292,8 +329,21 @@ package RobotDocuments {
 
     view allocation {
       @Section { title = "Requirement allocation to modules"; }
-      @Prose { file = "prose/sds-allocation.md"; }
-      @Prose { file = "generated/allocation.md"; }
+      doc /* A system requirement that no single module can meet alone is split into budgets,
+           * one for each module on the path. Each budget is a requirement on that module, so a
+           * module team can design and verify against its own specification, and a change to
+           * one budget is visible to the others.
+           *
+           * Five system requirements are split this way. Each split is a derivation in the
+           * model that records why the budgets close. The module requirements constrain design
+           * values that are attributes of the module in the model, so the model shows at any
+           * time whether the current design is inside its budget. */
+      @Table {
+        columns = "System requirement = original, Module requirements = derived, How the budget closes = @Rationale.text";
+        kind = "connection";
+        sort = "original";
+      }
+      expose RequirementAllocation::*;
       view safeStopBudget {
         @Section { title = "Safe-stop time budget"; }
         @Prose { file = "prose/sds-safe-stop.md"; }
@@ -330,8 +380,22 @@ package RobotDocuments {
       }
       view moduleVerification {
         @Section { title = "Module requirement coverage"; }
-        @Prose { file = "prose/sds-module-coverage.md"; }
-        @Prose { file = "generated/module-matrix.md"; }
+        doc /* The matrix names, for every module requirement, the system requirement it was
+             * derived from, the part that claims it and the verification case that covers it.
+             * The same rule applies as for the system-level matrix in RVC-SRS-001: the build of
+             * the model fails for a module requirement without a derivation, a claim or a
+             * verification case. */
+        @Table {
+          columns = "ID = id, Module requirement = name, Derived from = derived-from, Satisfied by = satisfied-by, Verified by = verified-by";
+          kind = "requirement";
+          sort = "id";
+        }
+        expose ModuleRequirements::baseModuleSpecification::*;
+        expose ModuleRequirements::mainPcbSpecification::*;
+        expose ModuleRequirements::firmwareSpecification::*;
+        expose ModuleRequirements::topModuleSpecification::*;
+        expose ModuleRequirements::dustBinSpecification::*;
+        expose ModuleRequirements::harnessSpecification::*;
       }
     }
 
