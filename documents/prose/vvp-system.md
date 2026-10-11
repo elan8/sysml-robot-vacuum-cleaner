@@ -5,5 +5,5 @@ Requirements flow down in two steps. Each customer requirement is derived into s
 | Level | Requirements | Number | Shown by |
 | --- | --- | ---: | --- |
 | Customer | USR, in RVC-CRS-001 | 11 | 5 validation cases |
-| System | SYS, in RVC-SRS-001 | 19 | 12 verification cases |
+| System | SYS, in RVC-SRS-001 | 21 | 12 verification cases |
 | Module | BASE, PCB, FW, TOP, BIN, HAR, in RVC-SDS-001 | 13 | The same 12 cases, with the module quantity measured separately |

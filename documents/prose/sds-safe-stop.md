@@ -1,4 +1,4 @@
-The safe stop is the tightest chain in the design. From the moment a hazard appears, the base module has to sense it, the safety supervisor has to decide, the main board has to remove drive, and the drive trains have to come to standstill. Three modules and four steps share {{= DesignLimits::maxSafeStopReactionTime}}.
+The safe stop is the tightest chain in the design. From the moment a hazard appears, the base module has to sense it, the safety supervisor has to decide, the main board has to remove drive, and the drive trains have to come to standstill. Three modules and four steps share {{= RequirementLimits::maxSafeStopReactionTime}}.
 
 The budgets are {{= ModuleBudgets::cliffSensingBudget}} for sensing, {{= ModuleBudgets::supervisorDecisionBudget}} for the supervisor, {{= ModuleBudgets::driveDisableBudget}} for removing drive and {{= ModuleBudgets::brakingBudget}} for braking. They add up to 90 ms; the remaining 10 ms is unallocated margin.
 

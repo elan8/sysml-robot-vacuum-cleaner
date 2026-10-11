@@ -25,7 +25,7 @@ carry the engineering, not only describe it:
 | Question a project has to answer | Where the model answers it |
 | --- | --- |
 | What does the customer need? | 11 customer requirements in the household's words (`USR-…`) |
-| What must the system do, measurably? | 19 system requirements, each a constraint against a design limit (`SYS-…`) |
+| What must the system do, measurably? | 21 system requirements, each a constraint against a design limit (`SYS-…`) |
 | Is every need covered, and why? | One derivation per customer requirement, with the reason the set is complete |
 | Who has to deliver what? | 13 module requirements with budgets for safe-stop time, mass, height and energy (`BASE-…`, `PCB-…`, `FW-…`, `TOP-…`) |
 | What is it made of, and what does it cost and weigh? | Physical architecture with 46 parts; generated bill of materials and mass budget |
@@ -95,7 +95,7 @@ of information and refers to the others for the rest:
 | Document | Number | Answers | Content |
 | --- | --- | --- | --- |
 | Customer Requirements Specification | RVC-CRS-001 | What does the household need? | Stakeholders, the reference home, scenarios, the 11 customer requirements, constraints |
-| System Requirements Specification | RVC-SRS-001 | What shall the robot do, and how well? | System context, modes and states, limit values, the 19 system requirements by kind, traceability to customer requirements. No design. |
+| System Requirements Specification | RVC-SRS-001 | What shall the robot do, and how well? | System context, the 21 system requirements by kind, traceability to customer requirements. No design. |
 | System Design Specification | RVC-SDS-001 | How is the robot built to do it? | Architecture, allocation of requirements to modules with budgets, firmware, bill of materials, analyses, requirement satisfaction |
 | Verification and Validation Plan | RVC-VVP-001 | How will we know that it does? | Methods, test articles and facilities, 12 verification cases with pass criteria, the requirements verification matrix, 5 validation cases and the validation matrix |
 
@@ -110,7 +110,7 @@ shows is read from the model when the document is built:
 - **Tables** with `@Table`: requirement tables, the customer-to-system and
   system-to-module trace tables with their rationale, and the verification
   matrices. A section exposes elements and names its columns.
-- **Values** with `{{= DesignLimits::maxRobotMass}}` in the text, so a number in
+- **Values** with `{{= RequirementLimits::maxRobotMass}}` in the text, so a number in
   a document cannot disagree with the model.
 - **Diagrams** from sections typed by a standard view.
 

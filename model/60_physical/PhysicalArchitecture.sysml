@@ -715,6 +715,8 @@ package PhysicalArchitecture {
       sum(base.mass, mainPcb.mass, top.mass, dustBin.mass, baseHarness.mass, topHarness.mass);
     attribute :>> rechargeTime = 3.5 [h];
     attribute :>> batteryProtectionIndependentOfFirmware = true;
+    attribute :>> operatingModeReported = true;
+    attribute :>> safeStopHeldUntilCleared = true;
 
     part base : BaseModule;
     part mainPcb : MainPcbModule;

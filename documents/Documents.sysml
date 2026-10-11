@@ -137,24 +137,13 @@ package RobotDocuments {
              * robot's behaviour at these interfaces. */
         expose ProductContext::residentialCleaningContext;
       }
-      view operatingStates : StateTransitionView {
-        @Section { title = "Modes and states"; }
-        doc /* The states the robot is required to move through during a mission, including
-             * the safe stop that the safety requirements refer to. */
-        expose BehaviorStates::RobotOperatingBehavior;
-      }
-    }
-
-    view designLimits {
-      @Section { title = "Limit values"; }
-      @Prose { file = "prose/srs-limits.md"; }
     }
 
     view requirements {
       @Section { title = "System requirements"; }
-      doc /* Each requirement constrains one measurable property of the robot against a limit
-           * value of the previous section, and names the customer requirement it was derived
-           * from. A requirement states what the robot shall do or be, not how: the design that
+      doc /* Each requirement constrains one measurable property of the robot and states its
+           * limit, and names the customer requirement it was derived from. The limits are
+           * read from the model, where the analyses and budgets use the same values. A requirement states what the robot shall do or be, not how: the design that
            * meets it is in RVC-SDS-001, and how it is verified is in RVC-VVP-001. */
 
       view functional {
@@ -164,6 +153,7 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
         expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
         expose SystemRequirements::robotSystemSpecification::'Dust bin capacity';
+        expose SystemRequirements::robotSystemSpecification::'Operating modes';
       }
       view performance {
         @Section { title = "Performance requirements"; }
@@ -194,6 +184,7 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
         expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
         expose SystemRequirements::robotSystemSpecification::'Battery protection independent of firmware';
+        expose SystemRequirements::robotSystemSpecification::'Safe stop held until cleared';
       }
       view security {
         @Section { title = "Security and privacy requirements"; }

@@ -25,13 +25,14 @@ package Verification {
     @VerificationMethod { kind = VerificationMethodKind::test; }
     doc /* Run the mission controller on the target board against simulated sensor, battery and
          * application inputs. Pass when a stalled wheel is reported and recovered within the
-         * limit, the return to the dock starts at the threshold state of charge, and every
-         * state change is reported. */
+         * limit, the return to the dock starts at the threshold state of charge, the robot is
+         * always in exactly one operating mode, and every change of mode is reported. */
     subject task : MissionControllerTask;
     objective {
       verify robotSystemSpecification.'Wheel stall detection and recovery';
       verify robotSystemSpecification.'Return to dock on low battery';
       verify robotSystemSpecification.'Mission status reporting';
+      verify robotSystemSpecification.'Operating modes';
     }
     then action runMissionChecks : RunSoftwareVerification;
   }
@@ -41,13 +42,15 @@ package Verification {
     doc /* Inject every hazard event on the target board under worst-case load of the other
          * tasks and measure the time to the safe-stop command with a logic analyser. Pass when
          * the command is issued within the deadline for every hazard in 1000 consecutive
-         * injections. */
+         * injections, and no drive command is passed on until the hazard is removed and a
+         * user confirmation is received. */
     subject task : SafetySupervisorTask;
     objective {
       verify robotSystemSpecification.'Safe stop on hazard';
       verify robotSystemSpecification.'Cliff detection';
       verify robotSystemSpecification.'Charging within the battery safe operating area';
       verify firmwareSpecification.'Safety supervisor deadline';
+      verify robotSystemSpecification.'Safe stop held until cleared';
     }
     then action runSafetyChecks : RunSoftwareVerification;
   }
@@ -151,7 +154,8 @@ package Verification {
          * directions and record sensing, command and wheel motion with a high-speed camera and
          * a logic analyser; compare with the safety reaction analysis. Pass when no wheel
          * crosses the edge, the time from hazard to standstill is within the limit in every
-         * run, each step is within its module budget, and the safe stop is reported. */
+         * run, each step is within its module budget, the safe stop is reported, and the robot
+         * stays stationary until the drop is covered and the user confirms. */
     subject scenario : CliffSafeStopScenario;
     objective {
       verify robotSystemSpecification.'Cliff detection';
@@ -160,6 +164,7 @@ package Verification {
       verify baseModuleSpecification.'Cliff sensing latency';
       verify baseModuleSpecification.'Drive braking time';
       verify mainPcbSpecification.'Drive disable latency';
+      verify robotSystemSpecification.'Safe stop held until cleared';
     }
     ref reactionAnalysis = SafetyReactionAnalysis;
     then action executeScenario : RunPhysicalTest;

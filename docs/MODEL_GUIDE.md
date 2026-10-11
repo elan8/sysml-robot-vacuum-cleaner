@@ -14,7 +14,7 @@ organizes a model while the SysML elements retain product-domain names.
 ## Recommended tour
 
 1. Start in `05_requirements/`. `CustomerRequirements.sysml` holds eleven needs in
-   the household's words. `SystemRequirements.sysml` holds nineteen testable
+   the household's words. `SystemRequirements.sysml` holds twenty-one testable
    requirements with quantities, constraints and Elan8 requirement roles.
    `ModuleRequirements.sysml` splits five of them into budgets for the modules.
    `RequirementTraceability.sysml` and `RequirementAllocation.sysml` hold the
@@ -62,7 +62,7 @@ flowchart LR
 | `Elan8::Procurement` | `BuyPart` metadata and `PartLifecycleStatus` |
 | `PurchasedParts` | Concrete catalog part selections annotated with `Elan8::Procurement::BuyPart` |
 | `DomainModel` | Protocol vocabulary, items, ports, buses |
-| `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
+| `RequirementLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
 | `ModuleBudgets`, `ModuleRequirements` | Budgets per module and the requirements that hold each module to its budget |
 | `RequirementTraceability` | Derivations from customer requirements to system requirements |
 | `RequirementAllocation` | Derivations from system requirements to module requirements |
@@ -83,6 +83,24 @@ flowchart LR
 | `Verification` | Twelve verification cases with identifier, method and pass criterion |
 | `Validation` | Five validation cases for the customer requirements |
 | `ModelViews` | Six stakeholder projections |
+
+## One source for every number
+
+A limit is written once, as an attribute in `RequirementLimits` or `ModuleBudgets`. The
+requirement's constraint refers to the attribute, and the requirement's text shows it
+with a placeholder that Doc42 replaces by the value when it builds a document:
+
+```sysml
+requirement <'SYS-015'> 'Robot mass' {
+  require constraint { robot.robotMass <= maxRobotMass }
+  doc /* The robot shall have a mass of at most {{= RequirementLimits::maxRobotMass}} with an empty dust bin. */
+}
+```
+
+The analyses and budgets use the same attributes, so changing a limit changes the
+constraint, the analysis and the text of the requirement together. One number is still
+typed in its requirement text, the cleaning area, because Spec42 does not evaluate a unit
+written as an expression (`[m^2]`) yet.
 
 ## Bill of materials
 

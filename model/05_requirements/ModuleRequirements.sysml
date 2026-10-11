@@ -11,7 +11,7 @@
  */
 package ModuleBudgets {
   private import Elan8::Units::Engineering::*;
-  private import DesignLimits::*;
+  private import RequirementLimits::*;
   private import ISQ::*;
   private import SI::*;
 
@@ -60,37 +60,37 @@ package ModuleRequirements {
     requirement <'BASE-001'> 'Cliff sensing latency' {
       @RequirementRole { role = safety; }
       require constraint { base.cliffSensingLatency <= cliffSensingBudget }
-      doc /* The base module shall assert a cliff or wheel-drop hazard signal within 25 ms of the hazard appearing under a sensor. */
+      doc /* The base module shall assert a cliff or wheel-drop hazard signal within {{= ModuleBudgets::cliffSensingBudget}} of the hazard appearing under a sensor. */
     }
 
     requirement <'BASE-002'> 'Drive braking time' {
       @RequirementRole { role = safety; }
       require constraint { base.brakingTime <= brakingBudget }
-      doc /* The base module shall bring both drive wheels to standstill within 50 ms of the drive outputs being disabled at cleaning speed. */
+      doc /* The base module shall bring both drive wheels to standstill within {{= ModuleBudgets::brakingBudget}} of the drive outputs being disabled at cleaning speed. */
     }
 
     requirement <'BASE-003'> 'Base module mass' {
       @RequirementRole { role = 'interface'; }
       require constraint { base.mass <= baseMassBudget }
-      doc /* The base module shall have a mass of at most 2.75 kg including the battery pack. */
+      doc /* The base module shall have a mass of at most {{= ModuleBudgets::baseMassBudget}} including the battery pack. */
     }
 
     requirement <'BASE-004'> 'Base module height' {
       @RequirementRole { role = 'interface'; }
       require constraint { base.height <= baseHeightBudget }
-      doc /* The base module shall be at most 57 mm high from the floor to the parting line with the top module. */
+      doc /* The base module shall be at most {{= ModuleBudgets::baseHeightBudget}} high from the floor to the parting line with the top module. */
     }
 
     requirement <'BASE-005'> 'Battery capacity' {
       @RequirementRole { role = performance; }
       require constraint { base.powerModule.battery.nominalCapacity >= minBatteryCapacity }
-      doc /* The power module shall hold a battery pack with a rated capacity of at least 6400 mAh. */
+      doc /* The power module shall hold a battery pack with a rated capacity of at least {{= ModuleBudgets::minBatteryCapacity}}. */
     }
 
     requirement <'BASE-006'> 'Charge current' {
       @RequirementRole { role = performance; }
       require constraint { base.powerModule.charger.maxChargeCurrent >= minChargeCurrent }
-      doc /* The power module shall charge the battery pack with at least 2 A in the constant-current phase. */
+      doc /* The power module shall charge the battery pack with at least {{= ModuleBudgets::minChargeCurrent}} in the constant-current phase. */
     }
   }
 
@@ -100,13 +100,13 @@ package ModuleRequirements {
     requirement <'PCB-001'> 'Drive disable latency' {
       @RequirementRole { role = safety; }
       require constraint { board.driveDisableLatency <= driveDisableBudget }
-      doc /* The main board shall remove drive from both motors within 5 ms of the safe-stop command, through a disable line that does not depend on the motion-control loop. */
+      doc /* The main board shall remove drive from both motors within {{= ModuleBudgets::driveDisableBudget}} of the safe-stop command, through a disable line that does not depend on the motion-control loop. */
     }
 
     requirement <'PCB-002'> 'Main board mass' {
       @RequirementRole { role = 'interface'; }
       require constraint { board.mass <= mainPcbMassBudget }
-      doc /* The assembled main board shall have a mass of at most 0.25 kg. */
+      doc /* The assembled main board shall have a mass of at most {{= ModuleBudgets::mainPcbMassBudget}}. */
     }
   }
 
@@ -116,7 +116,7 @@ package ModuleRequirements {
     requirement <'FW-001'> 'Safety supervisor deadline' {
       @RequirementRole { role = safety; }
       require constraint { firmware.safetySupervisor.deadline <= supervisorDecisionBudget }
-      doc /* The safety supervisor task shall issue the safe-stop command within 10 ms of a hazard event entering its queue, under worst-case load of all other tasks. */
+      doc /* The safety supervisor task shall issue the safe-stop command within {{= ModuleBudgets::supervisorDecisionBudget}} of a hazard event entering its queue, under worst-case load of all other tasks. */
     }
   }
 
@@ -126,13 +126,13 @@ package ModuleRequirements {
     requirement <'TOP-001'> 'Top module height' {
       @RequirementRole { role = 'interface'; }
       require constraint { top.height <= topHeightBudget }
-      doc /* The top module shall rise at most 38 mm above the parting line, including the laser scanner turret. */
+      doc /* The top module shall rise at most {{= ModuleBudgets::topHeightBudget}} above the parting line, including the laser scanner turret. */
     }
 
     requirement <'TOP-002'> 'Top module mass' {
       @RequirementRole { role = 'interface'; }
       require constraint { top.mass <= topMassBudget }
-      doc /* The top module shall have a mass of at most 0.60 kg. */
+      doc /* The top module shall have a mass of at most {{= ModuleBudgets::topMassBudget}}. */
     }
   }
 
@@ -142,7 +142,7 @@ package ModuleRequirements {
     requirement <'BIN-001'> 'Dust bin mass' {
       @RequirementRole { role = 'interface'; }
       require constraint { bin.mass <= dustBinMassBudget }
-      doc /* The empty dust bin with its filter shall have a mass of at most 0.22 kg. */
+      doc /* The empty dust bin with its filter shall have a mass of at most {{= ModuleBudgets::dustBinMassBudget}}. */
     }
   }
 
@@ -152,7 +152,7 @@ package ModuleRequirements {
     requirement <'HAR-001'> 'Wiring harness mass' {
       @RequirementRole { role = 'interface'; }
       require constraint { robot.baseHarness.mass + robot.topHarness.mass <= harnessMassBudget }
-      doc /* The base and top wiring harnesses together shall have a mass of at most 0.18 kg. */
+      doc /* The base and top wiring harnesses together shall have a mass of at most {{= ModuleBudgets::harnessMassBudget}}. */
     }
   }
 }

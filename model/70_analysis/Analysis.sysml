@@ -6,7 +6,7 @@
  */
 package RobotAnalysisCases {
   private import Architecture::*;
-  private import DesignLimits::*;
+  private import RequirementLimits::*;
   private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
@@ -15,7 +15,7 @@ package RobotAnalysisCases {
   analysis def MissionEnergyAnalysis {
     subject robot : AutonomousFloorCleaningRobot;
     attribute chargeBudget : ElectricChargeValue =
-      DesignLimits::batteryCapacityBudget;
+      RequirementLimits::batteryCapacityBudget;
     attribute averageMissionCurrent : ElectricCurrentValue = 2.6 [A];
     attribute missionDuration : DurationValue = 1.875 [h];
     attribute missionChargeDraw : ElectricChargeValue =
@@ -44,7 +44,7 @@ package RobotAnalysisCases {
       brakingTime
     );
     attribute reactionTimeLimit : DurationValue =
-      DesignLimits::maxSafeStopReactionTime;
+      RequirementLimits::maxSafeStopReactionTime;
     return ref reactsWithinLimit {
       return measuredReactionTime <= reactionTimeLimit;
     }
@@ -57,7 +57,7 @@ package RobotAnalysisCases {
     subject robot : AutonomousFloorCleaningRobot;
     attribute estimatedLocalizationError : LengthValue = 95 [mm];
     attribute localizationErrorLimit : LengthValue =
-      DesignLimits::maxLocalizationError;
+      RequirementLimits::maxLocalizationError;
     return ref localizationWithinLimit {
       return estimatedLocalizationError <= localizationErrorLimit;
     }

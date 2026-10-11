@@ -62,6 +62,11 @@ package Architecture {
   satisfy robotSystemSpecification.'Local storage of map data'
     by robotSystem.operate.userInteraction;
 
+  satisfy robotSystemSpecification.'Operating modes'
+    by robotSystem.operate.missionControl;
+  satisfy robotSystemSpecification.'Safe stop held until cleared'
+    by robotSystem.operate.safetySupervision;
+
   // Physical properties are claimed by the element that determines them.
   satisfy robotSystemSpecification.'Overall height'
     by robotSystem.physical.top;

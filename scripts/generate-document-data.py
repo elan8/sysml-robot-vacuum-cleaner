@@ -306,12 +306,12 @@ def bom_outputs(model: Model) -> tuple[dict[str, str], list[str], dict[str, floa
 
 def mass_budget(model: Model, modules: dict[str, float]) -> tuple[str, list[str]]:
     limit = None
-    for attribute in model.owned(model.element("DesignLimits"), "AttributeUsage"):
+    for attribute in model.owned(model.element("RequirementLimits"), "AttributeUsage"):
         if attribute["name"] == "maxRobotMass":
             for expression in model.owned(attribute, "Expression"):
                 limit = kilograms(expression["expression"]["nodes"][0]["value"])
     if limit is None:
-        fail("DesignLimits::maxRobotMass has no literal value")
+        fail("RequirementLimits::maxRobotMass has no literal value")
     total = sum(modules.values())
     rows = [[humanize(name), f"{mass:.2f}", f"{100 * mass / total:.0f} %"]
             for name, mass in sorted(modules.items(), key=lambda entry: -entry[1])]
