@@ -70,7 +70,9 @@ $requirementNames = @(
     "'Threshold climbing'",
     "'Robot mass'",
     "'Recharge time'",
-    "'Battery protection independent of firmware'"
+    "'Battery protection independent of firmware'",
+    "'Operating modes'",
+    "'Safe stop held until cleared'"
 )
 foreach ($requirement in $requirementNames) {
     $qualifiedPrefix = "(?:[A-Za-z_][A-Za-z0-9_]*(?:::|\.))*"

@@ -23,13 +23,14 @@ package RequirementTraceability {
   }
 
   connection safeOperationCoverage : Derivation {
-    @Rationale { text = "The household hazards are falling, collision, entanglement and the battery. Each has a detection requirement, and all of them lead to one supervised safe stop. The battery additionally has protection that does not depend on firmware, because a firmware fault must not become a fire risk."; }
+    @Rationale { text = "The household hazards are falling, collision, entanglement and the battery. Each has a detection requirement, and all of them lead to one supervised safe stop, which holds until the hazard is gone and the user has confirmed. The battery additionally has protection that does not depend on firmware, because a firmware fault must not become a fire risk."; }
     end :>> Derivation::originalRequirement ::> 'Safe operation in the household';
     end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Obstacle avoidance';
     end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Cliff detection';
     end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Safe stop on hazard';
     end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Wheel stall detection and recovery';
     end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Battery protection independent of firmware';
+    end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Safe stop held until cleared';
   }
 
   connection dockingCoverage : Derivation {
@@ -48,9 +49,10 @@ package RequirementTraceability {
   }
 
   connection feedbackCoverage : Derivation {
-    @Rationale { text = "Progress and faults are both carried by the mission status the robot reports to the application."; }
+    @Rationale { text = "Progress and faults are carried by the mission status the robot reports to the application. The household also needs to know what the robot is doing at any moment, which is its operating mode."; }
     end :>> Derivation::originalRequirement ::> 'Mission progress and fault feedback';
     end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Mission status reporting';
+    end :>> Derivation::derivedRequirements ::> robotSystemSpecification.'Operating modes';
   }
 
   connection privacyCoverage : Derivation {

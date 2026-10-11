@@ -10,4 +10,4 @@ The robot performs nine functions, which together form its operating behaviour (
 - **safety supervision**, stopping the robot when a hazard is detected;
 - **user interaction**, accepting commands and reporting status.
 
-A behavioural requirement is satisfied by one of these functions, and a physical requirement, such as height or mass, by the part that determines it. The figure shows the product layout those physical requirements refer to. The allocation of functions to hardware and firmware is described in RVC-SDS-001.
+These functions describe what the robot does as seen from outside. The operating modes a user can observe are a requirement of this specification; the states the robot moves through internally are design. They say nothing about which hardware or firmware performs them; that allocation is a design decision and is described in RVC-SDS-001.

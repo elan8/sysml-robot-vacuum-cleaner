@@ -103,7 +103,7 @@ jobs:
         run: mv .libraries "$RUNNER_TEMP/libraries"
 
       - name: Install Doc42
-        uses: elan8/doc42-action@v0.3.0
+        uses: elan8/doc42-action@v0.4.0
 
       - name: Check documents
         run: |
@@ -115,7 +115,7 @@ jobs:
         env:
           ELAN8_LICENSE: ${{ secrets.ELAN8_LICENSE }}
         run: |
-          for document in crs srs sds; do
+          for document in crs srs sds vvp; do
             doc42 build . --doc "RobotDocuments::$document" --out out \
               --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
               --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"

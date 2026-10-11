@@ -22,7 +22,7 @@ concepts. The resulting SysML therefore uses names from the robot-vacuum domain.
 | `50_logical/` | Domain model and firmware architecture |
 | `60_physical/` | Physical architecture and SOI allocations |
 | `70_analysis/` | Mission energy, safety reaction, localization and mass budget analyses |
-| `80_verification/` | Twelve verification cases including `verifyCliffSafeStop` |
+| `80_verification/` | Twelve verification cases including `'Cliff safe stop'`, and five validation cases |
 | `90_views/` | Nine focused views |
 | `99_library/` | Purchased parts catalog and bill-of-materials classification |
 | `Root.sysml` | Import hub |
@@ -37,7 +37,8 @@ concepts. The resulting SysML therefore uses names from the robot-vacuum domain.
 | Scenario | `OperationalScenarios::CliffSafeStopScenario` |
 | Architecture | Allocations on `Architecture::robotSystem` / scenario satisfy links |
 | Evidence | `RobotAnalysisCases::SafetyReactionAnalysis` |
-| Verification | `Verification::verifyCliffSafeStop` |
+| Verification | `Verification::'Cliff safe stop'` (VER-009) |
+| Validation | `Validation::'Household safety walkthrough'` (VAL-003) |
 | View | `ModelViews::cliffSafeStopScenario` |
 
 This table is a method-oriented reading path across ordinary model elements. It

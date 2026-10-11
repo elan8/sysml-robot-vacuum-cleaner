@@ -1,17 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" font-family="Libertinus Serif, Georgia, serif" font-size="13" fill="#1f2933">
-  <!-- Authored figure. Dimensions follow DesignLimits and ModuleBudgets; update by hand when they change. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.7" fill="#1f2933">
+  <!-- Authored figure. Dimensions follow RequirementLimits and ModuleBudgets; update by hand when they change. -->
   <rect width="760" height="430" fill="#ffffff"/>
-  <text x="20" y="26" font-size="15" font-weight="bold">Top view (shell removed)</text>
-  <text x="400" y="26" font-size="15" font-weight="bold">Side view</text>
+  <text x="20" y="26" font-size="13.5" font-weight="bold">Top view (shell removed)</text>
+  <text x="400" y="26" font-size="13.5" font-weight="bold">Side view</text>
 
   <!-- top view, scale 0.88 px per mm, front is up -->
   <circle cx="200" cy="215" r="150" fill="#f3f6f8" stroke="#1f2933" stroke-width="1.6"/>
-  <path d="M 62 160 A 150 150 0 0 1 338 160" fill="none" stroke="#0f766e" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 62 160 A 150 150 0 0 1 338 160" fill="none" stroke="#0891b2" stroke-width="7" stroke-linecap="round"/>
   <rect x="62" y="188" width="20" height="58" rx="5" fill="#4b5563"/>
   <rect x="318" y="188" width="20" height="58" rx="5" fill="#4b5563"/>
   <circle cx="200" cy="96" r="11" fill="#ffffff" stroke="#4b5563" stroke-width="1.6"/>
-  <rect x="128" y="140" width="144" height="22" rx="11" fill="#d9ebe9" stroke="#0f766e" stroke-width="1.4"/>
-  <path d="M 140 151 h 120" stroke="#0f766e" stroke-width="1" stroke-dasharray="4 4"/>
+  <rect x="128" y="140" width="144" height="22" rx="11" fill="#cffafe" stroke="#0891b2" stroke-width="1.4"/>
+  <path d="M 140 151 h 120" stroke="#0891b2" stroke-width="1" stroke-dasharray="4 4"/>
   <rect x="98" y="178" width="84" height="74" rx="4" fill="#ffffff" stroke="#4b5563" stroke-width="1.3" stroke-dasharray="5 3"/>
   <rect x="218" y="178" width="84" height="74" rx="4" fill="#fdf1e2" stroke="#b45309" stroke-width="1.3"/>
   <circle cx="200" cy="215" r="30" fill="#ffffff" stroke="#1f2933" stroke-width="1.6"/>
@@ -25,10 +25,10 @@
     <rect x="194" y="68" width="12" height="8"/><rect x="58" y="166" width="8" height="12"/><rect x="334" y="166" width="8" height="12"/>
   </g>
   <path d="M 200 40 v 16 m -6 -8 l 6 -8 l 6 8" fill="none" stroke="#6b7280" stroke-width="1.4"/>
-  <text x="212" y="50" font-size="11" fill="#6b7280">forward</text>
+  <text x="212" y="50" font-size="9.9" fill="#6b7280">forward</text>
 
   <!-- callouts -->
-  <g font-size="11" font-weight="bold" text-anchor="middle" fill="#ffffff">
+  <g font-size="9.9" font-weight="bold" text-anchor="middle" fill="#ffffff">
     <g><circle cx="200" cy="196" r="9" fill="#1f2933"/><text x="200" y="200">1</text></g>
     <g><circle cx="96" cy="130" r="9" fill="#1f2933"/><text x="96" y="134">2</text></g>
     <g><circle cx="224" cy="72" r="9" fill="#1f2933"/><text x="224" y="76">3</text></g>
@@ -41,14 +41,14 @@
     <g><circle cx="200" cy="305" r="9" fill="#1f2933"/><text x="200" y="309">10</text></g>
   </g>
   <path d="M 50 386 h 300 M 50 380 v 12 M 350 380 v 12" stroke="#6b7280" stroke-width="1"/>
-  <text x="200" y="404" text-anchor="middle" font-size="12" fill="#4b5563">⌀ 340 mm (nominal)</text>
+  <text x="200" y="404" text-anchor="middle" font-size="10.8" fill="#4b5563">⌀ 340 mm (nominal)</text>
 
   <!-- side view, same scale, floor at y = 150 -->
   <path d="M 400 150 h 330" stroke="#1f2933" stroke-width="1.2"/>
   <path d="M 400 154 h 330" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="2 4"/>
   <rect x="425" y="107" width="280" height="36" rx="6" fill="#f3f6f8" stroke="#1f2933" stroke-width="1.5"/>
   <path d="M 425 100 h 280 a 6 6 0 0 0 -6 -10 h -268 a 6 6 0 0 0 -6 10 z" fill="#e8ecf0" stroke="#1f2933" stroke-width="1.5"/>
-  <rect x="425" y="96" width="14" height="42" rx="5" fill="#0f766e"/>
+  <rect x="425" y="96" width="14" height="42" rx="5" fill="#0891b2"/>
   <rect x="537" y="68" width="56" height="22" rx="4" fill="#ffffff" stroke="#1f2933" stroke-width="1.5"/>
   <circle cx="565" cy="125" r="25" fill="#4b5563"/>
   <circle cx="565" cy="125" r="7" fill="#9ca3af"/>
@@ -58,7 +58,7 @@
     <path d="M 718 68 h 24 M 718 150 h 24 M 736 68 v 82"/>
     <path d="M 404 68 h 16 M 404 100 h 16 M 404 150 h 16 M 412 68 v 82"/>
   </g>
-  <g font-size="12" fill="#4b5563">
+  <g font-size="10.8" fill="#4b5563">
     <text x="744" y="58" text-anchor="end">95 mm max (SYS-011)</text>
     <text x="400" y="58">top 38 mm (TOP-001)</text>
     <text x="400" y="172">base 57 mm (BASE-004)</text>
@@ -66,7 +66,7 @@
   </g>
 
   <!-- legend -->
-  <g font-size="12.5">
+  <g font-size="11.2">
     <text x="400" y="212"><tspan font-weight="bold">1</tspan>  360° laser distance scanner</text>
     <text x="400" y="232"><tspan font-weight="bold">2</tspan>  Front bumper with switch</text>
     <text x="400" y="252"><tspan font-weight="bold">3</tspan>  Time-of-flight sensors (3×, blue)</text>

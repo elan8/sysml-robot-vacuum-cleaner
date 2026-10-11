@@ -2,11 +2,14 @@
  * SPDX-FileCopyrightText: 2026 Elan8
  * SPDX-License-Identifier: MIT
  *
- * Measurable design limits and the system requirements on the robot. Each
- * requirement constrains one property of the robot against a design limit.
+ * The limits the system requirements set, and the system requirements on the
+ * robot. Each requirement constrains one property of the robot against a
+ * limit. A limit is written once, as an attribute: the constraint refers to it
+ * and the requirement text shows it with a `{{= ...}}` placeholder, which Doc42
+ * replaces by the value. The analyses and budgets use the same attributes.
  * Their derivation from the customer requirements is in RequirementTraceability.
  */
-package DesignLimits {
+package RequirementLimits {
   private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
@@ -31,7 +34,7 @@ package DesignLimits {
 
 package SystemRequirements {
   private import Elan8Method::Metadata::*;
-  private import DesignLimits::*;
+  private import RequirementLimits::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
@@ -57,6 +60,8 @@ package SystemRequirements {
     attribute robotMass : MassValue;
     attribute rechargeTime : DurationValue;
     attribute batteryProtectionIndependentOfFirmware : Boolean;
+    attribute operatingModeReported : Boolean;
+    attribute safeStopHeldUntilCleared : Boolean;
   }
 
   requirement robotSystemSpecification {
@@ -67,6 +72,7 @@ package SystemRequirements {
     @RequirementRole { role = performance; }
     require constraint { robot.cleanedAreaPerCharge >= cleaningAreaTarget }
     doc /* The robot shall clean at least 80 m² of floor on one battery charge in the reference home. */
+    // The area is typed in the text: Spec42 does not evaluate a unit expression such as [m^2] yet.
   }
 
   requirement <'SYS-002'> 'Floor coverage' {
@@ -74,7 +80,7 @@ package SystemRequirements {
     require constraint {
       robot.reachableFloorCoveragePercent >= floorCoverageTargetPercent
     }
-    doc /* The robot shall cover at least 90 percent of the reachable floor area in one mission. */
+    doc /* The robot shall cover at least {{= RequirementLimits::floorCoverageTargetPercent}} percent of the reachable floor area in one mission. */
   }
 
   requirement <'SYS-003'> 'Obstacle avoidance' {
@@ -82,7 +88,7 @@ package SystemRequirements {
     require constraint {
       robot.avoidedObstacleHeight >= minimumAvoidedObstacleHeight
     }
-    doc /* The robot shall avoid collision with household obstacles that are at least 30 mm high. */
+    doc /* The robot shall avoid collision with household obstacles that are at least {{= RequirementLimits::minimumAvoidedObstacleHeight}} high. */
   }
 
   requirement <'SYS-SAFE-010'> 'Cliff detection' {
@@ -90,19 +96,19 @@ package SystemRequirements {
     require constraint {
       robot.cliffHeightDetectedBeforeWheelCrossing >= minimumCliffHeight
     }
-    doc /* The robot shall detect a drop of at least 50 mm before a wheel crosses its edge. */
+    doc /* The robot shall detect a drop of at least {{= RequirementLimits::minimumCliffHeight}} before a wheel crosses its edge. */
   }
 
   requirement <'SYS-SAFE-011'> 'Safe stop on hazard' {
     @RequirementRole { role = safety; }
     require constraint { robot.safeStopOnHazard == true }
-    doc /* The robot shall command a safe stop within 100 ms of a cliff, lift, collision, over-current or over-temperature hazard. */
+    doc /* The robot shall command a safe stop within {{= RequirementLimits::maxSafeStopReactionTime}} of a cliff, lift, collision, over-current or over-temperature hazard. */
   }
 
   requirement <'SYS-004'> 'Localization accuracy' {
     @RequirementRole { role = performance; }
     require constraint { robot.localizationError <= maxLocalizationError }
-    doc /* The robot shall keep its localization error below 150 mm throughout the reference mission. */
+    doc /* The robot shall keep its localization error below {{= RequirementLimits::maxLocalizationError}} throughout the reference mission. */
   }
 
   requirement <'SYS-005'> 'Coverage map maintenance' {
@@ -116,7 +122,7 @@ package SystemRequirements {
     require constraint {
       robot.wheelStallDetectionTime <= maxWheelStallDetectionTime
     }
-    doc /* The robot shall detect a stalled drive wheel within 2 s and enter a bounded recovery. */
+    doc /* The robot shall detect a stalled drive wheel within {{= RequirementLimits::maxWheelStallDetectionTime}} and enter a bounded recovery. */
   }
 
   requirement <'SYS-007'> 'Return to dock on low battery' {
@@ -125,7 +131,7 @@ package SystemRequirements {
       robot.lowBatteryReturnThresholdPercent <=
         lowBatteryReturnThresholdPercent
     }
-    doc /* The robot shall return to its dock when the state of charge falls below 15 percent. */
+    doc /* The robot shall return to its dock when the state of charge falls below {{= RequirementLimits::lowBatteryReturnThresholdPercent}} percent. */
   }
 
   requirement <'SYS-008'> 'Charging within the battery safe operating area' {
@@ -152,37 +158,49 @@ package SystemRequirements {
   requirement <'SYS-011'> 'Overall height' {
     @RequirementRole { role = 'interface'; }
     require constraint { robot.overallHeight <= maxOverallHeight }
-    doc /* The robot shall be no higher than 95 mm, including the LiDAR turret. */
+    doc /* The robot shall be no higher than {{= RequirementLimits::maxOverallHeight}}, including the laser scanner turret. */
   }
 
   requirement <'SYS-012'> 'Acoustic noise' {
     @RequirementRole { role = performance; }
     require constraint { robot.soundPressureLevel <= maxSoundPressureLevel }
-    doc /* The robot shall emit a sound pressure level of at most 65 dB(A) at 1 m while cleaning a hard floor in standard mode. */
+    doc /* The robot shall emit a sound pressure level of at most {{= RequirementLimits::maxSoundPressureLevel}}(A) at 1 m while cleaning a hard floor at the default suction setting. */
   }
 
   requirement <'SYS-013'> 'Dust bin capacity' {
     @RequirementRole { role = functional; }
     require constraint { robot.dustBinCapacity >= minDustBinCapacity }
-    doc /* The robot shall hold at least 400 mL of debris in a dust bin that is removed and emptied without tools. */
+    doc /* The robot shall hold at least {{= RequirementLimits::minDustBinCapacity}} of debris in a dust bin that is removed and emptied without tools. */
   }
 
   requirement <'SYS-014'> 'Threshold climbing' {
     @RequirementRole { role = performance; }
     require constraint { robot.climbableThreshold >= minClimbableThreshold }
-    doc /* The robot shall cross a rigid threshold at least 20 mm high in both directions. */
+    doc /* The robot shall cross a rigid threshold at least {{= RequirementLimits::minClimbableThreshold}} high in both directions. */
   }
 
   requirement <'SYS-015'> 'Robot mass' {
     @RequirementRole { role = 'interface'; }
     require constraint { robot.robotMass <= maxRobotMass }
-    doc /* The robot shall have a mass of at most 4.0 kg with an empty dust bin. */
+    doc /* The robot shall have a mass of at most {{= RequirementLimits::maxRobotMass}} with an empty dust bin. */
   }
 
   requirement <'SYS-016'> 'Recharge time' {
     @RequirementRole { role = performance; }
     require constraint { robot.rechargeTime <= maxRechargeTime }
-    doc /* The robot shall recharge from the low-battery return threshold to full charge within 4 hours on its dock. */
+    doc /* The robot shall recharge from the low-battery return threshold to full charge within {{= RequirementLimits::maxRechargeTime}} on its dock. */
+  }
+
+  requirement <'SYS-017'> 'Operating modes' {
+    @RequirementRole { role = functional; }
+    require constraint { robot.operatingModeReported == true }
+    doc /* The robot shall at any time be in exactly one of the operating modes idle, cleaning, paused, returning to the dock, charging, safe stop and fault, and shall report a change of mode to the local application. */
+  }
+
+  requirement <'SYS-SAFE-013'> 'Safe stop held until cleared' {
+    @RequirementRole { role = safety; }
+    require constraint { robot.safeStopHeldUntilCleared == true }
+    doc /* The robot shall remain stationary in safe stop, with drive and cleaning motors off, until the hazard is no longer present and the user has confirmed that the robot may continue. */
   }
 
   requirement <'SYS-SAFE-012'> 'Battery protection independent of firmware' {

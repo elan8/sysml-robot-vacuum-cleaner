@@ -10,7 +10,7 @@ package AutonomousFloorCleaningRobotDemo {
   private import PurchasedParts::*;
   private import Sourcing::*;
   private import DomainModel::*;
-  private import DesignLimits::*;
+  private import RequirementLimits::*;
   private import StakeholderNeeds::*;
   private import SystemRequirements::*;
   private import ModuleBudgets::*;
@@ -26,5 +26,6 @@ package AutonomousFloorCleaningRobotDemo {
   private import Architecture::*;
   private import RobotAnalysisCases::*;
   private import Verification::*;
+  private import Validation::*;
   private import ModelViews::*;
 }

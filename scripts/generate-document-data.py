@@ -16,8 +16,8 @@ walked through its definitions and quantities added up, which this script does.
 It also checks the model for gaps and fails when it finds one: a physical part
 without a bill-of-materials classification or a mass, a customer requirement
 without a derivation, a system or module requirement that no derivation names,
-or a system or module requirement without a satisfaction claim or a
-verification case.
+a system or module requirement without a satisfaction claim or a
+verification case, or a customer requirement without a validation case.
 
     python scripts/generate-document-data.py            regenerate
     python scripts/generate-document-data.py --check    fail if the files are stale
@@ -306,12 +306,12 @@ def bom_outputs(model: Model) -> tuple[dict[str, str], list[str], dict[str, floa
 
 def mass_budget(model: Model, modules: dict[str, float]) -> tuple[str, list[str]]:
     limit = None
-    for attribute in model.owned(model.element("DesignLimits"), "AttributeUsage"):
+    for attribute in model.owned(model.element("RequirementLimits"), "AttributeUsage"):
         if attribute["name"] == "maxRobotMass":
             for expression in model.owned(attribute, "Expression"):
                 limit = kilograms(expression["expression"]["nodes"][0]["value"])
     if limit is None:
-        fail("DesignLimits::maxRobotMass has no literal value")
+        fail("RequirementLimits::maxRobotMass has no literal value")
     total = sum(modules.values())
     rows = [[humanize(name), f"{mass:.2f}", f"{100 * mass / total:.0f} %"]
             for name, mass in sorted(modules.items(), key=lambda entry: -entry[1])]
@@ -389,6 +389,10 @@ def requirement_gaps(model: Model) -> list[str]:
             if not edges(requirement, "incoming", "verifyRequirementTarget"):
                 gaps.append(f"{level} requirement without a verification case: "
                             + requirement_label(requirement))
+    for requirement in customer:
+        if not edges(requirement, "incoming", "verifyRequirementTarget"):
+            gaps.append("customer requirement without a validation case: "
+                        + requirement_label(requirement))
     return gaps
 
 
