@@ -31,7 +31,8 @@ organizes a model while the SysML elements retain product-domain names.
 5. Inspect `50_logical/FirmwareArchitecture.sysml`: seven periodic or
    event-driven tasks, typed queues, scheduling priorities, and deadlines.
 6. Continue into `70_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
-   `80_verification/Verification.sysml` (`verifyCliffSafeStop`).
+   `80_verification/Verification.sysml` (`'Cliff safe stop'`, VER-009), and the
+   validation cases for the customer requirements in `Validation.sysml`.
 7. Finish with the nine focused views in `90_views/ModelViews.sysml`.
 
 ## Semantic backbone
@@ -79,7 +80,8 @@ flowchart LR
 | `PhysicalArchitecture` | Assembly-oriented baseline with an end-to-end dock/charger/BMS/battery path, explicit base and top wiring harnesses, separate safety GPIOs, mechanically connected drivetrains, a powered beacon receiver, debris transfer to the removable bin, and the local HMI integrated into `TopModule`. `MainPcbModule` is the populated PCB assembly. |
 | `Architecture` | Concrete system, allocations, satisfaction |
 | `RobotAnalysisCases` | Four analyses: mission energy, safety reaction, localization, mass budget |
-| `Verification` | Twelve verification cases |
+| `Verification` | Twelve verification cases with identifier, method and pass criterion |
+| `Validation` | Five validation cases for the customer requirements |
 | `ModelViews` | Six stakeholder projections |
 
 ## Bill of materials

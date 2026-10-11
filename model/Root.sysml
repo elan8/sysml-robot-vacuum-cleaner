@@ -26,5 +26,6 @@ package AutonomousFloorCleaningRobotDemo {
   private import Architecture::*;
   private import RobotAnalysisCases::*;
   private import Verification::*;
+  private import Validation::*;
   private import ModelViews::*;
 }

@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: MIT
  *
  * Engineering documents generated from the model with Doc42: the customer
- * requirements, system requirements and system design specifications. Each
+ * requirements, system requirements and system design specifications and the
+ * verification and validation plan. Each
  * document is a view; its nested views are the sections, in order. Tables,
  * values and diagrams are read from the model, so they cannot drift from it.
  * A short text is the `doc` of its section, written in Markdown; a long one is
@@ -41,6 +42,10 @@ package RobotDocuments {
         @Section { title = "Document conventions"; }
         @Prose { file = "prose/conventions.md"; }
       }
+      view referenceDocuments {
+        @Section { title = "Applicable and reference documents"; }
+        @Prose { file = "prose/references.md"; }
+      }
     }
 
     view context {
@@ -60,22 +65,14 @@ package RobotDocuments {
       @Prose { file = "prose/crs-scenarios.md"; }
     }
 
-    view customerRequirements : GeneralView {
+    view customerRequirements {
       @Section { title = "Customer requirements"; }
-      @RequirementTable;
-      doc /* Each requirement is a need of the household, identified by a stable number. The
-           * system requirements that refine it are specified in RVC-SRS-001. */
-      expose StakeholderNeeds::'Whole-home cleaning in one run';
-      expose StakeholderNeeds::'Safe operation in the household';
-      expose StakeholderNeeds::'Unattended docking and charging';
-      expose StakeholderNeeds::'Reliable navigation at home';
-      expose StakeholderNeeds::'Mission progress and fault feedback';
-      expose StakeholderNeeds::'Privacy of the home map';
-      expose StakeholderNeeds::'Cleaning under furniture';
-      expose StakeholderNeeds::'Quiet operation';
-      expose StakeholderNeeds::'Easy routine maintenance';
-      expose StakeholderNeeds::'Thresholds between rooms';
-      expose StakeholderNeeds::'Carrying between floors';
+      doc /* Each requirement is a need of the household, stated in the household's terms and
+           * identified by a stable number. None of them says how the product meets it or how
+           * that is measured: the system requirements that make each need measurable are in
+           * RVC-SRS-001. */
+      @Table { columns = "ID = id, Requirement = name, Text = text"; kind = "requirement"; sort = "id"; }
+      expose StakeholderNeeds::*;
     }
 
     view constraints {
@@ -83,9 +80,9 @@ package RobotDocuments {
       @Prose { file = "prose/crs-constraints.md"; }
     }
 
-    view acceptance {
-      @Section { title = "Acceptance and open points"; }
-      @Prose { file = "prose/crs-acceptance.md"; }
+    view validation {
+      @Section { title = "Validation and open points"; }
+      @Prose { file = "prose/crs-validation.md"; }
     }
   }
 
@@ -104,10 +101,10 @@ package RobotDocuments {
       @Section { title = "Introduction"; }
       view purpose {
         @Section { title = "Purpose"; }
-        doc /* This specification states what the robot system shall do and how well, as
-             * verifiable requirements on {{Architecture::robotSystem}}. It refines the customer
-             * requirements of RVC-CRS-001 and is the baseline for design (RVC-SDS-001) and for
-             * verification. */
+        doc /* This specification states what the robot shall do and how well, as verifiable
+             * requirements on the robot as a whole. It refines the customer requirements of
+             * RVC-CRS-001 and is the baseline for the design (RVC-SDS-001) and for verification
+             * (RVC-VVP-001). It contains no design. */
       }
       view scope {
         @Section { title = "Scope"; }
@@ -124,41 +121,53 @@ package RobotDocuments {
         @Section { title = "Document conventions"; }
         @Prose { file = "prose/conventions.md"; }
       }
+      view referenceDocuments {
+        @Section { title = "Applicable and reference documents"; }
+        @Prose { file = "prose/references.md"; }
+      }
     }
 
     view overview {
       @Section { title = "System overview"; }
       @Prose { file = "prose/srs-overview.md"; }
-      @Figure { file = "figures/product-layout.svg"; caption = "Product layout with the envelope the physical requirements refer to"; }
       view boundary : InterconnectionView {
-        @Section { title = "System boundary"; }
+        @Section { title = "System context"; }
         doc /* The system of interest is the robot. The user, the mobile application, the
              * docking station and the home are outside it; the requirements constrain the
              * robot's behaviour at these interfaces. */
         expose ProductContext::residentialCleaningContext;
       }
       view operatingStates : StateTransitionView {
-        @Section { title = "Operating states"; }
-        doc /* The states the robot moves through during a mission, including the safe stop
-             * that the safety requirements refer to. */
+        @Section { title = "Modes and states"; }
+        doc /* The states the robot is required to move through during a mission, including
+             * the safe stop that the safety requirements refer to. */
         expose BehaviorStates::RobotOperatingBehavior;
       }
     }
 
     view designLimits {
-      @Section { title = "Design limits"; }
+      @Section { title = "Limit values"; }
       @Prose { file = "prose/srs-limits.md"; }
     }
 
     view requirements {
       @Section { title = "System requirements"; }
-      doc /* Requirements are grouped by kind. Each one constrains a measurable property of the
-           * robot; the limit values are those of the previous section. The last column names
-           * the design element that claims to satisfy the requirement. */
+      doc /* Each requirement constrains one measurable property of the robot against a limit
+           * value of the previous section, and names the customer requirement it was derived
+           * from. A requirement states what the robot shall do or be, not how: the design that
+           * meets it is in RVC-SDS-001, and how it is verified is in RVC-VVP-001. */
 
-      view performance : GeneralView {
-        @Section { title = "Performance"; }
-        @RequirementTable;
+      view functional {
+        @Section { title = "Functional requirements"; }
+        @Table { columns = "ID = id, Requirement = name, Text = text, Derived from = derived-from / id"; sort = "id"; }
+        expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
+        expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
+        expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
+        expose SystemRequirements::robotSystemSpecification::'Dust bin capacity';
+      }
+      view performance {
+        @Section { title = "Performance requirements"; }
+        @Table { columns = "ID = id, Requirement = name, Text = text, Derived from = derived-from / id"; sort = "id"; }
         expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
         expose SystemRequirements::robotSystemSpecification::'Floor coverage';
         expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
@@ -166,34 +175,30 @@ package RobotDocuments {
         expose SystemRequirements::robotSystemSpecification::'Threshold climbing';
         expose SystemRequirements::robotSystemSpecification::'Recharge time';
       }
-      view safety : GeneralView {
-        @Section { title = "Safety"; }
-        @RequirementTable;
+      view interfaces {
+        @Section { title = "Interface requirements"; }
+        @Table { columns = "ID = id, Requirement = name, Text = text, Derived from = derived-from / id"; sort = "id"; }
+        expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
+      }
+      view physical {
+        @Section { title = "Physical characteristics"; }
+        @Table { columns = "ID = id, Requirement = name, Text = text, Derived from = derived-from / id"; sort = "id"; }
+        expose SystemRequirements::robotSystemSpecification::'Overall height';
+        expose SystemRequirements::robotSystemSpecification::'Robot mass';
+      }
+      view safety {
+        @Section { title = "Safety requirements"; }
+        @Table { columns = "ID = id, Requirement = name, Text = text, Derived from = derived-from / id"; sort = "id"; }
         expose SystemRequirements::robotSystemSpecification::'Obstacle avoidance';
         expose SystemRequirements::robotSystemSpecification::'Cliff detection';
         expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
         expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
         expose SystemRequirements::robotSystemSpecification::'Battery protection independent of firmware';
       }
-      view functional : GeneralView {
-        @Section { title = "Functional"; }
-        @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
-        expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
-        expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
-        expose SystemRequirements::robotSystemSpecification::'Dust bin capacity';
-      }
-      view interfaceAndSecurity : GeneralView {
-        @Section { title = "Interface and security"; }
-        @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
+      view security {
+        @Section { title = "Security and privacy requirements"; }
+        @Table { columns = "ID = id, Requirement = name, Text = text, Derived from = derived-from / id"; sort = "id"; }
         expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
-      }
-      view physical : GeneralView {
-        @Section { title = "Physical characteristics"; }
-        @RequirementTable;
-        expose SystemRequirements::robotSystemSpecification::'Overall height';
-        expose SystemRequirements::robotSystemSpecification::'Robot mass';
       }
     }
 
@@ -216,14 +221,12 @@ package RobotDocuments {
     }
 
     view verification {
-      @Section { title = "Verification approach"; }
-      @Prose { file = "prose/srs-verification.md"; }
-      @Table {
-        columns = "ID = id, System requirement = name, Satisfied by = satisfied-by, Verified by = verified-by";
-        kind = "requirement";
-        sort = "id";
-      }
-      expose SystemRequirements::robotSystemSpecification::*;
+      @Section { title = "Verification"; }
+      doc /* Every requirement of this specification is verified by at least one verification
+           * case. The methods, the cases with their pass criteria and the requirements
+           * verification matrix are in the Verification and Validation Plan, RVC-VVP-001.
+           * This specification states what is required; it claims nothing about whether the
+           * design meets it. */
     }
   }
 
@@ -261,6 +264,10 @@ package RobotDocuments {
       view conventions {
         @Section { title = "Document conventions"; }
         @Prose { file = "prose/conventions.md"; }
+      }
+      view referenceDocuments {
+        @Section { title = "Applicable and reference documents"; }
+        @Prose { file = "prose/references.md"; }
       }
     }
 
@@ -378,15 +385,12 @@ package RobotDocuments {
         expose ModuleRequirements::dustBinSpecification::'Dust bin mass';
         expose ModuleRequirements::harnessSpecification::'Wiring harness mass';
       }
-      view moduleVerification {
-        @Section { title = "Module requirement coverage"; }
-        doc /* The matrix names, for every module requirement, the system requirement it was
-             * derived from, the part that claims it and the verification case that covers it.
-             * The same rule applies as for the system-level matrix in RVC-SRS-001: the build of
-             * the model fails for a module requirement without a derivation, a claim or a
-             * verification case. */
+      view moduleSummary {
+        @Section { title = "Module requirement summary"; }
+        doc /* Every module requirement with the system requirement it was derived from and the
+             * part that claims it. How each one is verified is in RVC-VVP-001. */
         @Table {
-          columns = "ID = id, Module requirement = name, Derived from = derived-from, Satisfied by = satisfied-by, Verified by = verified-by";
+          columns = "ID = id, Module requirement = name, Derived from = derived-from, Satisfied by = satisfied-by";
           kind = "requirement";
           sort = "id";
         }
@@ -420,36 +424,154 @@ package RobotDocuments {
       @Prose { file = "generated/mass-budget.md"; }
     }
 
-    view satisfaction : GeneralView {
+    view satisfaction {
       @Section { title = "Requirement satisfaction"; }
-      @RequirementTable;
-      doc /* The design element that claims each system requirement. A claim is a design
-           * intent recorded in the model, not evidence; evidence comes from the verification
-           * cases listed in RVC-SRS-001. */
-      expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
-      expose SystemRequirements::robotSystemSpecification::'Floor coverage';
-      expose SystemRequirements::robotSystemSpecification::'Obstacle avoidance';
-      expose SystemRequirements::robotSystemSpecification::'Cliff detection';
-      expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
-      expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
-      expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
-      expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
-      expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
-      expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
-      expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
-      expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
-      expose SystemRequirements::robotSystemSpecification::'Overall height';
-      expose SystemRequirements::robotSystemSpecification::'Acoustic noise';
-      expose SystemRequirements::robotSystemSpecification::'Dust bin capacity';
-      expose SystemRequirements::robotSystemSpecification::'Threshold climbing';
-      expose SystemRequirements::robotSystemSpecification::'Robot mass';
-      expose SystemRequirements::robotSystemSpecification::'Recharge time';
-      expose SystemRequirements::robotSystemSpecification::'Battery protection independent of firmware';
+      doc /* The design element that claims each system requirement. A claim is a design intent
+           * recorded in the model, not evidence; evidence comes from the verification cases of
+           * RVC-VVP-001. */
+      @Table {
+        columns = "ID = id, System requirement = name, Satisfied by = satisfied-by";
+        kind = "requirement";
+        sort = "id";
+      }
+      expose SystemRequirements::robotSystemSpecification::*;
     }
 
     view openPoints {
       @Section { title = "Limitations and open design points"; }
       @Prose { file = "prose/sds-open.md"; }
+    }
+  }
+
+  view vvp {
+    @Document {
+      title = "Autonomous Floor Cleaning Robot";
+      subtitle = "Verification and Validation Plan";
+      organization = "Elan8";
+      number = "RVC-VVP-001";
+      revision = "A";
+      status = "Draft for review";
+      template = "template";
+    }
+
+    view introduction {
+      @Section { title = "Introduction"; }
+      view purpose {
+        @Section { title = "Purpose"; }
+        doc /* This plan states how Elan8 will show that the robot meets its requirements and
+             * that it is the product a household needs. Verification answers the first
+             * question against RVC-SRS-001 and the module requirements of RVC-SDS-001;
+             * validation answers the second against RVC-CRS-001. The plan defines the methods,
+             * the cases with their pass criteria, and the matrices that show every requirement
+             * is covered. It contains no results. */
+      }
+      view scope {
+        @Section { title = "Scope"; }
+        @Prose { file = "prose/vvp-scope.md"; }
+      }
+      view conventions {
+        @Section { title = "Document conventions"; }
+        @Prose { file = "prose/conventions.md"; }
+      }
+      view referenceDocuments {
+        @Section { title = "Applicable and reference documents"; }
+        @Prose { file = "prose/references.md"; }
+      }
+    }
+
+    view system {
+      @Section { title = "System under verification"; }
+      @Prose { file = "prose/vvp-system.md"; }
+      @Figure { file = "figures/product-layout.svg"; caption = "The robot and its modules, the units verification is planned against"; }
+    }
+
+    view approach {
+      @Section { title = "Verification and validation approach"; }
+      @Prose { file = "prose/vvp-approach.md"; }
+    }
+
+    view resources {
+      @Section { title = "Test articles, facilities and equipment"; }
+      @Prose { file = "prose/vvp-resources.md"; }
+    }
+
+    view systemVerification {
+      @Section { title = "System verification"; }
+      doc /* Twelve verification cases cover the system requirements. Six are run on the
+           * firmware on its target board and six on the assembled robot. */
+      view cases {
+        @Section { title = "Verification cases"; }
+        doc /* Each case states its method, what is done, and the criterion for passing. The
+             * last column lists the requirements the case verifies, at system and at module
+             * level. */
+        @Table {
+          columns = "ID = id, Case = name, Method = @VerificationMethod.kind, Procedure and pass criterion = text, Verifies = verifies / id";
+          kind = "verification case";
+          sort = "id";
+        }
+        expose Verification::*;
+      }
+      view matrix {
+        @Section { title = "Requirements verification matrix"; }
+        doc /* Every system requirement of RVC-SRS-001 with the methods and the cases that
+             * verify it. The build of the model fails for a requirement without a case, so a
+             * requirement cannot be missing from this matrix or be left without verification. */
+        @Table {
+          columns = "ID = id, System requirement = name, Method = verified-by / @VerificationMethod.kind, Verified by = verified-by";
+          kind = "requirement";
+          sort = "id";
+        }
+        expose SystemRequirements::robotSystemSpecification::*;
+      }
+    }
+
+    view moduleVerification {
+      @Section { title = "Module verification"; }
+      doc /* Module requirements are the budgets that RVC-SDS-001 allocates to the modules.
+           * They are verified in the same cases as the system requirements they come from,
+           * with the module quantity measured separately, so that a failure at system level
+           * can be traced to the module that exceeded its budget. */
+      @Table {
+        columns = "ID = id, Module requirement = name, Derived from = derived-from / id, Method = verified-by / @VerificationMethod.kind, Verified by = verified-by";
+        kind = "requirement";
+        sort = "id";
+      }
+      expose ModuleRequirements::baseModuleSpecification::*;
+      expose ModuleRequirements::mainPcbSpecification::*;
+      expose ModuleRequirements::firmwareSpecification::*;
+      expose ModuleRequirements::topModuleSpecification::*;
+      expose ModuleRequirements::dustBinSpecification::*;
+      expose ModuleRequirements::harnessSpecification::*;
+    }
+
+    view validation {
+      @Section { title = "Validation"; }
+      @Prose { file = "prose/vvp-validation.md"; }
+      view cases {
+        @Section { title = "Validation cases"; }
+        @Table {
+          columns = "ID = id, Case = name, Method = @VerificationMethod.kind, Activity and acceptance criterion = text, Validates = verifies / id";
+          kind = "verification case";
+          sort = "id";
+        }
+        expose Validation::*;
+      }
+      view matrix {
+        @Section { title = "Validation matrix"; }
+        doc /* Every customer requirement of RVC-CRS-001 with the validation case that covers
+             * it. */
+        @Table {
+          columns = "ID = id, Customer requirement = name, Method = verified-by / @VerificationMethod.kind, Validated by = verified-by";
+          kind = "requirement";
+          sort = "id";
+        }
+        expose StakeholderNeeds::*;
+      }
+    }
+
+    view status {
+      @Section { title = "Status and open points"; }
+      @Prose { file = "prose/vvp-status.md"; }
     }
   }
 }

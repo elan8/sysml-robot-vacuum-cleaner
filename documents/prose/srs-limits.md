@@ -1,4 +1,4 @@
-The requirements refer to the following limit values. They are defined once in the model ({{DesignLimits::cleaningAreaTarget}} and its siblings) and used by the requirements, the analyses and the verification cases, so a change to a limit propagates to all three. The values in this list are read from the model when the document is built.
+The requirements refer to the following limit values. They are defined once in the model and used by the requirements, the analyses and the verification cases, so a change to a limit reaches all three. The values in this list are read from the model when the document is built.
 
 - Cleaning area on one charge: at least 80 m².
 - Coverage of the reachable floor: at least {{= DesignLimits::floorCoverageTargetPercent}} percent.
