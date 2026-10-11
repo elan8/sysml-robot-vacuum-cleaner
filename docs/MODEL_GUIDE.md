@@ -13,20 +13,21 @@ organizes a model while the SysML elements retain product-domain names.
 
 ## Recommended tour
 
-1. Start in `10_purpose/Requirements.sysml`: six stakeholder needs derive twelve
+1. Start in `05_requirements/Requirements.sysml`: six stakeholder needs derive twelve
    testable requirements with quantities, constraints, and Elan8 requirement roles.
-2. Read `20_behavior/FunctionalBehavior.sysml`: `OperateCleaningRobot` decomposes
+2. Read `40_functions/Functions.sysml`: `OperateCleaningRobot` decomposes
    product behavior. Compare the autonomous-cleaning, obstacle-avoidance,
-   low-battery-return, and cliff-safe-stop scenarios.
-3. Open `30_architecture/PhysicalArchitecture.sysml`: the selected baseline
+   low-battery-return, and cliff-safe-stop scenarios in
+   `20_usecases/UseCases.sysml`.
+3. Open `60_physical/PhysicalArchitecture.sysml`: the selected baseline
    contains the major LRUs, typed interfaces, power rails, and catalog selections.
 4. Follow `Architecture::robotSystem`. Its `operate` behavior usage is used for
    allocation and requirement satisfaction.
-5. Inspect `30_architecture/FirmwareArchitecture.sysml`: seven periodic or
+5. Inspect `50_logical/FirmwareArchitecture.sysml`: seven periodic or
    event-driven tasks, typed queues, scheduling priorities, and deadlines.
-6. Continue into `40_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
-   `50_verification/Verification.sysml` (`verifyCliffSafeStop`).
-7. Finish with the nine focused views in `60_views/ModelViews.sysml`.
+6. Continue into `70_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
+   `80_verification/Verification.sysml` (`verifyCliffSafeStop`).
+7. Finish with the nine focused views in `90_views/ModelViews.sysml`.
 
 ## Semantic backbone
 

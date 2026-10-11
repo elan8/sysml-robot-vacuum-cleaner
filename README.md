@@ -19,8 +19,8 @@ requirements, behavior, architecture and verification elements.
 
 ## What the showcase demonstrates
 
-- Elan8 Method concerns via folders `00_project` … `90_library`.
-- Elan8 requirement roles, identities, engineering concerns, and folder conventions
+- Elan8 Method model areas via folders `00_project` … `99_library`.
+- Elan8 requirement roles, native SysML requirement identifiers, and folder conventions
   without exposing methodology jargon as product-domain behavior.
 - Definition/usage separation and one concrete `robotSystem` usage.
 - Typed items, ports, connections, flows and allocations instead of internal
@@ -31,7 +31,7 @@ requirements, behavior, architecture and verification elements.
   verification cases plus three quantitative analyses.
 - A reusable `PurchasedParts` library; named dependencies select catalog
   implementations without turning procurement choice into type specialization.
-- Six curated views over the same graph.
+- Nine focused views over the same graph.
 
 The scope deliberately excludes product variants, trade studies, and
 implementation handoff tables. Human-facing external identifiers such as
@@ -41,28 +41,60 @@ manufacturer part numbers stay text; internal model identity is semantic.
 
 | Path | Purpose |
 | --- | --- |
-| `00_project/Project.sysml` | Tailoring / method profile |
-| `10_purpose/` | Context, needs, design limits, system requirements |
-| `20_behavior/` | Capabilities, states, scenarios |
-| `30_architecture/` | Domain, physical, firmware, SOI allocations |
-| `40_analysis/` | Three quantitative analyses |
-| `50_verification/` | Nine verification cases |
-| `60_views/` | Six projections |
-| `90_library/` | Purchased parts (units via `Elan8::Units::Engineering`) |
+| `00_project/Project.sysml` | Project information |
+| `05_requirements/` | Stakeholder needs, design limits, system requirements |
+| `10_context/` | External actors and the residential operating boundary |
+| `20_usecases/` | Four representative operational scenarios |
+| `40_functions/` | Functional decomposition and operating states |
+| `50_logical/` | Domain model and firmware architecture |
+| `60_physical/` | Physical architecture and system-of-interest allocations |
+| `70_analysis/` | Three quantitative analyses |
+| `80_verification/` | Nine verification cases |
+| `90_views/` | Nine focused views |
+| `99_library/` | Purchased parts (units via `Elan8::Units::Engineering`) |
 | `Root.sysml` | Workspace import hub |
+| `../documents/` | Doc42 document definitions and prose, outside the model |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).
 
+## Engineering documents
+
+Three documents are generated from the model with [Doc42](https://github.com/elan8/doc42-action),
+with Elan8 as the engineering organization that issues them:
+
+| Document | Number | Content |
+| --- | --- | --- |
+| Customer Requirements Specification | RVC-CRS-001 | Stakeholders, operating context, scenarios and the six customer requirements |
+| System Requirements Specification | RVC-SRS-001 | System boundary, design limits, the twelve system requirements, traceability and verification approach |
+| System Design Specification | RVC-SDS-001 | Functions, physical and firmware architecture, purchased components, analyses and requirement satisfaction |
+
+They are defined in [`documents/Documents.sysml`](documents/Documents.sysml): each
+document is a SysML view, its nested views are the sections, and its requirement
+tables and diagrams are projected from the model. The surrounding text lives in
+`documents/prose/`. Every push builds the PDFs; download them from the
+`engineering-documents` artifact of the latest
+[workflow run](../../actions/workflows/validate.yml).
+
+```sh
+doc42 check . --library-path <method-library> --library-path <domain-libraries>/model
+doc42 build . --doc RobotDocuments::srs --out out --library-path ...
+```
+
+Checking the documents is free. Building them needs an Elan8 license in the
+`ELAN8_LICENSE` environment variable; the model itself needs neither Doc42 nor a
+license.
+
 ## Validation
 
-Requires sibling checkouts of `sysml-domain-libraries` and `mbse-methodology`:
+Requires [Spec42](https://github.com/elan8/spec42) 0.54.1 or later and sibling
+checkouts of `sysml-domain-libraries` and `mbse-methodology`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
 The release criterion is 0 errors, 0 warnings and 0 information diagnostics,
-followed by successful SVG export of all five views. See
+followed by successful SVG export of the views. See
 [validation details](docs/VALIDATION.md).
 
 ## Status and limitations

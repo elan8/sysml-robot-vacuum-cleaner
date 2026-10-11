@@ -11,10 +11,8 @@ package RobotAnalysisCases {
   private import ISQ::*;
   private import SI::*;
   private import NumericalFunctions::*; // sum(...) in measuredReactionTime / baseElectronicsPowerDraw
-  private import Elan8::Method::Core::*;
 
   analysis def MissionEnergyAnalysis {
-    @EngineeringConcern { concern = evidence; }
     subject robot : AutonomousFloorCleaningRobot;
     attribute chargeBudget : ElectricChargeValue =
       DesignLimits::batteryCapacityBudget;
@@ -34,7 +32,6 @@ package RobotAnalysisCases {
   }
 
   analysis def SafetyReactionAnalysis {
-    @EngineeringConcern { concern = evidence; }
     subject robot : AutonomousFloorCleaningRobot;
     attribute sensorDetectionLatency : DurationValue = 25 [ms];
     attribute queueAndSchedulingLatency : DurationValue = 10 [ms];
@@ -57,7 +54,6 @@ package RobotAnalysisCases {
   }
 
   analysis def LocalizationPerformanceAnalysis {
-    @EngineeringConcern { concern = evidence; }
     subject robot : AutonomousFloorCleaningRobot;
     attribute estimatedLocalizationError : LengthValue = 95 [mm];
     attribute localizationErrorLimit : LengthValue =
