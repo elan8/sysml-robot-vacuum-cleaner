@@ -52,8 +52,9 @@ carry the engineering, not only describe it:
   derivation recording why the derived set is complete or how the budget closes.
 - Requirements satisfied by concrete behavior usages or parts and verified by
   twelve verification cases plus four quantitative analyses.
-- A bill of materials, a mass budget, trace tables and verification matrices
-  generated from the model, with a build that fails on a gap.
+- Trace tables, verification matrices and limit values that the documents read
+  from the model, and a bill of materials and mass budget generated from it,
+  with a build that fails on a gap.
 - A reusable `PurchasedParts` library; named dependencies select catalog
   implementations without turning procurement choice into type specialization.
 - Nine focused views over the same graph.
@@ -78,7 +79,7 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `90_views/` | Nine focused views |
 | `99_library/` | Purchased parts and bill-of-materials classification |
 | `Root.sysml` | Workspace import hub |
-| `../documents/` | Doc42 document definitions, prose, authored figures and generated tables |
+| `../documents/` | Doc42 document definitions, prose, authored figures, the house template and generated tables |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).
 
@@ -94,18 +95,30 @@ with Elan8 as the engineering organization that issues them:
 | System Design Specification | RVC-SDS-001 | Architecture, allocation of requirements to modules with budgets, firmware, bill of materials, analyses and requirement satisfaction |
 
 They are defined in [`documents/Documents.sysml`](documents/Documents.sysml): each
-document is a SysML view, its nested views are the sections, and its requirement
-tables and diagrams are projected from the model. The surrounding text lives in
-`documents/prose/` and four authored drawings in `documents/figures/`.
+document is a SysML view and its nested views are the sections. What a section
+shows is read from the model when the document is built:
 
-The bill of materials, the mass budget, the trace tables and the verification
-matrices in `documents/generated/` are written by
-[`scripts/generate-document-data.py`](scripts/generate-document-data.py) from a
-Spec42 export of the model. The script needs only Python and Spec42. It fails
-when a physical part has no bill-of-materials classification or mass, when a
-requirement is not covered by a derivation, or when a requirement has no
-satisfaction claim or verification case. CI fails when the committed files are
-not what the model generates.
+- **Tables** with `@Table`: requirement tables, the customer-to-system and
+  system-to-module trace tables with their rationale, and the verification
+  matrices. A section exposes elements and names its columns.
+- **Values** with `{{= DesignLimits::maxRobotMass}}` in the text, so a number in
+  a document cannot disagree with the model.
+- **Diagrams** from sections typed by a standard view.
+
+Short texts are the `doc` of their section, written in Markdown; longer ones are
+Markdown files in `documents/prose/`. Four authored drawings are in
+`documents/figures/`. The layout is the Elan8 house template in
+[`documents/template/`](documents/template), a copy of a built-in Doc42 template
+with its own title page, selected with `template = "template"`.
+
+The bill of materials and the mass budget in `documents/generated/` are written
+by [`scripts/generate-document-data.py`](scripts/generate-document-data.py) from
+a Spec42 export of the model, because they need the part tree walked and
+quantities added up. The script needs only Python and Spec42. It also checks the
+model for gaps and fails when a physical part has no bill-of-materials
+classification or mass, when a requirement is not covered by a derivation, or
+when a requirement has no satisfaction claim or verification case. CI fails when
+the committed files are not what the model generates.
 
 ```sh
 python scripts/generate-document-data.py          # regenerate after a model change

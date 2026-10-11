@@ -1,1 +1,0 @@
-The matrix names, for every module requirement, the part that claims it and the verification case that covers it. It is generated from the model under the same rule as the system-level matrix in RVC-SRS-001: the build fails for a module requirement without a derivation, a claim or a verification case.

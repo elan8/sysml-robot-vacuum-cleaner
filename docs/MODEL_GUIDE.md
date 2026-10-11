@@ -17,8 +17,9 @@ organizes a model while the SysML elements retain product-domain names.
    the household's words. `SystemRequirements.sysml` holds nineteen testable
    requirements with quantities, constraints and Elan8 requirement roles.
    `ModuleRequirements.sysml` splits five of them into budgets for the modules.
-   `RequirementTraceability.sysml` holds the derivations between the levels, each
-   with the reason the derived set is complete.
+   `RequirementTraceability.sysml` and `RequirementAllocation.sysml` hold the
+   derivations between the levels, each with the reason the derived set is
+   complete or the budget closes.
 2. Read `40_functions/Functions.sysml`: `OperateCleaningRobot` decomposes
    product behavior. Compare the autonomous-cleaning, obstacle-avoidance,
    low-battery-return, and cliff-safe-stop scenarios in
@@ -62,7 +63,8 @@ flowchart LR
 | `DomainModel` | Protocol vocabulary, items, ports, buses |
 | `DesignLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
 | `ModuleBudgets`, `ModuleRequirements` | Budgets per module and the requirements that hold each module to its budget |
-| `RequirementTraceability` | Derivations from customer to system to module requirements |
+| `RequirementTraceability` | Derivations from customer requirements to system requirements |
+| `RequirementAllocation` | Derivations from system requirements to module requirements |
 | `Sourcing` | `BomItem` metadata: description, make or buy, unit cost |
 | `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
 | `ProductContext` | Users, app, network, dock, home, robot boundary |

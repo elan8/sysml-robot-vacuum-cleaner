@@ -14,7 +14,6 @@ package ModuleBudgets {
   private import DesignLimits::*;
   private import ISQ::*;
   private import SI::*;
-  private import NumericalFunctions::*;
 
   // Safe stop: 100 ms from hazard to standstill command, of which 10 ms is unallocated margin.
   attribute cliffSensingBudget : DurationValue = 25 [ms];
@@ -22,7 +21,7 @@ package ModuleBudgets {
   attribute driveDisableBudget : DurationValue = 5 [ms];
   attribute brakingBudget : DurationValue = 50 [ms];
   attribute allocatedSafeStopTime : DurationValue =
-    sum(cliffSensingBudget, supervisorDecisionBudget, driveDisableBudget, brakingBudget);
+    cliffSensingBudget + supervisorDecisionBudget + driveDisableBudget + brakingBudget;
 
   // Mass: 4.0 kg, fully allocated; the margin is held inside each module budget.
   attribute baseMassBudget : MassValue = 2.75 [kg];
@@ -31,7 +30,7 @@ package ModuleBudgets {
   attribute dustBinMassBudget : MassValue = 0.22 [kg];
   attribute harnessMassBudget : MassValue = 0.18 [kg];
   attribute allocatedMass : MassValue =
-    sum(baseMassBudget, topMassBudget, mainPcbMassBudget, dustBinMassBudget, harnessMassBudget);
+    baseMassBudget + topMassBudget + mainPcbMassBudget + dustBinMassBudget + harnessMassBudget;
 
   // Height: 95 mm overall, split at the parting line between base and top.
   attribute baseHeightBudget : LengthValue = 57 [mm];

@@ -19,7 +19,7 @@ domain-library paths when available, and then runs static model guards.
 Expected result:
 
 ```text
-Checked 18 document(s): 0 error(s), 0 warning(s), 0 info(s)
+Checked 19 document(s): 0 error(s), 0 warning(s), 0 info(s)
 Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean.
 ```
 
@@ -43,8 +43,8 @@ missing queue flows and requirements without satisfaction or verification.
 python scripts/generate-document-data.py --check
 ```
 
-The script exports the model with Spec42 and compares the tables it derives with
-the committed files in `documents/generated/`. It fails when they differ and when
+The script exports the model with Spec42 and compares the bill of materials and
+the mass budget it derives with the committed files in `documents/generated/`. It fails when they differ and when
 the model has a gap: a physical part without a bill-of-materials classification or
 a mass, a customer requirement without a derivation, a system or module
 requirement that no derivation names, or a requirement without a satisfaction

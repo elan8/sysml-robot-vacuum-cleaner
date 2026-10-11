@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 Elan8
 # SPDX-License-Identifier: MIT
-"""Generate the tables the engineering documents include, from the model.
+"""Generate the bill of materials and check the model for gaps.
 
-Reads one Spec42 export of `model/` and writes Markdown tables into
-`documents/generated/`:
+Reads one Spec42 export of `model/` and writes into `documents/generated/`:
 
-    bom.md                 bill of materials with quantities, sourcing, cost and mass
-    bom.csv                the same lines for a spreadsheet or an ERP import
-    mass-budget.md         mass per module against the robot mass limit
-    traceability.md        customer requirement -> derived system requirements
-    verification-matrix.md system requirement -> satisfied by -> verified by
-    allocation.md          system requirement -> module requirements and budgets
-    module-matrix.md       module requirement -> satisfied by -> verified by
+    bom.md           bill of materials with quantities, sourcing, cost and mass
+    bom.csv          the same lines for a spreadsheet or an ERP import
+    mass-budget.md   mass per module against the robot mass limit
+
+Trace tables and verification matrices are not generated here: Doc42 reads
+them from the model with `@Table`. A bill of materials needs the part tree
+walked through its definitions and quantities added up, which this script does.
 
 It also checks the model for gaps and fails when it finds one: a physical part
-without a bill-of-materials classification, a customer requirement without a
-derivation, a system or module requirement that no derivation names, or a
-system or module requirement without a satisfaction claim or a verification
-case.
+without a bill-of-materials classification or a mass, a customer requirement
+without a derivation, a system or module requirement that no derivation names,
+or a system or module requirement without a satisfaction claim or a
+verification case.
 
     python scripts/generate-document-data.py            regenerate
     python scripts/generate-document-data.py --check    fail if the files are stale
@@ -332,15 +331,19 @@ def edges(element: dict, direction: str, kind: str) -> list[str]:
             if edge["kind"] == kind]
 
 
-def requirement_tables(model: Model) -> tuple[dict[str, str], list[str]]:
+def requirement_gaps(model: Model) -> list[str]:
+    """Coverage gaps between the requirement levels and towards design and verification."""
     gaps: list[str] = []
-    customer = sorted(model.owned(model.element(CUSTOMER), "RequirementUsage"),
-                      key=lambda requirement: requirement["short_name"] or "")
-    system = sorted(model.owned(model.element(SPECIFICATION), "RequirementUsage"),
-                    key=lambda requirement: requirement["short_name"] or "")
-    system_names = {requirement["qualified_name"] for requirement in system}
+    customer = model.owned(model.element(CUSTOMER), "RequirementUsage")
+    system = model.owned(model.element(SPECIFICATION), "RequirementUsage")
+    module = [requirement
+              for specification in model.owned(model.element(MODULES), "RequirementUsage")
+              for requirement in model.owned(specification, "RequirementUsage")]
+    names = {level: {requirement["qualified_name"] for requirement in requirements}
+             for level, requirements in (("system", system), ("module", module))}
 
-    derivations: dict[str, tuple[list[str], str]] = {}
+    # Original requirement -> the requirements one derivation derives from it.
+    derivations: dict[str, list[str]] = {}
     for connector in model.connectors:
         if connector["declared_type"].get("qualified_name") != "DerivationConnections::Derivation":
             continue
@@ -352,87 +355,41 @@ def requirement_tables(model: Model) -> tuple[dict[str, str], list[str]]:
                 original = target
             else:
                 derived.append(target)
-        rationale = model.annotation(model.element(connector["qualified_name"]),
-                                     "ModelingMetadata::Rationale") or {}
         if original:
-            derivations[original] = (derived, rationale.get("text", ""))
+            derivations[original] = derived
 
-    trace_rows, named = [], set()
-    for requirement in customer:
-        derived, rationale = derivations.get(requirement["qualified_name"], ([], ""))
-        if not derived:
-            gaps.append("customer requirement without a derivation: " + requirement_label(requirement))
-        named.update(derived)
-        labels = [requirement_label(model.element(name)) for name in sorted(
-            derived, key=lambda name: model.element(name)["short_name"] or "")]
-        trace_rows.append([requirement_label(requirement), "; ".join(labels), rationale])
-    for requirement in system:
-        if requirement["qualified_name"] not in named:
-            gaps.append("system requirement named by no derivation: " + requirement_label(requirement))
-    for name in named - system_names:
-        gaps.append("derivation names an element that is not a system requirement: " + name)
+    def derived_from(originals: list[dict], level: str, required: bool) -> None:
+        """Checks one step between levels: `originals` derive the requirements of `level`."""
+        named: set[str] = set()
+        for requirement in originals:
+            derived = derivations.get(requirement["qualified_name"], [])
+            if required and not derived:
+                gaps.append("requirement without a derivation: " + requirement_label(requirement))
+            named.update(derived)
+        for requirement in (system if level == "system" else module):
+            if requirement["qualified_name"] not in named:
+                gaps.append(f"{level} requirement named by no derivation: "
+                            + requirement_label(requirement))
+        for name in sorted(named - names[level]):
+            gaps.append(f"a derivation names an element that is not a {level} requirement: {name}")
 
-    satisfied: dict[str, list[str]] = {}
+    derived_from(customer, "system", required=True)
+    # Only system requirements that no single module can meet are split into module budgets.
+    derived_from(system, "module", required=False)
+
+    satisfied: set[str] = set()
     for satisfy in model.elements:
-        if satisfy["kind"] != "SatisfyRequirementUsage":
-            continue
-        targets = edges(satisfy, "outgoing", "satisfySource")
-        by = edges(satisfy, "outgoing", "satisfyTarget")
-        for target in targets:
-            satisfied.setdefault(target, []).extend(by)
-    module = sorted((requirement
-                     for specification in model.owned(model.element(MODULES), "RequirementUsage")
-                     for requirement in model.owned(specification, "RequirementUsage")),
-                    key=lambda requirement: requirement["short_name"] or "")
-    module_names = {requirement["qualified_name"] for requirement in module}
-    allocation_rows, allocated = [], set()
-    for requirement in system:
-        derived, rationale = derivations.get(requirement["qualified_name"], ([], ""))
-        if not derived:
-            continue
-        allocated.update(derived)
-        for name in set(derived) - module_names:
-            gaps.append("allocation names an element that is not a module requirement: " + name)
-        labels = [requirement_label(model.element(name)) for name in sorted(
-            derived, key=lambda name: model.element(name)["short_name"] or "")]
-        allocation_rows.append([requirement_label(requirement), "; ".join(labels), rationale])
-    for requirement in module:
-        if requirement["qualified_name"] not in allocated:
-            gaps.append("module requirement named by no derivation: " + requirement_label(requirement))
-
-    verified: dict[str, list[str]] = {}
-    for requirement in system + module:
-        for peer in edges(requirement, "incoming", "verifyRequirementTarget"):
-            verified.setdefault(requirement["qualified_name"], []).append(peer.split("::")[1])
-
-    def matrix(requirements: list[dict], level: str) -> list[list[str]]:
-        rows = []
+        if satisfy["kind"] == "SatisfyRequirementUsage":
+            satisfied.update(edges(satisfy, "outgoing", "satisfySource"))
+    for level, requirements in (("system", system), ("module", module)):
         for requirement in requirements:
-            rows.append(matrix_row(requirement, level))
-        return rows
-
-    def matrix_row(requirement: dict, level: str) -> list[str]:
-        name = requirement["qualified_name"]
-        claims = sorted({claim.split("::", 1)[-1].replace("::", ".") for claim in satisfied.get(name, [])})
-        cases = sorted(set(verified.get(name, [])))
-        if not claims:
-            gaps.append(f"{level} requirement without a satisfaction claim: " + requirement_label(requirement))
-        if not cases:
-            gaps.append(f"{level} requirement without a verification case: " + requirement_label(requirement))
-        return [requirement_label(requirement), ", ".join(claims),
-                ", ".join(humanize(case.removeprefix("verify")) for case in cases)]
-
-    matrix_rows = matrix(system, "system")
-    module_rows = matrix(module, "module")
-    return {
-        "allocation.md": table(["System requirement", "Module requirements", "How the budget closes"],
-                               allocation_rows),
-        "module-matrix.md": table(["Module requirement", "Satisfied by", "Verified by"], module_rows),
-        "traceability.md": table(["Customer requirement", "Derived system requirements",
-                                  "Why this set is complete"], trace_rows),
-        "verification-matrix.md": table(["System requirement", "Satisfied by", "Verified by"],
-                                        matrix_rows),
-    }, gaps
+            if requirement["qualified_name"] not in satisfied:
+                gaps.append(f"{level} requirement without a satisfaction claim: "
+                            + requirement_label(requirement))
+            if not edges(requirement, "incoming", "verifyRequirementTarget"):
+                gaps.append(f"{level} requirement without a verification case: "
+                            + requirement_label(requirement))
+    return gaps
 
 
 def main() -> None:
@@ -444,9 +401,7 @@ def main() -> None:
     model = Model(export())
     files, gaps, modules = bom_outputs(model)
     files["mass-budget.md"], mass_gaps = mass_budget(model, modules)
-    requirement_files, requirement_gaps = requirement_tables(model)
-    files.update(requirement_files)
-    gaps += mass_gaps + requirement_gaps
+    gaps += mass_gaps + requirement_gaps(model)
     if gaps:
         for gap in gaps:
             print("gap: " + gap, file=sys.stderr)
