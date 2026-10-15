@@ -47,7 +47,6 @@ package ModuleBudgets {
 }
 
 package ModuleRequirements {
-  private import Elan8Method::Metadata::*;
   private import ModuleBudgets::*;
   private import PhysicalArchitecture::*;
   private import FirmwareArchitecture::*;
@@ -58,37 +57,31 @@ package ModuleRequirements {
     subject base : BaseModule;
 
     requirement <'BASE-001'> 'Cliff sensing latency' {
-      @RequirementRole { role = safety; }
       require constraint { base.cliffSensingLatency <= cliffSensingBudget }
       doc /* The base module shall assert a cliff or wheel-drop hazard signal within {{= ModuleBudgets::cliffSensingBudget}} of the hazard appearing under a sensor. */
     }
 
     requirement <'BASE-002'> 'Drive braking time' {
-      @RequirementRole { role = safety; }
       require constraint { base.brakingTime <= brakingBudget }
       doc /* The base module shall bring both drive wheels to standstill within {{= ModuleBudgets::brakingBudget}} of the drive outputs being disabled at cleaning speed. */
     }
 
     requirement <'BASE-003'> 'Base module mass' {
-      @RequirementRole { role = 'interface'; }
       require constraint { base.mass <= baseMassBudget }
       doc /* The base module shall have a mass of at most {{= ModuleBudgets::baseMassBudget}} including the battery pack. */
     }
 
     requirement <'BASE-004'> 'Base module height' {
-      @RequirementRole { role = 'interface'; }
       require constraint { base.height <= baseHeightBudget }
       doc /* The base module shall be at most {{= ModuleBudgets::baseHeightBudget}} high from the floor to the parting line with the top module. */
     }
 
     requirement <'BASE-005'> 'Battery capacity' {
-      @RequirementRole { role = performance; }
       require constraint { base.powerModule.battery.nominalCapacity >= minBatteryCapacity }
       doc /* The power module shall hold a battery pack with a rated capacity of at least {{= ModuleBudgets::minBatteryCapacity}}. */
     }
 
     requirement <'BASE-006'> 'Charge current' {
-      @RequirementRole { role = performance; }
       require constraint { base.powerModule.charger.maxChargeCurrent >= minChargeCurrent }
       doc /* The power module shall charge the battery pack with at least {{= ModuleBudgets::minChargeCurrent}} in the constant-current phase. */
     }
@@ -98,13 +91,11 @@ package ModuleRequirements {
     subject board : MainPcbModule;
 
     requirement <'PCB-001'> 'Drive disable latency' {
-      @RequirementRole { role = safety; }
       require constraint { board.driveDisableLatency <= driveDisableBudget }
       doc /* The main board shall remove drive from both motors within {{= ModuleBudgets::driveDisableBudget}} of the safe-stop command, through a disable line that does not depend on the motion-control loop. */
     }
 
     requirement <'PCB-002'> 'Main board mass' {
-      @RequirementRole { role = 'interface'; }
       require constraint { board.mass <= mainPcbMassBudget }
       doc /* The assembled main board shall have a mass of at most {{= ModuleBudgets::mainPcbMassBudget}}. */
     }
@@ -114,7 +105,6 @@ package ModuleRequirements {
     subject firmware : FirmwareTaskArchitecture;
 
     requirement <'FW-001'> 'Safety supervisor deadline' {
-      @RequirementRole { role = safety; }
       require constraint { firmware.safetySupervisor.deadline <= supervisorDecisionBudget }
       doc /* The safety supervisor task shall issue the safe-stop command within {{= ModuleBudgets::supervisorDecisionBudget}} of a hazard event entering its queue, under worst-case load of all other tasks. */
     }
@@ -124,13 +114,11 @@ package ModuleRequirements {
     subject top : TopModule;
 
     requirement <'TOP-001'> 'Top module height' {
-      @RequirementRole { role = 'interface'; }
       require constraint { top.height <= topHeightBudget }
       doc /* The top module shall rise at most {{= ModuleBudgets::topHeightBudget}} above the parting line, including the laser scanner turret. */
     }
 
     requirement <'TOP-002'> 'Top module mass' {
-      @RequirementRole { role = 'interface'; }
       require constraint { top.mass <= topMassBudget }
       doc /* The top module shall have a mass of at most {{= ModuleBudgets::topMassBudget}}. */
     }
@@ -140,7 +128,6 @@ package ModuleRequirements {
     subject bin : DustBin;
 
     requirement <'BIN-001'> 'Dust bin mass' {
-      @RequirementRole { role = 'interface'; }
       require constraint { bin.mass <= dustBinMassBudget }
       doc /* The empty dust bin with its filter shall have a mass of at most {{= ModuleBudgets::dustBinMassBudget}}. */
     }
@@ -150,7 +137,6 @@ package ModuleRequirements {
     subject robot : AutonomousFloorCleaningRobot;
 
     requirement <'HAR-001'> 'Wiring harness mass' {
-      @RequirementRole { role = 'interface'; }
       require constraint { robot.baseHarness.mass + robot.topHarness.mass <= harnessMassBudget }
       doc /* The base and top wiring harnesses together shall have a mass of at most {{= ModuleBudgets::harnessMassBudget}}. */
     }
