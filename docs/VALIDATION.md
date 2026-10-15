@@ -94,7 +94,7 @@ fallback labels.
 `.github/workflows/validate.yml` runs on pushes and pull requests:
 
 - **Spec42** checks out `sysml-domain-libraries` at a pinned
-  commit, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
+  commit, runs the model guards, and validates `model/` with Spec42 **0.55.0**.
   The libraries bundled with Spec42 are disabled so only the pinned sources are
   used, together with `libraries/doc42-v0.4.0`. Errors and warnings fail the job;
   only `view_expose_empty` information in `Documents.sysml` is allowed. It then checks

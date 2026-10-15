@@ -9,6 +9,7 @@ package ProductContext {
   private import SystemRequirements::*;
   private import ScalarValues::*;
   private import Elan8::Electronics::Sensing::*;
+  private import RobotSensing::*;
 
   part def User {
     port app : ~UserInteractionPort;

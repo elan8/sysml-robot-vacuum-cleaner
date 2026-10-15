@@ -69,10 +69,11 @@ flowchart LR
 | `Sourcing` | `BomItem` metadata: description, make or buy, unit cost |
 | `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
 | `ProductContext` | Users, app, network, dock, home, robot boundary |
-| `Elan8::Software::Realtime` | `RealtimeTask`, `PeriodicTask`, `EventDrivenTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
-| `FirmwareArchitecture` | Vacuum-specific periodic and event-driven tasks plus typed runtime queues |
+| `Elan8::Software` | `Task`, `PeriodicTask`, `EventDrivenTask`, `SoftwareQueue`, `ExecutionPlatform` (scheduling policy and tick period), and their criticality/discipline/policy enums |
+| `FirmwareArchitecture` | Vacuum-specific periodic and event-driven tasks, typed runtime queues, and the scheduler as an `ExecutionPlatform` |
 | `Elan8::Electronics::Actuation` | BLDC and brushed-DC motors, H-bridge and three-phase drivers, and mechanical outputs |
-| `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, passive bumper/lift switches, and typed measurements |
+| `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, switch sensors, infrared transmitters and receivers, and typed measurements |
+| `RobotSensing` | The robot's roles of those kinds: bumper and wheel-drop (lift) switches and the dock's infrared homing beacon |
 | `Elan8::Electronics::Power` | `BatteryPack`, `BatteryCharger`, protected `BatteryManagementSystem` power paths, and `VoltageRegulator` |
 | `Elan8::Electronics::{Board, Assembly}` | Bare `PrintedCircuitBoard` versus populated `PrintedCircuitBoardAssembly` |
 | `Elan8::Mechanical::Core` | `MechanicalComponent` (`mass` only, purely mechanical parts — no ports, no `powerDraw`) |
