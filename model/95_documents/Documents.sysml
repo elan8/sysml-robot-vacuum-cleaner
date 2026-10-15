@@ -22,7 +22,7 @@ package RobotDocuments {
       number = "RVC-CRS-001";
       revision = "A";
       status = "Draft for review";
-      template = "template";
+      template = "../../documents/template";
     }
 
     view introduction {
@@ -36,22 +36,22 @@ package RobotDocuments {
       }
       view scope {
         @Section { title = "Scope"; }
-        @Prose { file = "prose/crs-scope.md"; }
+        @Prose { file = "../../documents/prose/crs-scope.md"; }
       }
       view conventions {
         @Section { title = "Document conventions"; }
-        @Prose { file = "prose/conventions.md"; }
+        @Prose { file = "../../documents/prose/conventions.md"; }
       }
       view referenceDocuments {
         @Section { title = "Applicable and reference documents"; }
-        @Prose { file = "prose/references.md"; }
+        @Prose { file = "../../documents/prose/references.md"; }
       }
     }
 
     view context {
       @Section { title = "Stakeholders and operating context"; }
-      @Prose { file = "prose/crs-context.md"; }
-      @Figure { file = "figures/operating-context.svg"; caption = "The reference home, the parties in it and the conditions the robot meets"; }
+      @Prose { file = "../../documents/prose/crs-context.md"; }
+      @Figure { file = "../../documents/figures/operating-context.svg"; caption = "The reference home, the parties in it and the conditions the robot meets"; }
       view contextDiagram : InterconnectionView {
         @Section { title = "Operating context"; }
         doc /* The robot and the external parties it exchanges power, signals and
@@ -62,7 +62,7 @@ package RobotDocuments {
 
     view scenarios {
       @Section { title = "Operational scenarios"; }
-      @Prose { file = "prose/crs-scenarios.md"; }
+      @Prose { file = "../../documents/prose/crs-scenarios.md"; }
     }
 
     view customerRequirements {
@@ -77,12 +77,12 @@ package RobotDocuments {
 
     view constraints {
       @Section { title = "Constraints and assumptions"; }
-      @Prose { file = "prose/crs-constraints.md"; }
+      @Prose { file = "../../documents/prose/crs-constraints.md"; }
     }
 
     view validation {
       @Section { title = "Validation and open points"; }
-      @Prose { file = "prose/crs-validation.md"; }
+      @Prose { file = "../../documents/prose/crs-validation.md"; }
     }
   }
 
@@ -94,7 +94,7 @@ package RobotDocuments {
       number = "RVC-SRS-001";
       revision = "A";
       status = "Draft for review";
-      template = "template";
+      template = "../../documents/template";
     }
 
     view introduction {
@@ -119,17 +119,17 @@ package RobotDocuments {
       }
       view conventions {
         @Section { title = "Document conventions"; }
-        @Prose { file = "prose/conventions.md"; }
+        @Prose { file = "../../documents/prose/conventions.md"; }
       }
       view referenceDocuments {
         @Section { title = "Applicable and reference documents"; }
-        @Prose { file = "prose/references.md"; }
+        @Prose { file = "../../documents/prose/references.md"; }
       }
     }
 
     view overview {
       @Section { title = "System overview"; }
-      @Prose { file = "prose/srs-overview.md"; }
+      @Prose { file = "../../documents/prose/srs-overview.md"; }
       view boundary : InterconnectionView {
         @Section { title = "System context"; }
         doc /* The system of interest is the robot. The user, the mobile application, the
@@ -211,7 +211,7 @@ package RobotDocuments {
       expose RequirementTraceability::*;
     }
 
-    view verification {
+    view 'verification' {
       @Section { title = "Verification"; }
       doc /* Every requirement of this specification is verified by at least one verification
            * case. The methods, the cases with their pass criteria and the requirements
@@ -229,7 +229,7 @@ package RobotDocuments {
       number = "RVC-SDS-001";
       revision = "A";
       status = "Draft for review";
-      template = "template";
+      template = "../../documents/template";
     }
 
     view introduction {
@@ -254,24 +254,24 @@ package RobotDocuments {
       }
       view conventions {
         @Section { title = "Document conventions"; }
-        @Prose { file = "prose/conventions.md"; }
+        @Prose { file = "../../documents/prose/conventions.md"; }
       }
       view referenceDocuments {
         @Section { title = "Applicable and reference documents"; }
-        @Prose { file = "prose/references.md"; }
+        @Prose { file = "../../documents/prose/references.md"; }
       }
     }
 
     view designOverview {
       @Section { title = "Design overview"; }
-      @Prose { file = "prose/sds-overview.md"; }
-      @Figure { file = "figures/system-architecture.svg"; caption = "System architecture: sensing, control, actuation and power, with the safe-stop path"; }
-      @Figure { file = "figures/product-layout.svg"; caption = "Product layout and envelope"; }
+      @Prose { file = "../../documents/prose/sds-overview.md"; }
+      @Figure { file = "../../documents/figures/system-architecture.svg"; caption = "System architecture: sensing, control, actuation and power, with the safe-stop path"; }
+      @Figure { file = "../../documents/figures/product-layout.svg"; caption = "Product layout and envelope"; }
     }
 
     view functionalDesign {
       @Section { title = "Functional design"; }
-      @Prose { file = "prose/sds-functions.md"; }
+      @Prose { file = "../../documents/prose/sds-functions.md"; }
       view operatingStates : StateTransitionView {
         @Section { title = "Operating states"; }
         doc /* Mission control is a state machine. Every hazard leads to the safe stop, from
@@ -288,7 +288,7 @@ package RobotDocuments {
 
     view physicalArchitecture {
       @Section { title = "Physical architecture"; }
-      @Prose { file = "prose/sds-physical.md"; }
+      @Prose { file = "../../documents/prose/sds-physical.md"; }
       view interconnection : InterconnectionView {
         @Section { title = "Module interconnection"; }
         doc /* The six line-replaceable units and the electrical, signal and material
@@ -325,7 +325,7 @@ package RobotDocuments {
       }
     }
 
-    view allocation {
+    view 'allocation' {
       @Section { title = "Requirement allocation to modules"; }
       doc /* A system requirement that no single module can meet alone is split into budgets,
            * one for each module on the path. Each budget is a requirement on that module, so a
@@ -344,8 +344,8 @@ package RobotDocuments {
       expose RequirementAllocation::*;
       view safeStopBudget {
         @Section { title = "Safe-stop time budget"; }
-        @Prose { file = "prose/sds-safe-stop.md"; }
-        @Figure { file = "figures/safe-stop-timing.svg"; caption = "Safe-stop time: module budgets and current design values against the 100 ms limit"; }
+        @Prose { file = "../../documents/prose/sds-safe-stop.md"; }
+        @Figure { file = "../../documents/figures/safe-stop-timing.svg"; caption = "Safe-stop time: module budgets and current design values against the 100 ms limit"; }
       }
       view baseModuleRequirements : GeneralView {
         @Section { title = "Base module requirements"; }
@@ -396,23 +396,23 @@ package RobotDocuments {
 
     view firmwareArchitecture {
       @Section { title = "Firmware architecture"; }
-      @Prose { file = "prose/sds-firmware.md"; }
+      @Prose { file = "../../documents/prose/sds-firmware.md"; }
     }
 
     view billOfMaterials {
       @Section { title = "Bill of materials"; }
-      @Prose { file = "prose/sds-bom.md"; }
-      @Prose { file = "generated/bom.md"; }
+      @Prose { file = "../../documents/prose/sds-bom.md"; }
+      @Prose { file = "../../documents/generated/bom.md"; }
       view components {
         @Section { title = "Design-determining components"; }
-        @Prose { file = "prose/sds-components.md"; }
+        @Prose { file = "../../documents/prose/sds-components.md"; }
       }
     }
 
     view analyses {
       @Section { title = "Design analyses"; }
-      @Prose { file = "prose/sds-analyses.md"; }
-      @Prose { file = "generated/mass-budget.md"; }
+      @Prose { file = "../../documents/prose/sds-analyses.md"; }
+      @Prose { file = "../../documents/generated/mass-budget.md"; }
     }
 
     view satisfaction {
@@ -430,7 +430,7 @@ package RobotDocuments {
 
     view openPoints {
       @Section { title = "Limitations and open design points"; }
-      @Prose { file = "prose/sds-open.md"; }
+      @Prose { file = "../../documents/prose/sds-open.md"; }
     }
   }
 
@@ -442,7 +442,7 @@ package RobotDocuments {
       number = "RVC-VVP-001";
       revision = "A";
       status = "Draft for review";
-      template = "template";
+      template = "../../documents/template";
     }
 
     view introduction {
@@ -458,32 +458,32 @@ package RobotDocuments {
       }
       view scope {
         @Section { title = "Scope"; }
-        @Prose { file = "prose/vvp-scope.md"; }
+        @Prose { file = "../../documents/prose/vvp-scope.md"; }
       }
       view conventions {
         @Section { title = "Document conventions"; }
-        @Prose { file = "prose/conventions.md"; }
+        @Prose { file = "../../documents/prose/conventions.md"; }
       }
       view referenceDocuments {
         @Section { title = "Applicable and reference documents"; }
-        @Prose { file = "prose/references.md"; }
+        @Prose { file = "../../documents/prose/references.md"; }
       }
     }
 
     view system {
       @Section { title = "System under verification"; }
-      @Prose { file = "prose/vvp-system.md"; }
-      @Figure { file = "figures/product-layout.svg"; caption = "The robot and its modules, the units verification is planned against"; }
+      @Prose { file = "../../documents/prose/vvp-system.md"; }
+      @Figure { file = "../../documents/figures/product-layout.svg"; caption = "The robot and its modules, the units verification is planned against"; }
     }
 
     view approach {
       @Section { title = "Verification and validation approach"; }
-      @Prose { file = "prose/vvp-approach.md"; }
+      @Prose { file = "../../documents/prose/vvp-approach.md"; }
     }
 
     view resources {
       @Section { title = "Test articles, facilities and equipment"; }
-      @Prose { file = "prose/vvp-resources.md"; }
+      @Prose { file = "../../documents/prose/vvp-resources.md"; }
     }
 
     view systemVerification {
@@ -537,7 +537,7 @@ package RobotDocuments {
 
     view validation {
       @Section { title = "Validation"; }
-      @Prose { file = "prose/vvp-validation.md"; }
+      @Prose { file = "../../documents/prose/vvp-validation.md"; }
       view cases {
         @Section { title = "Validation cases"; }
         @Table {
@@ -562,7 +562,7 @@ package RobotDocuments {
 
     view status {
       @Section { title = "Status and open points"; }
-      @Prose { file = "prose/vvp-status.md"; }
+      @Prose { file = "../../documents/prose/vvp-status.md"; }
     }
   }
 }

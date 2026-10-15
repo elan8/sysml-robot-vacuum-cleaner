@@ -53,7 +53,8 @@ if (-not $MethodLibraryRoot) {
 # KPAR variants prevents stale installed packages from masking migration errors.
 $arguments = @(
     "--disable-kpar-library", "domain",
-    "--disable-kpar-library", "method"
+    "--disable-kpar-library", "method",
+    "--library-path", (Join-Path $repoRoot "libraries/doc42-v0.4.0")
 )
 
 if ($MethodLibraryRoot -and (Test-Path $MethodLibraryRoot)) {
@@ -70,7 +71,7 @@ if ($DomainLibrariesRoot) {
     }
 }
 
-$arguments += @("check", $resolvedModelPath, "--format", $Format)
+$arguments += @("check", $resolvedModelPath, "--format", $Format, "--warnings-as-errors")
 
 Write-Host "Running: $Spec42Exe $($arguments -join ' ')"
 & $Spec42Exe @arguments

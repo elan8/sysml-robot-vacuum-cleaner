@@ -63,7 +63,8 @@ def library_arguments() -> list[str]:
         fail("check out mbse-methodology and sysml-domain-libraries next to this repository, "
              "or set ELAN8_METHOD_LIBRARY_ROOT and SYSML_DOMAIN_LIBRARIES_ROOT")
     return ["--disable-kpar-library", "domain", "--disable-kpar-library", "method",
-            "--library-path", method, "--library-path", str(Path(domain) / "model")]
+            "--library-path", method, "--library-path", str(Path(domain) / "model"),
+            "--library-path", str(ROOT / "libraries" / "doc42-v0.4.0")]
 
 
 def export() -> dict:

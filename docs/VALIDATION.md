@@ -13,15 +13,26 @@ From the repository root:
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 ```
 
-The script runs Spec42 over all model files, supplies local Elan8
-domain-library paths when available, and then runs static model guards.
+The script runs Spec42 over all model files, including
+`model/95_documents/Documents.sysml`, supplies local Elan8 libraries and the
+pinned Doc42 metadata library, and then runs static model guards.
 
 Expected result:
 
 ```text
-Checked 20 document(s): 0 error(s), 0 warning(s), 0 info(s)
-Model guards passed: lean graph, purchased parts, runtime queues, and traceability are clean.
+Checked 21 document(s): 0 error(s), 0 warning(s), 16 info(s)
+Model guards passed: physical paths, purchased parts, runtime queues, and traceability are clean.
 ```
+
+Spec42 0.55.0 reports `view_expose_empty` information for the document and
+section container views: these organize nested sections or prose rather than
+exposing model elements directly. They are intentional. Errors and warnings
+fail validation.
+
+The repository's `.vscode/settings.json` loads the same source libraries for
+the editor. Open this repository as the workspace root; the two Elan8 library
+checkouts are expected beside it. `libraries/doc42-v0.4.0` is the metadata
+snapshot matching the Doc42 release used in CI.
 
 Optional parameters:
 
@@ -86,9 +97,11 @@ fallback labels.
 - **Spec42** checks out `mbse-methodology` and `sysml-domain-libraries` at pinned
   commits, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
   The libraries bundled with Spec42 are disabled so only the pinned sources are
-  used. Any error, warning or information diagnostic fails the job. It then checks
+  used, together with `libraries/doc42-v0.4.0`. Errors and warnings fail the job;
+  only `view_expose_empty` information in `Documents.sysml` is allowed. It then checks
   that the generated document data is up to date and that the model has no gap.
-- **Doc42 documents** checks `documents/` against the model and builds the four
+- **Doc42 documents** checks `model/` with the repository as `--workspace-root`
+  and builds the four
   PDFs with [Doc42](https://github.com/elan8/doc42-action), uploading them as the
   `engineering-documents` artifact. It needs the `ELAN8_LICENSE` repository
   secret and is skipped for pull requests from forks.

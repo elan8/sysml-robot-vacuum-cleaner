@@ -17,7 +17,7 @@ package DomainModel {
 
   enum def Severity { info; warning; fault; safetyCritical; }
   enum def HazardKind { cliff; bumper; lift; overcurrent; thermal; stall; }
-  enum def VacuumPowerMode { off; eco; standard; max; }
+  enum def VacuumPowerMode { off; eco; 'standard'; 'max'; }
   enum def UserCommandKind { start; pause; resume; home; consentChanged; }
   enum def AppMessageKind { command; status; mapSummary; diagnostic; consent; }
   enum def AppProtocolVersion { v1; }

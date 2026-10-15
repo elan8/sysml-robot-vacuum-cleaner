@@ -80,9 +80,10 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `70_analysis/` | Four quantitative analyses |
 | `80_verification/` | Twelve verification cases and five validation cases |
 | `90_views/` | Nine focused views |
+| `95_documents/` | Doc42 definitions of the four engineering documents |
 | `99_library/` | Purchased parts and bill-of-materials classification |
 | `Root.sysml` | Workspace import hub |
-| `../documents/` | Doc42 document definitions, prose, authored figures, the house template and generated tables |
+| `../documents/` | Prose, authored figures, the house template and generated tables |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).
 
@@ -103,7 +104,7 @@ The split follows ISO/IEC/IEEE 29148 for the two requirements specifications and
 the NASA Systems Engineering Handbook for the verification and validation plan,
 tailored to a product of this size.
 
-They are defined in [`documents/Documents.sysml`](documents/Documents.sysml): each
+They are defined in [`model/95_documents/Documents.sysml`](model/95_documents/Documents.sysml): each
 document is a SysML view and its nested views are the sections. What a section
 shows is read from the model when the document is built:
 
@@ -118,7 +119,7 @@ Short texts are the `doc` of their section, written in Markdown; longer ones are
 Markdown files in `documents/prose/`. Four authored drawings are in
 `documents/figures/`. All styling is in the Elan8 house template in
 [`documents/template/`](documents/template): the logo, the Inter typeface and
-the colours of the Elan8 style guide. It is selected with `template = "template"`
+the colours of the Elan8 style guide. It is selected with `template = "../../documents/template"`
 and serves all four documents.
 
 The bill of materials and the mass budget in `documents/generated/` are written

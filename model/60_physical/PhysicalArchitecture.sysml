@@ -54,7 +54,7 @@ package PhysicalArchitecture {
     part motor : DriveMotor;
     part gearbox : Gearbox {
       @BomItem { description = "Planetary gearbox, 30:1"; sourcing = SourcingKind::buy; unitCostEur = 1.60; }
-      attribute :>> gearRatio = 30; /* illustrative estimate */
+      attribute :>> gearRatio = 30 [one]; /* illustrative estimate */
       attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
     }
     part wheel : Wheel {
@@ -586,13 +586,13 @@ package PhysicalArchitecture {
       separately replaceable real-world spare part. Purely mechanical: no ports,
       no electronics.
     */
-    attribute :>> mass = sum(body.mass, lid.mass, filter.mass);
+    attribute :>> mass = sum(body.mass, lid.mass, 'filter'.mass);
     attribute capacity : VolumeValue = 450 [mL];
     port debrisIn : ~CleaningFlowPort;
 
     part body : DustBinBody;
     part lid : DustBinLid;
-    part filter : DustFilter;
+    part 'filter' : DustFilter;
   }
 
   part def BaseWiringHarness :> WiringHarness {

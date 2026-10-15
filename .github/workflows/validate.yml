@@ -55,14 +55,20 @@ jobs:
           echo "$RUNNER_TEMP/spec42" >> "$GITHUB_PATH"
 
       # The libraries bundled with Spec42 are disabled so that only the pinned
-      # sources above are used. Any error, warning or information diagnostic fails.
+      # sources above are used. Errors and warnings fail; document container views
+      # may report view_expose_empty information because they compose sections.
       - name: Validate model
         run: |
           spec42 --disable-kpar-library domain --disable-kpar-library method \
             --library-path .libraries/mbse-methodology/library \
             --library-path .libraries/sysml-domain-libraries/model \
+            --library-path libraries/doc42-v0.4.0 \
             check model --warnings-as-errors | tee spec42.txt
-          grep -q "0 error(s), 0 warning(s), 0 info(s)" spec42.txt
+          grep -q "0 error(s), 0 warning(s)," spec42.txt
+          # Only the document containers' empty-expose information is expected.
+          if grep 'info \[' spec42.txt | grep -v 'Documents.sysml:.*info \[view_expose_empty\]'; then
+            exit 1
+          fi
 
       # The bill of materials and the mass budget are derived from the model.
       # This fails when they are stale or when the model has a gap.
@@ -107,7 +113,7 @@ jobs:
 
       - name: Check documents
         run: |
-          doc42 check . \
+          doc42 check model --workspace-root . \
             --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
             --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
 
@@ -116,7 +122,7 @@ jobs:
           ELAN8_LICENSE: ${{ secrets.ELAN8_LICENSE }}
         run: |
           for document in crs srs sds vvp; do
-            doc42 build . --doc "RobotDocuments::$document" --out out \
+            doc42 build model --workspace-root . --doc "RobotDocuments::$document" --out out \
               --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
               --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
           done
