@@ -152,7 +152,7 @@ license.
 
 ## Validation
 
-Requires [Spec42](https://github.com/elan8/spec42) 0.54.1 or later and sibling
+Requires [Spec42](https://github.com/elan8/spec42) 0.55.0 or later and sibling
 checkout of `sysml-domain-libraries`:
 
 ```powershell
