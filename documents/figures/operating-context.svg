@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" width="760" height="420" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.2" fill="#1f2933">
+  <!-- Authored figure. The reference home of the customer requirements; not to scale. -->
+  <rect width="760" height="420" fill="#ffffff"/>
+  <!-- floor plan -->
+  <rect x="30" y="30" width="520" height="360" fill="#f8fafb" stroke="#1f2933" stroke-width="3"/>
+  <path d="M 310 30 v 150 M 310 240 v 150" stroke="#1f2933" stroke-width="3"/>
+  <path d="M 310 180 v 60" stroke="#b45309" stroke-width="5"/>
+  <text x="318" y="214" font-size="10.3" fill="#b45309">threshold</text>
+  <text x="318" y="228" font-size="10.3" fill="#b45309">up to 20 mm</text>
+  <text x="46" y="52" font-size="10.8" fill="#6b7280">Living room</text>
+  <text x="326" y="52" font-size="10.8" fill="#6b7280">Hall and kitchen</text>
+
+  <!-- coverage path -->
+  <path d="M 96 352 H 280 V 322 H 70 V 292 H 280 V 262 H 70 V 232 H 150" fill="none" stroke="#0891b2" stroke-width="1.6" stroke-dasharray="6 5"/>
+  <!-- dock -->
+  <rect x="36" y="338" width="26" height="40" rx="3" fill="#4b5563"/>
+  <text x="70" y="378" font-size="10.3">docking station</text>
+  <!-- robot -->
+  <circle cx="172" cy="232" r="22" fill="#ffffff" stroke="#0891b2" stroke-width="2.4"/>
+  <circle cx="172" cy="232" r="7" fill="#0891b2"/>
+  <text x="200" y="228" font-weight="bold">robot</text>
+  <!-- sofa (low clearance) -->
+  <rect x="60" y="80" width="170" height="62" rx="10" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.3"/>
+  <text x="145" y="108" text-anchor="middle" font-size="10.3">sofa</text>
+  <text x="145" y="124" text-anchor="middle" font-size="10.3" fill="#4b5563">100 mm clearance</text>
+  <!-- rug -->
+  <rect x="96" y="160" width="150" height="46" fill="none" stroke="#6b7280" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <text x="104" y="176" font-size="10.3" fill="#4b5563">rug</text>
+  <!-- table and chairs -->
+  <rect x="380" y="92" width="110" height="60" rx="4" fill="#e5e7eb" stroke="#6b7280" stroke-width="1.3"/>
+  <g fill="#6b7280"><circle cx="372" cy="104" r="4"/><circle cx="372" cy="140" r="4"/><circle cx="498" cy="104" r="4"/><circle cx="498" cy="140" r="4"/><circle cx="410" cy="84" r="4"/><circle cx="460" cy="84" r="4"/><circle cx="410" cy="160" r="4"/><circle cx="460" cy="160" r="4"/></g>
+  <text x="435" y="126" text-anchor="middle" font-size="10.3">table, chair legs</text>
+  <!-- stairs -->
+  <g stroke="#b91c1c" stroke-width="1.2" fill="#fde8e8">
+    <rect x="430" y="280" width="118" height="108"/>
+    <path d="M 430 307 h 118 M 430 334 h 118 M 430 361 h 118" fill="none"/>
+  </g>
+  <text x="489" y="272" text-anchor="middle" font-size="10.3" fill="#b91c1c">stairs down: cliff hazard</text>
+  <!-- cable and pet -->
+  <path d="M 336 300 q 20 -18 36 2 t 34 0" fill="none" stroke="#6b7280" stroke-width="1.6"/>
+  <text x="336" y="326" font-size="10.3" fill="#4b5563">cables, toys, pets</text>
+
+  <!-- outside the home -->
+  <rect x="610" y="60" width="54" height="96" rx="8" fill="#ffffff" stroke="#1f2933" stroke-width="1.8"/>
+  <rect x="617" y="72" width="40" height="66" fill="#cffafe"/>
+  <text x="637" y="176" text-anchor="middle" font-weight="bold">mobile application</text>
+  <text x="637" y="192" text-anchor="middle" font-size="10.3" fill="#4b5563">start, stop, progress, faults</text>
+  <path d="M 196 222 C 330 120 480 70 606 100" fill="none" stroke="#1d4ed8" stroke-width="1.4" stroke-dasharray="2 4"/>
+  <text x="637" y="50" text-anchor="middle" font-size="10.3" fill="#1d4ed8">home Wi-Fi</text>
+
+  <circle cx="637" cy="262" r="15" fill="#e5e7eb" stroke="#1f2933" stroke-width="1.5"/>
+  <path d="M 612 318 q 25 -44 50 0 z" fill="#e5e7eb" stroke="#1f2933" stroke-width="1.5"/>
+  <text x="637" y="340" text-anchor="middle" font-weight="bold">household</text>
+  <text x="637" y="356" text-anchor="middle" font-size="10.3" fill="#4b5563">empties the dust bin,</text>
+  <text x="637" y="371" text-anchor="middle" font-size="10.3" fill="#4b5563">carries the robot upstairs</text>
+
+  <path d="M 62 358 h 12" stroke="#b45309" stroke-width="2.4"/>
+  <text x="36" y="408" font-size="10.3" fill="#4b5563">Dashed green: coverage path. The map of the home stays on the robot unless the household consents to sharing it.</text>
+</svg>

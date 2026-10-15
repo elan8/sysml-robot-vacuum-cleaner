@@ -15,28 +15,30 @@ concepts. The resulting SysML therefore uses names from the robot-vacuum domain.
 | Folder | Content |
 | --- | --- |
 | `00_project/` | Project info (`ProjectInfo`) |
-| `05_requirements/` | Stakeholder needs, design limits, system requirements |
+| `05_requirements/` | Customer, system and module requirements, design limits, budgets, derivations |
 | `10_context/` | External actors and the operating boundary |
 | `20_usecases/` | Operational scenarios |
 | `40_functions/` | Functional actions and operating states |
 | `50_logical/` | Domain model and firmware architecture |
 | `60_physical/` | Physical architecture and SOI allocations |
-| `70_analysis/` | Mission energy, safety reaction, localization analyses |
-| `80_verification/` | Nine verification cases including `verifyCliffSafeStop` |
+| `70_analysis/` | Mission energy, safety reaction, localization and mass budget analyses |
+| `80_verification/` | Twelve verification cases including `'Cliff safe stop'`, and five validation cases |
 | `90_views/` | Nine focused views |
-| `99_library/` | Purchased parts catalog (`Elan8::Units::Engineering`) |
+| `99_library/` | Purchased parts catalog and bill-of-materials classification |
 | `Root.sysml` | Import hub |
 
 ## Example increment coverage
 
 | Method piece | Model anchor |
 | --- | --- |
-| Stakeholder concern / need | `StakeholderNeeds::operateSafely` (`USR-SAFE-001`) |
-| Derived requirements | `detectCliffs`, `superviseHazards`, `reportCleaningStatus` |
+| Customer requirement | `StakeholderNeeds::'Safe operation in the household'` (`USR-SAFE-001`) |
+| Derived system requirements | `'Cliff detection'`, `'Safe stop on hazard'`, `'Mission status reporting'` |
+| Module budgets | `'Cliff sensing latency'`, `'Safety supervisor deadline'`, `'Drive disable latency'`, `'Drive braking time'` |
 | Scenario | `OperationalScenarios::CliffSafeStopScenario` |
 | Architecture | Allocations on `Architecture::robotSystem` / scenario satisfy links |
-| Evidence | `AnalysisCases::SafetyReactionAnalysis` |
-| Verification | `Verification::verifyCliffSafeStop` |
+| Evidence | `RobotAnalysisCases::SafetyReactionAnalysis` |
+| Verification | `Verification::'Cliff safe stop'` (VER-009) |
+| Validation | `Validation::'Household safety walkthrough'` (VAL-003) |
 | View | `ModelViews::cliffSafeStopScenario` |
 
 This table is a method-oriented reading path across ordinary model elements. It
