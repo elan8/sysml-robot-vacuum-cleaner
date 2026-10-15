@@ -62,8 +62,7 @@ requirement that no derivation names, or a requirement without a satisfaction
 claim or a verification case, or a customer requirement without a validation case.
 Run it without `--check` to regenerate the files
 after a model change. It finds Spec42 on `PATH` or in `SPEC42_EXE`, and the
-libraries next to the repository or through `ELAN8_METHOD_LIBRARY_ROOT` and
-`SYSML_DOMAIN_LIBRARIES_ROOT`.
+domain libraries next to the repository or through `SYSML_DOMAIN_LIBRARIES_ROOT`.
 
 ## Diagram smoke check
 
@@ -94,8 +93,8 @@ fallback labels.
 
 `.github/workflows/validate.yml` runs on pushes and pull requests:
 
-- **Spec42** checks out `mbse-methodology` and `sysml-domain-libraries` at pinned
-  commits, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
+- **Spec42** checks out `sysml-domain-libraries` at a pinned
+  commit, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
   The libraries bundled with Spec42 are disabled so only the pinned sources are
   used, together with `libraries/doc42-v0.4.0`. Errors and warnings fail the job;
   only `view_expose_empty` information in `Documents.sysml` is allowed. It then checks

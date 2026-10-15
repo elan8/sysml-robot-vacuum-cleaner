@@ -15,7 +15,6 @@ permissions:
 env:
   SPEC42_VERSION: "0.54.1"
   # Elan8 libraries the model is validated against, pinned to exact commits.
-  METHOD_LIBRARY_REF: 377795f216bc677333f28a4448eb7c53066caa5f
   DOMAIN_LIBRARIES_REF: bb2aba9d356314ffb38510ed8f87a556503736ab
 
 jobs:
@@ -25,13 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Checkout Elan8 Method library
-        uses: actions/checkout@v4
-        with:
-          repository: elan8/mbse-methodology
-          ref: ${{ env.METHOD_LIBRARY_REF }}
-          path: .libraries/mbse-methodology
 
       - name: Checkout Elan8 domain libraries
         uses: actions/checkout@v4
@@ -60,7 +52,6 @@ jobs:
       - name: Validate model
         run: |
           spec42 --disable-kpar-library domain --disable-kpar-library method \
-            --library-path .libraries/mbse-methodology/library \
             --library-path .libraries/sysml-domain-libraries/model \
             --library-path libraries/doc42-v0.4.0 \
             check model --warnings-as-errors | tee spec42.txt
@@ -74,7 +65,6 @@ jobs:
       # This fails when they are stale or when the model has a gap.
       - name: Check generated document data
         env:
-          ELAN8_METHOD_LIBRARY_ROOT: .libraries/mbse-methodology/library
           SYSML_DOMAIN_LIBRARIES_ROOT: .libraries/sysml-domain-libraries
         run: python3 scripts/generate-document-data.py --check
 
@@ -88,13 +78,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Checkout Elan8 Method library
-        uses: actions/checkout@v4
-        with:
-          repository: elan8/mbse-methodology
-          ref: ${{ env.METHOD_LIBRARY_REF }}
-          path: .libraries/mbse-methodology
 
       - name: Checkout Elan8 domain libraries
         uses: actions/checkout@v4
@@ -114,7 +97,6 @@ jobs:
       - name: Check documents
         run: |
           doc42 check model --workspace-root . \
-            --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
             --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
 
       - name: Build documents
@@ -123,8 +105,7 @@ jobs:
         run: |
           for document in crs srs sds vvp; do
             doc42 build model --workspace-root . --doc "RobotDocuments::$document" --out out \
-              --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
-              --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
+                --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
           done
 
       - name: Upload documents

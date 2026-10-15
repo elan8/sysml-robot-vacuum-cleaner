@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 # Elan8 Method tour
 
 This showcase is laid out with Elan8 Method folders and imports
-`mbse-methodology/library` alongside `sysml-domain-libraries`. Engineering
+`sysml-domain-libraries`; the method itself needs no library. Engineering
 increments are a way to plan and review coherent changes; they are not product
 concepts. The resulting SysML therefore uses names from the robot-vacuum domain.
 
@@ -14,7 +14,7 @@ concepts. The resulting SysML therefore uses names from the robot-vacuum domain.
 
 | Folder | Content |
 | --- | --- |
-| `00_project/` | Project info (`ProjectInfo`) |
+| `00_project/` | Project information |
 | `05_requirements/` | Customer, system and module requirements, design limits, budgets, derivations |
 | `10_context/` | External actors and the operating boundary |
 | `20_usecases/` | Operational scenarios |
@@ -53,9 +53,8 @@ does not introduce a separate trace object into the product model.
 
 ## Libraries
 
-- **Method:** `Elan8Method` (`MethodCore`, `MethodMetadata`, `Viewpoints`)
 - **Domain/technical:** namespaced `Elan8` electronics, mechanical, software,
   communication, units, and procurement vocabularies
 
 See also [MODEL_GUIDE.md](MODEL_GUIDE.md) and
-[mbse-methodology recipes](../../mbse-methodology/recipes/README.md).
+[Elan8 Method guidance](../../mbse-methodology/docs/README.md).

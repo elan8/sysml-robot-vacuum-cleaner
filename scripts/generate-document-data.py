@@ -52,18 +52,16 @@ def fail(message: str) -> "NoReturn":
 
 def library_arguments() -> list[str]:
     """The same library selection as scripts/validate.ps1 and the CI workflow."""
-    method = os.environ.get("ELAN8_METHOD_LIBRARY_ROOT")
     domain = os.environ.get("SYSML_DOMAIN_LIBRARIES_ROOT")
     for base in (ROOT / ".libraries", ROOT.parent):
-        if not method and (base / "mbse-methodology" / "library").is_dir():
-            method = str(base / "mbse-methodology" / "library")
         if not domain and (base / "sysml-domain-libraries" / "model").is_dir():
             domain = str(base / "sysml-domain-libraries")
-    if not method or not domain:
-        fail("check out mbse-methodology and sysml-domain-libraries next to this repository, "
-             "or set ELAN8_METHOD_LIBRARY_ROOT and SYSML_DOMAIN_LIBRARIES_ROOT")
+    if not domain:
+        fail("check out sysml-domain-libraries next to this repository, "
+             "or set SYSML_DOMAIN_LIBRARIES_ROOT")
+    # `method` is the managed archive older Spec42 releases bundle; the model no longer uses it.
     return ["--disable-kpar-library", "domain", "--disable-kpar-library", "method",
-            "--library-path", method, "--library-path", str(Path(domain) / "model"),
+            "--library-path", str(Path(domain) / "model"),
             "--library-path", str(ROOT / "libraries" / "doc42-v0.4.0")]
 
 
