@@ -67,27 +67,15 @@ domain libraries next to the repository or through `SYSML_DOMAIN_LIBRARIES_ROOT`
 ## Diagram smoke check
 
 ```powershell
-$views = @(
-  "productDecomposition",
-  "baseDecomposition",
-  "topDecomposition",
-  "mainPcbDecomposition",
-  "powerDecomposition",
-  "interconnections",
-  "firmwareDeployment",
-  "systemRequirements",
-  "cliffSafeStopScenario"
-)
-foreach ($view in $views) {
-  spec42 diagrams export model `
-    --selected-view $view `
-    --format svg `
-    --output target/lean-diagrams
-}
+./scripts/render-views.ps1 -Spec42Exe <path-to-spec42> -ResvgExe <path-to-resvg>
 ```
 
-Each generated SVG must contain model nodes and no unresolved-reference
-fallback labels.
+`-ResvgExe` is optional. The script exports all nine `ModelViews` diagrams as SVG
+and complete diagram products, plus PNG when requested, and creates
+`target/model-views/index.html`. It fails on an export error or an incomplete
+projection. See [VIEWS.md](VIEWS.md) for each diagram's engineering question,
+selection and presentation depth. Inspect the gallery for readable labels,
+module boundaries and relationships after validation succeeds.
 
 ## CI
 

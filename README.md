@@ -85,7 +85,8 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `Root.sysml` | Workspace import hub |
 | `../documents/` | Prose, authored figures, the house template and generated tables |
 
-See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md) and [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md).
+See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md), [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md),
+and [the purpose and scope of each view](docs/VIEWS.md).
 
 ## Engineering documents
 
