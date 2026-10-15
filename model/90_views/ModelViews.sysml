@@ -54,115 +54,56 @@ package ModelViews {
   viewpoint safeStopScenarioPerspective { frame safeStopScenario; }
 
   view productDecomposition : GeneralView {
+    doc /* What are the top-level constituents of this robot baseline? Show the physical robot, its
+     * six hardware modules and its referenced firmware task group. Module internals are explored
+     * in the module views; type names identify reusable definitions without displaying a second
+     * definition tree. */
     satisfy productStructurePerspective;
-    filter @SysML::PartUsage
-      or @SysML::PartDefinition
-      or @KerML::OwningMembership
-      or @KerML::FeatureTyping;
-    expose Architecture::robotSystem;
-    expose Architecture::CleaningRobotSystemOfInterest;
+    filter @SysML::PartUsage;
     expose Architecture::robotSystem.physical;
-    expose PhysicalArchitecture::AutonomousFloorCleaningRobot;
-    expose Architecture::robotSystem.physical.base;
-    expose PhysicalArchitecture::BaseModule;
-    expose Architecture::robotSystem.physical.mainPcb;
-    expose PhysicalArchitecture::MainPcbModule;
-    expose Architecture::robotSystem.physical.baseHarness;
-    expose PhysicalArchitecture::BaseWiringHarness;
-    expose Architecture::robotSystem.physical.topHarness;
-    expose PhysicalArchitecture::TopWiringHarness;
-    expose Architecture::robotSystem.physical.top;
-    expose PhysicalArchitecture::TopModule;
-    expose Architecture::robotSystem.physical.dustBin;
-    expose PhysicalArchitecture::DustBin;
-    expose Architecture::robotSystem.physical.top.hmi;
-    expose PhysicalArchitecture::HumanMachineInterface;
   }
 
   view baseDecomposition : GeneralView {
+    doc /* Which components constitute this robot's base? Show the chassis, two drive trains, caster,
+     * four cliff sensors, cleaning head, power module and dock interface in their base context.
+     * Electrical routing belongs in interconnections, not in this composition view. */
     satisfy productStructurePerspective;
-    filter @SysML::PartUsage
-      or @SysML::PartDefinition
-      or @KerML::OwningMembership
-      or @KerML::FeatureTyping;
+    filter @SysML::PartUsage;
     expose Architecture::robotSystem.physical.base;
-    expose PhysicalArchitecture::BaseModule;
-    expose Architecture::robotSystem.physical.base.chassis;
-    expose PhysicalArchitecture::Chassis;
-    expose Architecture::robotSystem.physical.base.leftDriveTrain;
-    expose Architecture::robotSystem.physical.base.rightDriveTrain;
-    expose PhysicalArchitecture::DriveTrain;
-    expose Architecture::robotSystem.physical.base.casterWheel;
-    expose Architecture::robotSystem.physical.base.cleaningHead;
-    expose PhysicalArchitecture::CleaningHeadModule;
-    expose Architecture::robotSystem.physical.base.dockInterface;
-    expose PhysicalArchitecture::DockInterfaceModule;
-    expose Architecture::robotSystem.physical.base.frontLeftCliff;
-    expose Architecture::robotSystem.physical.base.frontRightCliff;
-    expose Architecture::robotSystem.physical.base.rearLeftCliff;
-    expose Architecture::robotSystem.physical.base.rearRightCliff;
-    expose PhysicalArchitecture::CliffSensor;
-    expose Architecture::robotSystem.physical.base.powerModule;
-    expose PhysicalArchitecture::PowerModule;
   }
 
   view topDecomposition : GeneralView {
+    doc /* Which sensing and interaction components constitute this robot's top module? Show the
+     * bumper, time-of-flight sensors, LiDAR, shell, sensor bus and human-machine interface in
+     * their top context. This view answers composition, not signal routing. */
     satisfy productStructurePerspective;
-    filter @SysML::PartUsage
-      or @SysML::PartDefinition
-      or @KerML::OwningMembership
-      or @KerML::FeatureTyping;
+    filter @SysML::PartUsage;
     expose Architecture::robotSystem.physical.top;
-    expose PhysicalArchitecture::TopModule;
-    expose Architecture::robotSystem.physical.top.frontBumper;
-    expose Architecture::robotSystem.physical.top.leftTof;
-    expose Architecture::robotSystem.physical.top.rightTof;
-    expose Architecture::robotSystem.physical.top.frontTof;
-    expose PhysicalArchitecture::RobotTofSensor;
-    expose Architecture::robotSystem.physical.top.lidar;
-    expose PhysicalArchitecture::RobotLidar;
-    expose Architecture::robotSystem.physical.top.hmi;
-    expose PhysicalArchitecture::HumanMachineInterface;
   }
 
   view mainPcbDecomposition : GeneralView {
+    doc /* Which board and electronic components constitute this robot's main PCB assembly? Show the
+     * bare board, MCU, two motor drivers, IMU, wireless module and wireless link in this
+     * assembly context. Procurement choices and circuit routing are outside this view. */
     satisfy productStructurePerspective;
-    filter @SysML::PartUsage
-      or @SysML::PartDefinition
-      or @KerML::OwningMembership
-      or @KerML::FeatureTyping;
+    filter @SysML::PartUsage;
     expose Architecture::robotSystem.physical.mainPcb;
-    expose PhysicalArchitecture::MainPcbModule;
-    expose Architecture::robotSystem.physical.mainPcb.bareBoard;
-    expose PhysicalArchitecture::RobotControlBoard;
-    expose Architecture::robotSystem.physical.mainPcb.mcu;
-    expose PhysicalArchitecture::RobotMainMcu;
-    expose Architecture::robotSystem.physical.mainPcb.imu;
-    expose Architecture::robotSystem.physical.mainPcb.leftMotorDriver;
-    expose Architecture::robotSystem.physical.mainPcb.rightMotorDriver;
-    expose PhysicalArchitecture::RobotMotorDriver;
-    expose Architecture::robotSystem.physical.mainPcb.wireless;
-    expose PhysicalArchitecture::RobotWirelessModule;
   }
 
   view powerDecomposition : GeneralView {
+    doc /* Which components constitute this robot's power module? Show the battery, BMS, charger, two
+     * regulators and SMBus in this power-module context. This view answers composition; the
+     * document's power-module interconnection view answers how protected power is distributed. */
     satisfy productStructurePerspective;
-    filter @SysML::PartUsage
-      or @SysML::PartDefinition
-      or @KerML::OwningMembership
-      or @KerML::FeatureTyping;
+    filter @SysML::PartUsage;
     expose Architecture::robotSystem.physical.base.powerModule;
-    expose PhysicalArchitecture::PowerModule;
-    expose Architecture::robotSystem.physical.base.powerModule.battery;
-    expose Architecture::robotSystem.physical.base.powerModule.bms;
-    expose PhysicalArchitecture::RobotBms;
-    expose Architecture::robotSystem.physical.base.powerModule.charger;
-    expose PhysicalArchitecture::RobotBatteryCharger;
-    expose Architecture::robotSystem.physical.base.powerModule.logicRegulator;
-    expose Architecture::robotSystem.physical.base.powerModule.sensorRegulator;
   }
 
   view interconnections : InterconnectionView {
+    doc /* How do the six hardware modules connect at their boundaries? Show the base, main PCB, two
+     * harnesses, top and dust bin. Start with module internals closed to follow inter-module
+     * power, signals and debris transfer; expand a module only to trace an endpoint inside it.
+     * Firmware deployment is shown separately. */
     satisfy productConnectionsPerspective;
     expose Architecture::robotSystem.physical.base;
     expose Architecture::robotSystem.physical.mainPcb;
@@ -173,6 +114,9 @@ package ModelViews {
   }
 
   view firmwareDeployment : GeneralView {
+    doc /* Which processor hosts each of the seven firmware tasks? Show only task usages, the MCU
+     * usage and their allocation relationships. Task queues, runtime behavior and reusable task
+     * definitions are outside this deployment view. */
     satisfy firmwareDeploymentPerspective;
     filter @SysML::PartUsage or @SysML::AllocationUsage;
     expose Architecture::robotSystem.physical.firmwareTasks.missionController;
@@ -186,24 +130,18 @@ package ModelViews {
   }
 
   view systemRequirements : GeneralView {
+    doc /* Which 21 system requirements constrain the robot baseline? Show the requirement collection
+     * and its individual requirements. Satisfaction, derivation and verification evidence are
+     * provided by the document trace tables, not inferred from this inventory. */
     satisfy requirementStructurePerspective;
     filter @SysML::RequirementUsage;
     expose SystemRequirements::robotSystemSpecification;
-    expose SystemRequirements::robotSystemSpecification::'Cleaning area per charge';
-    expose SystemRequirements::robotSystemSpecification::'Floor coverage';
-    expose SystemRequirements::robotSystemSpecification::'Obstacle avoidance';
-    expose SystemRequirements::robotSystemSpecification::'Cliff detection';
-    expose SystemRequirements::robotSystemSpecification::'Safe stop on hazard';
-    expose SystemRequirements::robotSystemSpecification::'Localization accuracy';
-    expose SystemRequirements::robotSystemSpecification::'Coverage map maintenance';
-    expose SystemRequirements::robotSystemSpecification::'Wheel stall detection and recovery';
-    expose SystemRequirements::robotSystemSpecification::'Return to dock on low battery';
-    expose SystemRequirements::robotSystemSpecification::'Charging within the battery safe operating area';
-    expose SystemRequirements::robotSystemSpecification::'Mission status reporting';
-    expose SystemRequirements::robotSystemSpecification::'Local storage of map data';
   }
 
   view cliffSafeStopScenario : ActionFlowView {
+    doc /* How does a cliff observation propagate to stopped actuation and reported safe-stop status?
+     * Show the scenario actions, parameter flows and successions. This is the behavioral path;
+     * timing budgets and requirement verification are provided separately. */
     satisfy safeStopScenarioPerspective;
     expose OperationalScenarios::CliffSafeStopScenario;
   }

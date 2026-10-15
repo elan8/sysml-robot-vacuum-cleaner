@@ -82,7 +82,7 @@ flowchart LR
 | `RobotAnalysisCases` | Four analyses: mission energy, safety reaction, localization, mass budget |
 | `Verification` | Twelve verification cases with identifier, method and pass criterion |
 | `Validation` | Five validation cases for the customer requirements |
-| `ModelViews` | Six stakeholder projections |
+| `ModelViews` | Nine focused stakeholder views; see [VIEWS.md](VIEWS.md) |
 
 ## One source for every number
 
