@@ -11,7 +11,7 @@
  * a Markdown file in `prose/`.
  */
 package RobotDocuments {
-  private import Doc42::*;
+  private import Elan8::Documents::*;
   private import StandardViewDefinitions::*;
 
   view crs {

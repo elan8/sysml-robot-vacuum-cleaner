@@ -53,8 +53,7 @@ if (-not $MethodLibraryRoot) {
 # KPAR variants prevents stale installed packages from masking migration errors.
 $arguments = @(
     "--disable-kpar-library", "domain",
-    "--disable-kpar-library", "method",
-    "--library-path", (Join-Path $repoRoot "libraries/doc42-v0.4.0")
+    "--disable-kpar-library", "method"
 )
 
 if ($MethodLibraryRoot -and (Test-Path $MethodLibraryRoot)) {

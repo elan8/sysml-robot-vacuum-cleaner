@@ -28,13 +28,13 @@ carry the engineering, not only describe it:
 | What must the system do, measurably? | 21 system requirements, each a constraint against a design limit (`SYS-…`) |
 | Is every need covered, and why? | One derivation per customer requirement, with the reason the set is complete |
 | Who has to deliver what? | 13 module requirements with budgets for safe-stop time, mass, height and energy (`BASE-…`, `PCB-…`, `FW-…`, `TOP-…`) |
-| What is it made of, and what does it cost and weigh? | Physical architecture with 46 parts; generated bill of materials and mass budget |
+| What is it made of, and what does it cost and weigh? | Physical architecture with 49 parts; generated bill of materials and mass budget |
 | Does the design hold? | Four analyses: mission energy, safe-stop timing, localization, mass |
 | How will we know? | Twelve verification cases and five validation cases with methods and pass criteria; verification and validation matrices |
 
 ![System architecture](documents/figures/system-architecture.svg)
 
-![Product layout](documents/figures/product-layout.svg)
+![Product layout: two forward side brushes, main roller and suction intake, and rear caster](documents/figures/product-layout.svg)
 
 ## What the showcase demonstrates
 
@@ -80,7 +80,7 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `70_analysis/` | Four quantitative analyses |
 | `80_verification/` | Twelve verification cases and five validation cases |
 | `90_views/` | Nine focused views |
-| `95_documents/` | Doc42 definitions of the four engineering documents |
+| `95_documents/` | Generic document views using `Elan8::Documents` |
 | `99_library/` | Purchased parts and bill-of-materials classification |
 | `Root.sysml` | Workspace import hub |
 | `../documents/` | Prose, authored figures, the house template and generated tables |
@@ -104,6 +104,11 @@ of information and refers to the others for the rest:
 The split follows ISO/IEC/IEEE 29148 for the two requirements specifications and
 the NASA Systems Engineering Handbook for the verification and validation plan,
 tailored to a product of this size.
+
+The shared metadata comes from `Elan8::Documents` in the domain libraries,
+so the model has no renderer-specific SysML library dependency. See the
+[coordinated migration notes](docs/VALIDATION.md#coordinated-document-library-migration)
+for the required domain-library and Doc42 revisions.
 
 They are defined in [`model/95_documents/Documents.sysml`](model/95_documents/Documents.sysml): each
 document is a SysML view and its nested views are the sections. What a section
@@ -130,12 +135,14 @@ quantities added up. The script needs only Python and Spec42. It also checks the
 model for gaps and fails when a physical part has no bill-of-materials
 classification or mass, when a requirement is not covered by a derivation, when
 a requirement has no satisfaction claim or verification case, or when a customer
-requirement has no validation case. CI fails when
-the committed files are not what the model generates.
+requirement has no validation case. CI generates these files from the model on each run. They are build outputs and
+are not committed. The document job downloads them before checking and rendering
+the documents; PDFs are also written into `documents/generated/`. A clean checkout
+has no generated folder; the generation commands create it as needed.
 
 ```sh
-python scripts/generate-document-data.py          # regenerate after a model change
-python scripts/generate-document-data.py --check  # what CI runs
+python scripts/generate-document-data.py          # prepare the tables before Doc42
+python scripts/generate-document-data.py --check  # optional local freshness check
 ```
 
 Every push builds the PDFs; download them from the
@@ -143,8 +150,9 @@ Every push builds the PDFs; download them from the
 [workflow run](../../actions/workflows/validate.yml).
 
 ```sh
-doc42 check . --library-path <method-library> --library-path <domain-libraries>/model
-doc42 build . --doc RobotDocuments::srs --out out --library-path ...
+python scripts/generate-document-data.py
+doc42 check model --workspace-root . --library-path <method-library> --library-path <domain-libraries>/model
+doc42 build model --workspace-root . --doc RobotDocuments::srs --out documents/generated --library-path ...
 ```
 
 Checking the documents is free. Building them needs an Elan8 license in the

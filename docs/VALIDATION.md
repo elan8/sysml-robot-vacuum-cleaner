@@ -15,7 +15,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
 
 The script runs Spec42 over all model files, including
 `model/95_documents/Documents.sysml`, supplies local Elan8 libraries and the
-pinned Doc42 metadata library, and then runs static model guards.
+document metadata from `Elan8::Documents` in the domain library, and then runs static model guards.
 
 Expected result:
 
@@ -31,8 +31,8 @@ fail validation.
 
 The repository's `.vscode/settings.json` loads the same source libraries for
 the editor. Open this repository as the workspace root; the two Elan8 library
-checkouts are expected beside it. `libraries/doc42-v0.4.0` is the metadata
-snapshot matching the Doc42 release used in CI.
+checkouts are expected beside it. Document metadata is provided by
+`Elan8::Documents` in `sysml-domain-libraries/model`; no Doc42 snapshot is vendored.
 
 Optional parameters:
 
@@ -51,17 +51,20 @@ missing queue flows and requirements without satisfaction or verification.
 ## Generated document data
 
 ```sh
-python scripts/generate-document-data.py --check
+python scripts/generate-document-data.py
 ```
 
-The script exports the model with Spec42 and compares the bill of materials and
-the mass budget it derives with the committed files in `documents/generated/`. It fails when they differ and when
-the model has a gap: a physical part without a bill-of-materials classification or
-a mass, a customer requirement without a derivation, a system or module
-requirement that no derivation names, or a requirement without a satisfaction
-claim or a verification case, or a customer requirement without a validation case.
-Run it without `--check` to regenerate the files
-after a model change. It finds Spec42 on `PATH` or in `SPEC42_EXE`, and the
+The script exports the model with Spec42 and generates the bill of materials and
+mass budget in `documents/generated/`. It fails on a model gap: a physical part
+without a bill-of-materials classification or mass, a missing derivation,
+satisfaction claim, verification case or customer validation case.
+
+The directory is ignored and absent from a clean checkout. Generate the data
+before `doc42 check` or `doc42 build`, because the design document includes the
+Markdown tables. Build PDFs with `--out documents/generated`. An optional
+`--check` run compares existing local files against freshly computed content;
+CI generates the files instead of comparing them with committed snapshots.
+It finds Spec42 on `PATH` or in `SPEC42_EXE`, and the
 libraries next to the repository or through `ELAN8_METHOD_LIBRARY_ROOT` and
 `SYSML_DOMAIN_LIBRARIES_ROOT`.
 
@@ -85,12 +88,12 @@ module boundaries and relationships after validation succeeds.
 - **Spec42** checks out `mbse-methodology` and `sysml-domain-libraries` at pinned
   commits, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
   The libraries bundled with Spec42 are disabled so only the pinned sources are
-  used, together with `libraries/doc42-v0.4.0`. Errors and warnings fail the job;
-  only `view_expose_empty` information in `Documents.sysml` is allowed. It then checks
-  that the generated document data is up to date and that the model has no gap.
-- **Doc42 documents** checks `model/` with the repository as `--workspace-root`
+  used, including `Elan8::Documents`. Errors and warnings fail the job;
+  only `view_expose_empty` information in `Documents.sysml` is allowed. It then generates
+  the document data, checks the model for gaps and uploads the data as an artifact.
+- **Doc42 documents** downloads the generated data, checks `model/` with the repository as `--workspace-root`
   and builds the four
-  PDFs with [Doc42](https://github.com/elan8/doc42-action), uploading them as the
+  PDFs into `documents/generated/` with [Doc42](https://github.com/elan8/doc42-action), uploading them as the
   `engineering-documents` artifact. It needs the `ELAN8_LICENSE` repository
   secret and is skipped for pull requests from forks.
 
@@ -100,3 +103,11 @@ re-run validation locally first.
 If Spec42 rejects or misprojects an independently confirmed SysML v2-conforming
 construct, add a minimal Spec42 regression test and repair the tool. Do not
 encode tool workarounds into the model.
+
+## Coordinated document-library migration
+
+The domain-library pin in CI must be advanced to the commit adding
+`Elan8::Documents`, and the Doc42 action pin must select a release that consumes
+it. The current v0.4.0 Doc42 release recognizes only the old `Doc42` namespace.
+Until those coordinated revisions are published, validate with the updated
+local domain sources and Doc42 build. Do not restore a vendored metadata copy.

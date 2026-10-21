@@ -51,7 +51,7 @@
     <text x="120" y="257">Cliff sensors (4×)</text><text x="120" y="295">Wheel-drop switches (2×)</text>
     <text x="120" y="333">Wheel encoders (2×)</text><text x="120" y="371">Homing-beacon receiver</text>
     <text x="640" y="71">Drive motor, left</text><text x="640" y="115">Drive motor, right</text>
-    <text x="640" y="175">H-bridge and brush motor</text><text x="640" y="213">H-bridge and fan motor</text>
+    <text x="640" y="175">Brush driver + motor (3 brushes)</text><text x="640" y="213">H-bridge and fan motor</text>
     <text x="640" y="265">Gearboxes and drive wheels</text>
     <text x="442" y="71">3-phase driver</text><text x="442" y="115">3-phase driver</text>
     <text x="318" y="271">Inertial unit</text><text x="442" y="271">Wi-Fi and BLE</text>

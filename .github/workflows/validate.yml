@@ -16,6 +16,7 @@ env:
   SPEC42_VERSION: "0.54.1"
   # Elan8 libraries the model is validated against, pinned to exact commits.
   METHOD_LIBRARY_REF: 377795f216bc677333f28a4448eb7c53066caa5f
+  # Advance to the Documents migration commit before merging this change.
   DOMAIN_LIBRARIES_REF: bb2aba9d356314ffb38510ed8f87a556503736ab
 
 jobs:
@@ -62,7 +63,6 @@ jobs:
           spec42 --disable-kpar-library domain --disable-kpar-library method \
             --library-path .libraries/mbse-methodology/library \
             --library-path .libraries/sysml-domain-libraries/model \
-            --library-path libraries/doc42-v0.4.0 \
             check model --warnings-as-errors | tee spec42.txt
           grep -q "0 error(s), 0 warning(s)," spec42.txt
           # Only the document containers' empty-expose information is expected.
@@ -71,12 +71,19 @@ jobs:
           fi
 
       # The bill of materials and the mass budget are derived from the model.
-      # This fails when they are stale or when the model has a gap.
-      - name: Check generated document data
+      # Generate them on every run; a model gap fails the job.
+      - name: Generate document data
         env:
           ELAN8_METHOD_LIBRARY_ROOT: .libraries/mbse-methodology/library
           SYSML_DOMAIN_LIBRARIES_ROOT: .libraries/sysml-domain-libraries
-        run: python3 scripts/generate-document-data.py --check
+        run: python3 scripts/generate-document-data.py
+
+      - name: Upload document data
+        uses: actions/upload-artifact@v4
+        with:
+          name: document-data
+          path: documents/generated/
+          if-no-files-found: error
 
   documents:
     name: Doc42 documents
@@ -108,8 +115,15 @@ jobs:
       - name: Move libraries out of the workspace
         run: mv .libraries "$RUNNER_TEMP/libraries"
 
+      # Advance the action pin to a release supporting Elan8::Documents before merging.
       - name: Install Doc42
         uses: elan8/doc42-action@v0.4.0
+
+      - name: Download generated document data
+        uses: actions/download-artifact@v4
+        with:
+          name: document-data
+          path: documents/generated
 
       - name: Check documents
         run: |
@@ -122,7 +136,7 @@ jobs:
           ELAN8_LICENSE: ${{ secrets.ELAN8_LICENSE }}
         run: |
           for document in crs srs sds vvp; do
-            doc42 build model --workspace-root . --doc "RobotDocuments::$document" --out out \
+            doc42 build model --workspace-root . --doc "RobotDocuments::$document" --out documents/generated \
               --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
               --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
           done
@@ -132,6 +146,5 @@ jobs:
         with:
           name: engineering-documents
           path: |
-            out/*.pdf
-            documents/generated/bom.csv
+            documents/generated/
           if-no-files-found: error

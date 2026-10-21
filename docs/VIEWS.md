@@ -57,3 +57,22 @@ rendering corrections for allocations, inherited ports, connections owned by
 enclosing assemblies and ownership layout must
 be present to reproduce the reviewed diagrams; model validation is independent
 of those renderer changes.
+
+## Authored product illustrations
+
+`documents/figures/product-layout.svg` uses the physical model's longitudinal
+coordinates: forward side brushes at +100 mm, main roller at +75 mm, suction
+intake at +55 mm and rear caster at -140 mm, relative to the drive axle.
+Forward is up in plan and left in the side elevation. The plan includes
+underside components seen through the chassis. The 80 mm dashed brush circles
+show swept extent; the 340 mm dimension is the nominal body diameter.
+The 65 mm drive wheels and 55 + 37 mm design height use the same 0.88 px/mm
+scale in both views. Height budgets (57 + 38 mm) are labeled separately.
+
+The hero image, product layout and system architecture depict the same two
+side brushes. The system architecture groups their shared transmission and
+main roller under the brush motor; detailed parts and mass come from the model.
+The other authored figures were checked against the context and timing model:
+three ToF sensors, four cliff sensors, two wheel-drop switches, seven firmware
+tasks, a 14.4 V battery, a 2 A charger, and a 72 ms safe-stop design against the
+100 ms limit. Authored figures must be reviewed when those model values change.

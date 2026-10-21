@@ -79,14 +79,50 @@ package PhysicalArchitecture {
   }
 
   part def CleaningHeadHousing :> MechanicalComponent {
-    doc /* Brush chamber, main brush, suction duct and impeller housing. */
+    doc /* Brush chamber with main roller, suction duct and impeller housing. */
     @BomItem { description = "Cleaning head housing with main brush and duct"; sourcing = SourcingKind::make; unitCostEur = 2.60; }
     attribute :>> mass = 0.4 [kg]; /* illustrative estimate */
+    port mainBrushAxle : RotationalMechanicalPort;
+  }
+
+  part def SideBrush :> MechanicalComponent {
+    doc /* Three-arm edge-sweeping brush, mechanically driven by the shared brush motor.
+         * Left and right outputs counter-rotate to sweep debris towards the main roller. */
+    @BomItem { description = "Side brush, three-arm"; sourcing = SourcingKind::make; unitCostEur = 0.30; }
+    attribute :>> mass = 0.015 [kg]; /* illustrative estimate */
+    attribute sweptDiameter : LengthValue = 80 [mm];
+    port axle : RotationalMechanicalPort;
+  }
+
+  part def BrushTransmission :> MechanicalComponent {
+    doc /* Belt and gear transmission from the brush motor to the main roller and both side
+         * brushes. The mirrored side outputs sweep inward; no independent brush motors. */
+    @BomItem { description = "Brush belt and gear transmission"; sourcing = SourcingKind::make; unitCostEur = 0.60; }
+    attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+    port inputShaft : RotationalMechanicalPort;
+    port mainRollerOutput : RotationalMechanicalPort;
+    port leftOutput : RotationalMechanicalPort;
+    port rightOutput : RotationalMechanicalPort;
   }
 
   part def CleaningHeadModule :> ElectronicsComponent {
     attribute :>> powerDraw = sum(brushMotor.ratedPower, vacuumMotor.ratedPower);
-    attribute :>> mass = sum(brushMotor.mass, brushDriver.mass, vacuumMotor.mass, vacuumDriver.mass, housing.mass);
+    attribute :>> mass = sum(brushMotor.mass, brushDriver.mass, vacuumMotor.mass, vacuumDriver.mass, housing.mass,
+      brushTransmission.mass, leftSideBrush.mass, rightSideBrush.mass);
+    doc /* Main roller, suction intake and two forward side brushes share one cleaning head.
+         * Layout coordinates are measured from the drive axle; positive is forward/left.
+         * The 8 W brush motor rating covers the complete brush train (design estimate). */
+    attribute mainBrushLongitudinalPosition : LengthValue = 75 [mm];
+    attribute suctionIntakeLongitudinalPosition : LengthValue = 55 [mm];
+    part brushTransmission : BrushTransmission;
+    part leftSideBrush : SideBrush {
+      attribute longitudinalPosition : LengthValue = 100 [mm];
+      attribute lateralPosition : LengthValue = 125 [mm];
+    }
+    part rightSideBrush : SideBrush {
+      attribute longitudinalPosition : LengthValue = 100 [mm];
+      attribute lateralPosition : LengthValue = -125 [mm];
+    }
     port power : PowerRailPort;
     port brushCommand : PwmPort;
     port vacuumCommand : PwmPort;
@@ -119,6 +155,10 @@ package PhysicalArchitecture {
     connect vacuumCommand to vacuumDriver.command;
     connect brushDriver.driveOutput to brushMotor.electricalInput;
     connect vacuumDriver.driveOutput to vacuumMotor.electricalInput;
+    connect brushMotor.mechanicalOutput to brushTransmission.inputShaft;
+    connect brushTransmission.mainRollerOutput to housing.mainBrushAxle;
+    connect brushTransmission.leftOutput to leftSideBrush.axle;
+    connect brushTransmission.rightOutput to rightSideBrush.axle;
     connect brushDriver.fault to fault;
     connect vacuumDriver.fault to fault;
   }
@@ -312,7 +352,10 @@ package PhysicalArchitecture {
     part leftDriveTrain : DriveTrain;
     part rightDriveTrain : DriveTrain;
     part casterWheel : CasterWheel {
-      @BomItem { description = "Front caster wheel"; sourcing = SourcingKind::buy; unitCostEur = 0.60; }
+      doc /* Rear support: always aft of the main roller and suction intake in the
+           * normal forward cleaning direction. Positive longitudinal position is forward. */
+      attribute longitudinalPosition : LengthValue = -140 [mm];
+      @BomItem { description = "Rear caster wheel"; sourcing = SourcingKind::buy; unitCostEur = 0.60; }
       attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
     }
     part frontLeftCliff : CliffSensor;
@@ -320,6 +363,15 @@ package PhysicalArchitecture {
     part rearLeftCliff : CliffSensor;
     part rearRightCliff : CliffSensor;
     part cleaningHead : CleaningHeadModule;
+    attribute nominalBodyDiameter : LengthValue = 340 [mm];
+    assert constraint casterBehindCleaningHead {
+      casterWheel.longitudinalPosition < cleaningHead.mainBrushLongitudinalPosition
+        and casterWheel.longitudinalPosition < cleaningHead.suctionIntakeLongitudinalPosition
+    }
+    assert constraint sideBrushesAheadOfMainRoller {
+      cleaningHead.leftSideBrush.longitudinalPosition > cleaningHead.mainBrushLongitudinalPosition
+        and cleaningHead.rightSideBrush.longitudinalPosition > cleaningHead.mainBrushLongitudinalPosition
+    }
     part powerModule : PowerModule;
     part dockInterface : DockInterfaceModule;
 

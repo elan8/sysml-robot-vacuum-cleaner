@@ -28,7 +28,6 @@ New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 $diagramArguments = @(
     "--disable-kpar-library", "domain",
     "--disable-kpar-library", "method",
-    "--library-path", (Join-Path $repoRoot "libraries/doc42-v0.4.0"),
     "--library-path", (Resolve-Path $MethodLibraryRoot).Path,
     "--library-path", (Resolve-Path (Join-Path $DomainLibrariesRoot "model")).Path,
     "diagram", (Join-Path $repoRoot "model")

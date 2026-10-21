@@ -64,8 +64,9 @@ package ModelViews {
   }
 
   view baseDecomposition : GeneralView {
-    doc /* Which components constitute this robot's base? Show the chassis, two drive trains, caster,
-     * four cliff sensors, cleaning head, power module and dock interface in their base context.
+    doc /* Which components constitute this robot's base? Show the chassis, two drive trains, rear caster,
+     * four cliff sensors, cleaning head (main roller, suction and two side brushes), power module
+     * and dock interface in their base context.
      * Electrical routing belongs in interconnections, not in this composition view. */
     satisfy productStructurePerspective;
     filter @SysML::PartUsage;
