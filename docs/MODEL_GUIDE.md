@@ -69,7 +69,7 @@ flowchart LR
 | `Sourcing` | `BomItem` metadata: description, make or buy, unit cost |
 | `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
 | `ProductContext` | Users, app, network, dock, home, robot boundary |
-| `Elan8::Software::Realtime` | `RealtimeTask`, `PeriodicTask`, `EventDrivenTask`, `SoftwareQueue`, `SchedulerModel`, and their criticality/discipline/policy enums |
+| `Elan8::Software` | `Task`, `PeriodicTask`, `EventDrivenTask`, `SoftwareQueue`, `ExecutionPlatform`, and their criticality/discipline/policy enums |
 | `FirmwareArchitecture` | Vacuum-specific periodic and event-driven tasks plus typed runtime queues |
 | `Elan8::Electronics::Actuation` | BLDC and brushed-DC motors, H-bridge and three-phase drivers, and mechanical outputs |
 | `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, passive bumper/lift switches, and typed measurements |

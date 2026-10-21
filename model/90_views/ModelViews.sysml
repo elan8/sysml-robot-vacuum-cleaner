@@ -127,6 +127,7 @@ package ModelViews {
     expose Architecture::robotSystem.physical.firmwareTasks.navigation;
     expose Architecture::robotSystem.physical.firmwareTasks.powerManager;
     expose Architecture::robotSystem.physical.firmwareTasks.appService;
+    expose Architecture::robotSystem.physical.firmwareTasks.scheduler;
     expose Architecture::robotSystem.physical.mainPcb.mcu;
   }
 

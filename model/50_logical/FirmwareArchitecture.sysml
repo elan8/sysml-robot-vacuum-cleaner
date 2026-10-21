@@ -6,14 +6,13 @@
  */
 package FirmwareArchitecture {
   private import DomainModel::*;
-  private import Elan8::Software::Core::*;
-  private import Elan8::Software::Realtime::*;
+  private import Elan8::Software::*;
   private import Elan8::Units::Engineering::*;
   private import ISQ::*;
   private import SI::*;
   private import ScalarValues::*;
 
-  abstract part def FirmwareTask :> RealtimeTask;
+  abstract part def FirmwareTask :> Task;
   abstract part def PeriodicFirmwareTask :> FirmwareTask, PeriodicTask;
   abstract part def EventDrivenFirmwareTask :> FirmwareTask, EventDrivenTask;
 
@@ -139,7 +138,7 @@ package FirmwareArchitecture {
   }
 
   part def FirmwareTaskArchitecture {
-    part scheduler : SchedulerModel {
+    part scheduler : ExecutionPlatform {
       doc /*
         Safety and actuator loops execute before mission and app work. Overload
         sheds noncritical app/status work before safety or control work.

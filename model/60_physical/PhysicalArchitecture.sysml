@@ -31,7 +31,7 @@ package PhysicalArchitecture {
   private import PurchasedParts::*;
   private import Sourcing::*;
   private import SystemRequirements::*;
-  private import Elan8::Software::Core::*;
+  private import Elan8::Software::*;
   private import Elan8::Electronics::Wireless::*;
   private import Elan8::Units::Engineering::*;
   private import ISQ::*;
@@ -838,20 +838,21 @@ package PhysicalArchitecture {
     connection dustBinMount : RemovableMount
       connect base to dustBin;
 
+    allocate firmwareTasks.scheduler to mainPcb.mcu;
     allocate firmwareTasks.missionController
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
     allocate firmwareTasks.safetySupervisor
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
     allocate firmwareTasks.actuatorControl
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
     allocate firmwareTasks.sensorAcquisition
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
     allocate firmwareTasks.navigation
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
     allocate firmwareTasks.powerManager
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
     allocate firmwareTasks.appService
-      to mainPcb.mcu;
+      to firmwareTasks.scheduler;
 
     allocation sensorBusAccess : TaskToPeripheralAccess
       allocate firmwareTasks.sensorAcquisition

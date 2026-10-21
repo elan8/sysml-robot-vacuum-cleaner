@@ -1,6 +1,5 @@
 {
   "spec42.libraryPaths": [
-    "../mbse-methodology/library",
     "../sysml-domain-libraries/model"
   ],
   "spec42.disabledLibraries": ["domain", "method"]

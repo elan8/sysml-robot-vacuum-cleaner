@@ -15,9 +15,8 @@ A worked SysML v2 example of a cyber-physical product: an autonomous vacuum
 cleaner, developed by Elan8 as the engineering company, from what the household
 wants down to module budgets, a bill of materials and the verification plan.
 The model is organized with the **Elan8 Method** folder layout, is validated
-with [Spec42](https://github.com/elan8/spec42), and is the single source of the
-engineering documents, which [Doc42](https://github.com/elan8/doc42-action)
-generates as PDF on every push.
+with [Spec42](https://github.com/elan8/spec42), and is the source of the
+engineering evidence and authored document definitions.
 
 Use it to see what a SysML v2 model of a real product looks like when it has to
 carry the engineering, not only describe it:
@@ -90,9 +89,9 @@ and [the purpose and scope of each view](docs/VIEWS.md).
 
 ## Engineering documents
 
-Four documents are generated from the model with [Doc42](https://github.com/elan8/doc42-action),
-with Elan8 as the engineering organization that issues them. Each holds one kind
-of information and refers to the others for the rest:
+Four engineering documents are defined in
+[`model/95_documents/Documents.sysml`](model/95_documents/Documents.sysml),
+using the generic `Elan8::Documents` vocabulary:
 
 | Document | Number | Answers | Content |
 | --- | --- | --- | --- |
@@ -101,68 +100,32 @@ of information and refers to the others for the rest:
 | System Design Specification | RVC-SDS-001 | How is the robot built to do it? | Architecture, allocation of requirements to modules with budgets, firmware, bill of materials, analyses, requirement satisfaction |
 | Verification and Validation Plan | RVC-VVP-001 | How will we know that it does? | Methods, test articles and facilities, 12 verification cases with pass criteria, the requirements verification matrix, 5 validation cases and the validation matrix |
 
-The split follows ISO/IEC/IEEE 29148 for the two requirements specifications and
-the NASA Systems Engineering Handbook for the verification and validation plan,
-tailored to a product of this size.
+**PDF generation is disabled** until a suitable Doc42 release and working
+license are available. CI does not install or run Doc42, check document
+rendering, build PDFs or upload engineering-document artifacts.
 
-The shared metadata comes from `Elan8::Documents` in the domain libraries,
-so the model has no renderer-specific SysML library dependency. See the
-[coordinated migration notes](docs/VALIDATION.md#coordinated-document-library-migration)
-for the required domain-library and Doc42 revisions.
+The authored document views, prose, figures and house template remain as
+sources for a future renderer. These definitions are included in ordinary
+SysML validation; that does not constitute a rendered-document check.
 
-They are defined in [`model/95_documents/Documents.sysml`](model/95_documents/Documents.sysml): each
-document is a SysML view and its nested views are the sections. What a section
-shows is read from the model when the document is built:
-
-- **Tables** with `@Table`: requirement tables, the customer-to-system and
-  system-to-module trace tables with their rationale, and the verification
-  matrices. A section exposes elements and names its columns.
-- **Values** with `{{= RequirementLimits::maxRobotMass}}` in the text, so a number in
-  a document cannot disagree with the model.
-- **Diagrams** from sections typed by a standard view.
-
-Short texts are the `doc` of their section, written in Markdown; longer ones are
-Markdown files in `documents/prose/`. Four authored drawings are in
-`documents/figures/`. All styling is in the Elan8 house template in
-[`documents/template/`](documents/template): the logo, the Inter typeface and
-the colours of the Elan8 style guide. It is selected with `template = "../../documents/template"`
-and serves all four documents.
-
-The bill of materials and the mass budget in `documents/generated/` are written
-by [`scripts/generate-document-data.py`](scripts/generate-document-data.py) from
-a Spec42 export of the model, because they need the part tree walked and
-quantities added up. The script needs only Python and Spec42. It also checks the
-model for gaps and fails when a physical part has no bill-of-materials
-classification or mass, when a requirement is not covered by a derivation, when
-a requirement has no satisfaction claim or verification case, or when a customer
-requirement has no validation case. CI generates these files from the model on each run. They are build outputs and
-are not committed. The document job downloads them before checking and rendering
-the documents; PDFs are also written into `documents/generated/`. A clean checkout
-has no generated folder; the generation commands create it as needed.
-
-```sh
-python scripts/generate-document-data.py          # prepare the tables before Doc42
-python scripts/generate-document-data.py --check  # optional local freshness check
-```
-
-Every push builds the PDFs; download them from the
-`engineering-documents` artifact of the latest
-[workflow run](../../actions/workflows/validate.yml).
+The BOM and mass-budget script remains available independently of Doc42. It
+exports the physical model with Spec42, generates Markdown/CSV data, and checks
+classification, mass, derivation, satisfaction, verification and validation gaps.
+CI runs it as a model check:
 
 ```sh
 python scripts/generate-document-data.py
-doc42 check model --workspace-root . --library-path <method-library> --library-path <domain-libraries>/model
-doc42 build model --workspace-root . --doc RobotDocuments::srs --out documents/generated --library-path ...
+python scripts/generate-document-data.py --check  # optional local freshness check
 ```
 
-Checking the documents is free. Building them needs an Elan8 license in the
-`ELAN8_LICENSE` environment variable; the model itself needs neither Doc42 nor a
-license.
+Its outputs go into ignored `documents/generated/`, which is absent from a
+clean checkout. No PDFs are generated. Sources in `documents/prose/`,
+`documents/figures/` and `documents/template/` remain tracked.
 
 ## Validation
 
 Requires [Spec42](https://github.com/elan8/spec42) 0.54.1 or later and sibling
-checkouts of `sysml-domain-libraries` and `mbse-methodology`:
+checkout of `sysml-domain-libraries`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1

@@ -30,8 +30,8 @@ exposing model elements directly. They are intentional. Errors and warnings
 fail validation.
 
 The repository's `.vscode/settings.json` loads the same source libraries for
-the editor. Open this repository as the workspace root; the two Elan8 library
-checkouts are expected beside it. Document metadata is provided by
+the editor. Open this repository as the workspace root; the `sysml-domain-libraries`
+checkout is expected beside it. Document metadata is provided by
 `Elan8::Documents` in `sysml-domain-libraries/model`; no Doc42 snapshot is vendored.
 
 Optional parameters:
@@ -59,14 +59,12 @@ mass budget in `documents/generated/`. It fails on a model gap: a physical part
 without a bill-of-materials classification or mass, a missing derivation,
 satisfaction claim, verification case or customer validation case.
 
-The directory is ignored and absent from a clean checkout. Generate the data
-before `doc42 check` or `doc42 build`, because the design document includes the
-Markdown tables. Build PDFs with `--out documents/generated`. An optional
+The directory is ignored and absent from a clean checkout. The retained design document sources refer to these Markdown tables. PDF
+generation and Doc42 document checks are disabled. An optional
 `--check` run compares existing local files against freshly computed content;
 CI generates the files instead of comparing them with committed snapshots.
 It finds Spec42 on `PATH` or in `SPEC42_EXE`, and the
-libraries next to the repository or through `ELAN8_METHOD_LIBRARY_ROOT` and
-`SYSML_DOMAIN_LIBRARIES_ROOT`.
+domain libraries next to the repository or through `SYSML_DOMAIN_LIBRARIES_ROOT`.
 
 ## Diagram smoke check
 
@@ -85,29 +83,31 @@ module boundaries and relationships after validation succeeds.
 
 `.github/workflows/validate.yml` runs on pushes and pull requests:
 
-- **Spec42** checks out `mbse-methodology` and `sysml-domain-libraries` at pinned
-  commits, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
+- **Spec42** checks out `sysml-domain-libraries` at a pinned
+  commit, runs the model guards, and validates `model/` with Spec42 **0.54.1**.
   The libraries bundled with Spec42 are disabled so only the pinned sources are
   used, including `Elan8::Documents`. Errors and warnings fail the job;
   only `view_expose_empty` information in `Documents.sysml` is allowed. It then generates
-  the document data, checks the model for gaps and uploads the data as an artifact.
-- **Doc42 documents** downloads the generated data, checks `model/` with the repository as `--workspace-root`
-  and builds the four
-  PDFs into `documents/generated/` with [Doc42](https://github.com/elan8/doc42-action), uploading them as the
-  `engineering-documents` artifact. It needs the `ELAN8_LICENSE` repository
-  secret and is skipped for pull requests from forks.
+  the document data, checks the model for gaps and checks the generated mass budget locally.
+There is no Doc42 job, PDF build, license-dependent step or document artifact
+upload. The document sources remain in the repository for future use.
 
-To move to newer libraries, update the two pinned commits in the workflow and
+To move to newer libraries or Doc42, update the pinned domain commit and
 re-run validation locally first.
 
 If Spec42 rejects or misprojects an independently confirmed SysML v2-conforming
 construct, add a minimal Spec42 regression test and repair the tool. Do not
 encode tool workarounds into the model.
 
-## Coordinated document-library migration
+## Document generation status
 
-The domain-library pin in CI must be advanced to the commit adding
-`Elan8::Documents`, and the Doc42 action pin must select a release that consumes
-it. The current v0.4.0 Doc42 release recognizes only the old `Doc42` namespace.
-Until those coordinated revisions are published, validate with the updated
-local domain sources and Doc42 build. Do not restore a vendored metadata copy.
+PDF generation is deferred until a suitable Doc42 release and working license
+are available. No Doc42 binary version is pinned or installed in this repository.
+The generic document definitions use `Elan8::Documents` from domain-library
+commit `24f13ae144a0400609d33ec93b1e476269235c97`; no metadata copy is vendored.
+Ordinary model validation checks the SysML sources, not their rendering.
+
+The model uses the current domain vocabulary: product-specific bumper,
+wheel-drop and homing-beacon roles specialize generic switches and infrared
+components, and firmware tasks are allocated through a scheduler execution
+platform to the processor. The old method library is no longer needed.

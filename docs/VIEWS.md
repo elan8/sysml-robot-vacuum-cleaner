@@ -16,7 +16,7 @@ The view's `doc` states its scope alongside its exposes and filter.
 | `mainPcbDecomposition` | What constitutes the main PCB assembly? | Contextual board assembly, bare PCB, MCU, drivers, IMU and wireless components | 1 |
 | `powerDecomposition` | What constitutes the power module? | Contextual power module, battery, BMS, charger, regulators and SMBus | 1 |
 | `interconnections` | How do the six hardware modules connect at their boundaries? | Six modules with boundary ports and inter-module connectors; internal connections stay inside closed modules | 0 |
-| `firmwareDeployment` | Which processor hosts each firmware task? | Seven task usages, MCU usage and task-to-processor allocations | 0 |
+| `firmwareDeployment` | Which processor hosts each firmware task? | Seven tasks, scheduler execution platform, MCU and their allocations | 0 |
 | `systemRequirements` | Which requirements constrain this baseline? | System requirement collection and its 21 requirements | 1 |
 | `cliffSafeStopScenario` | How does a cliff observation lead to stopped actuation and reported status? | Scenario actions, parameter flows and successions | Action-flow rendering |
 
@@ -28,7 +28,8 @@ electrical routing, requirement evidence or timing budgets.
 
 The product view includes the `ref part firmwareTasks` group because it is part
 of the robot's effective architecture. It is a reference, not another hardware
-module. The deployment view addresses which processor hosts those tasks.
+module. The deployment view shows tasks allocated to their scheduler execution platform,
+which is allocated to the processor.
 
 The interconnection view intentionally exposes modules separately rather than
 the whole robot: this avoids introducing the firmware task group into the

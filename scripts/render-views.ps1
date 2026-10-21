@@ -5,7 +5,6 @@
 param(
     [string]$Spec42Exe = $(if ($env:SPEC42_EXE) { $env:SPEC42_EXE } else { "spec42" }),
     [string]$DomainLibrariesRoot,
-    [string]$MethodLibraryRoot,
     [string]$OutputPath = "target/model-views",
     [string]$ResvgExe
 )
@@ -16,9 +15,6 @@ $parentRoot = Split-Path -Parent $repoRoot
 if (-not $DomainLibrariesRoot) {
     $DomainLibrariesRoot = Join-Path $parentRoot "sysml-domain-libraries"
 }
-if (-not $MethodLibraryRoot) {
-    $MethodLibraryRoot = Join-Path (Join-Path $parentRoot "mbse-methodology") "library"
-}
 $outputDirectory = if ([IO.Path]::IsPathRooted($OutputPath)) {
     $OutputPath
 } else {
@@ -28,7 +24,6 @@ New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 $diagramArguments = @(
     "--disable-kpar-library", "domain",
     "--disable-kpar-library", "method",
-    "--library-path", (Resolve-Path $MethodLibraryRoot).Path,
     "--library-path", (Resolve-Path (Join-Path $DomainLibrariesRoot "model")).Path,
     "diagram", (Join-Path $repoRoot "model")
 )

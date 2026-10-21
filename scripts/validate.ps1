@@ -5,7 +5,6 @@
 param(
     [string]$Spec42Exe,
     [string]$DomainLibrariesRoot,
-    [string]$MethodLibraryRoot,
     [string]$ModelPath = "model",
     [ValidateSet("text", "json")]
     [string]$Format = "text"
@@ -38,27 +37,13 @@ if (-not $DomainLibrariesRoot) {
     }
 }
 
-if (-not $MethodLibraryRoot) {
-    if ($env:ELAN8_METHOD_LIBRARY_ROOT) {
-        $MethodLibraryRoot = $env:ELAN8_METHOD_LIBRARY_ROOT
-    } else {
-        $siblingMethodLibrary = Join-Path (Join-Path $parentRoot "mbse-methodology") "library"
-        if (Test-Path $siblingMethodLibrary) {
-            $MethodLibraryRoot = $siblingMethodLibrary
-        }
-    }
-}
-
 # Validate against the explicitly selected source libraries. Disabling managed
-# KPAR variants prevents stale installed packages from masking migration errors.
+# KPAR variants prevents stale installed packages from masking migration errors;
+# `method` is the managed archive older Spec42 releases bundle.
 $arguments = @(
     "--disable-kpar-library", "domain",
     "--disable-kpar-library", "method"
 )
-
-if ($MethodLibraryRoot -and (Test-Path $MethodLibraryRoot)) {
-    $arguments += @("--library-path", (Resolve-Path $MethodLibraryRoot))
-}
 
 if ($DomainLibrariesRoot) {
     # The domain libraries live under one root that Elan8.sysml ties together.

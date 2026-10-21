@@ -1,4 +1,4 @@
-The firmware runs on the microcontroller of the main control board as seven tasks under a fixed-priority real-time scheduler. Tasks communicate only through typed message queues.
+The firmware runs on the microcontroller of the main control board as seven tasks under a fixed-priority real-time scheduler. The seven tasks are allocated to the scheduler execution platform, which is allocated to the microcontroller. Tasks communicate only through typed message queues.
 
 - **Safety supervisor**, event-driven, deadline 10 ms, highest priority. Receives every hazard and issues the safe command.
 - **Actuator control**, every 20 ms. Drives the wheel and cleaning motors and detects stalls.

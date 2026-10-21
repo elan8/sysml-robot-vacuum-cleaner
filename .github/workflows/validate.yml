@@ -15,9 +15,7 @@ permissions:
 env:
   SPEC42_VERSION: "0.54.1"
   # Elan8 libraries the model is validated against, pinned to exact commits.
-  METHOD_LIBRARY_REF: 377795f216bc677333f28a4448eb7c53066caa5f
-  # Advance to the Documents migration commit before merging this change.
-  DOMAIN_LIBRARIES_REF: bb2aba9d356314ffb38510ed8f87a556503736ab
+  DOMAIN_LIBRARIES_REF: 24f13ae144a0400609d33ec93b1e476269235c97
 
 jobs:
   spec42:
@@ -26,13 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Checkout Elan8 Method library
-        uses: actions/checkout@v4
-        with:
-          repository: elan8/mbse-methodology
-          ref: ${{ env.METHOD_LIBRARY_REF }}
-          path: .libraries/mbse-methodology
 
       - name: Checkout Elan8 domain libraries
         uses: actions/checkout@v4
@@ -61,7 +52,6 @@ jobs:
       - name: Validate model
         run: |
           spec42 --disable-kpar-library domain --disable-kpar-library method \
-            --library-path .libraries/mbse-methodology/library \
             --library-path .libraries/sysml-domain-libraries/model \
             check model --warnings-as-errors | tee spec42.txt
           grep -q "0 error(s), 0 warning(s)," spec42.txt
@@ -72,79 +62,7 @@ jobs:
 
       # The bill of materials and the mass budget are derived from the model.
       # Generate them on every run; a model gap fails the job.
-      - name: Generate document data
+      - name: Check model traceability and mass budget
         env:
-          ELAN8_METHOD_LIBRARY_ROOT: .libraries/mbse-methodology/library
           SYSML_DOMAIN_LIBRARIES_ROOT: .libraries/sysml-domain-libraries
         run: python3 scripts/generate-document-data.py
-
-      - name: Upload document data
-        uses: actions/upload-artifact@v4
-        with:
-          name: document-data
-          path: documents/generated/
-          if-no-files-found: error
-
-  documents:
-    name: Doc42 documents
-    runs-on: ubuntu-latest
-    needs: spec42
-    # Generating documents needs the Elan8 license secret, which pull requests
-    # from forks do not receive.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Checkout Elan8 Method library
-        uses: actions/checkout@v4
-        with:
-          repository: elan8/mbse-methodology
-          ref: ${{ env.METHOD_LIBRARY_REF }}
-          path: .libraries/mbse-methodology
-
-      - name: Checkout Elan8 domain libraries
-        uses: actions/checkout@v4
-        with:
-          repository: elan8/sysml-domain-libraries
-          ref: ${{ env.DOMAIN_LIBRARIES_REF }}
-          path: .libraries/sysml-domain-libraries
-
-      # Doc42 reads every model file under the repository, so the libraries
-      # are moved outside it and passed as library paths instead.
-      - name: Move libraries out of the workspace
-        run: mv .libraries "$RUNNER_TEMP/libraries"
-
-      # Advance the action pin to a release supporting Elan8::Documents before merging.
-      - name: Install Doc42
-        uses: elan8/doc42-action@v0.4.0
-
-      - name: Download generated document data
-        uses: actions/download-artifact@v4
-        with:
-          name: document-data
-          path: documents/generated
-
-      - name: Check documents
-        run: |
-          doc42 check model --workspace-root . \
-            --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
-            --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
-
-      - name: Build documents
-        env:
-          ELAN8_LICENSE: ${{ secrets.ELAN8_LICENSE }}
-        run: |
-          for document in crs srs sds vvp; do
-            doc42 build model --workspace-root . --doc "RobotDocuments::$document" --out documents/generated \
-              --library-path "$RUNNER_TEMP/libraries/mbse-methodology/library" \
-              --library-path "$RUNNER_TEMP/libraries/sysml-domain-libraries/model"
-          done
-
-      - name: Upload documents
-        uses: actions/upload-artifact@v4
-        with:
-          name: engineering-documents
-          path: |
-            documents/generated/
-          if-no-files-found: error

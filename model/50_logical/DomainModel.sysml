@@ -5,6 +5,19 @@
  * Shared items, ports, protocol media, and closed-set vocabulary.
  */
 package DomainModel {
+  private import Elan8::Electronics::Sensing::*;
+
+  // Product-specific sensing roles specialize the generic domain vocabulary.
+  part def BumperSwitch :> SwitchSensor;
+  part def LiftSwitch :> SwitchSensor;
+  alias HomingBeaconPort for InfraredPort;
+  part def HomingBeaconTransmitter :> InfraredTransmitter {
+    port beacon : InfraredPort :>> emission;
+  }
+  part def HomingBeaconReceiver :> InfraredReceiver {
+    port beacon : ~InfraredPort :>> reception;
+  }
+
   public import Elan8::Electronics::Interconnection::*;
   public import Elan8::Electronics::Buses::*;
   public import Elan8::Electronics::Io::*;
