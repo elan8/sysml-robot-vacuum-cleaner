@@ -13,9 +13,10 @@ permissions:
   contents: read
 
 env:
-  SPEC42_VERSION: "0.54.1"
+  SPEC42_VERSION: "0.56.0"
   # Elan8 libraries the model is validated against, pinned to exact commits.
   DOMAIN_LIBRARIES_REF: 24f13ae144a0400609d33ec93b1e476269235c97
+  METHODOLOGY_REF: 3837d43ac9d16f25b6d99e52e1e8e545bf16bc6b
 
 jobs:
   spec42:
@@ -36,6 +37,13 @@ jobs:
         shell: pwsh
         run: ./scripts/check-model-guards.ps1
 
+      - name: Checkout MBSE methodology checker
+        uses: actions/checkout@v4
+        with:
+          repository: elan8/mbse-methodology
+          ref: ${{ env.METHODOLOGY_REF }}
+          path: .libraries/mbse-methodology
+
       - name: Install Spec42
         env:
           GH_TOKEN: ${{ github.token }}
@@ -46,19 +54,14 @@ jobs:
           tar -xzf "$RUNNER_TEMP/spec42/spec42-$SPEC42_VERSION-linux-x64.tar.gz" -C "$RUNNER_TEMP/spec42"
           echo "$RUNNER_TEMP/spec42" >> "$GITHUB_PATH"
 
-      # The libraries bundled with Spec42 are disabled so that only the pinned
-      # sources above are used. Errors and warnings fail; document container views
-      # may report view_expose_empty information because they compose sections.
+      # Validate the same pinned dependencies and diagnostic policy locally and
+      # in CI. Only four documented custom-view warnings are accepted; see
+      # docs/VALIDATION.md. The structural checker receives dependency semantics.
       - name: Validate model
-        run: |
-          spec42 --disable-kpar-library domain --disable-kpar-library method \
-            --library-path .libraries/sysml-domain-libraries/model \
-            check model --warnings-as-errors | tee spec42.txt
-          grep -q "0 error(s), 0 warning(s)," spec42.txt
-          # Only the document containers' empty-expose information is expected.
-          if grep 'info \[' spec42.txt | grep -v 'Documents.sysml:.*info \[view_expose_empty\]'; then
-            exit 1
-          fi
+        run: python3 scripts/validate_model.py
+
+      - name: Check diagnostic exception policy
+        run: python3 -m unittest discover -s tests
 
       # The bill of materials and the mass budget are derived from the model.
       # Generate them on every run; a model gap fails the job.

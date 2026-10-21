@@ -1,31 +1,10 @@
-/*
- * SPDX-FileCopyrightText: 2026 Elan8
- * SPDX-License-Identifier: MIT
- *
- * Full-workspace import hub for the Elan8 Method-compliant showcase.
- */
+/* SPDX-FileCopyrightText: 2026 Elan8
+ * SPDX-License-Identifier: MIT */
 package AutonomousFloorCleaningRobotDemo {
-  private import Project::*;
-  private import Elan8::Units::Engineering::*;
-  private import PurchasedParts::*;
-  private import Sourcing::*;
-  private import DomainModel::*;
-  private import RequirementLimits::*;
-  private import StakeholderNeeds::*;
-  private import SystemRequirements::*;
-  private import ModuleBudgets::*;
-  private import ModuleRequirements::*;
-  private import RequirementTraceability::*;
-  private import RequirementAllocation::*;
-  private import FunctionalArchitecture::*;
-  private import BehaviorStates::*;
-  private import OperationalScenarios::*;
-  private import ProductContext::*;
-  private import FirmwareArchitecture::*;
-  private import PhysicalArchitecture::*;
-  private import Architecture::*;
-  private import RobotAnalysisCases::*;
-  private import Verification::*;
-  private import Validation::*;
-  private import ModelViews::*;
+    doc /* Navigation only: flat system packages own contracts, designs, selections and evidence.
+         * The selected robot occurrence is VacuumCleanerSystem::Integration::robotSystem. */
+    private import VacuumCleanerSystem;
+    private import RobotPlatformSystem;
+    private import ProductContext;
+    private import StakeholderNeeds;
 }

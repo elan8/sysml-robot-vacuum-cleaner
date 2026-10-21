@@ -31,13 +31,17 @@ carry the engineering, not only describe it:
 | Does the design hold? | Four analyses: mission energy, safe-stop timing, localization, mass |
 | How will we know? | Twelve verification cases and five validation cases with methods and pass criteria; verification and validation matrices |
 
-![System architecture](documents/figures/system-architecture.svg)
+![System architecture](model/80_documents/figures/system-architecture.svg)
 
-![Product layout: two forward side brushes, main roller and suction intake, and rear caster](documents/figures/product-layout.svg)
+![Product layout: two forward side brushes, main roller and suction intake, and rear caster](model/80_documents/figures/product-layout.svg)
 
 ## What the showcase demonstrates
 
-- Elan8 Method model areas via folders `00_project` … `99_library`.
+- Updated MBSE methodology areas: project context and stakeholder needs,
+  shared library, flat systems, and document sources.
+- Independent specification, architecture and integration roles from
+  `Elan8::SystemsEngineering`; architectures type children by their contracts,
+  and integrations select compatible child designs through redefinition.
 - Elan8 requirement roles, native SysML requirement identifiers, and folder conventions
   without exposing methodology jargon as product-domain behavior.
 - Definition/usage separation and one concrete `robotSystem` usage.
@@ -59,7 +63,7 @@ carry the engineering, not only describe it:
   with a build that fails on a gap.
 - A reusable `PurchasedParts` library; named dependencies select catalog
   implementations without turning procurement choice into type specialization.
-- Nine focused views over the same graph.
+- Nine focused views and four methodology role views over the same graph.
 
 The scope deliberately excludes product variants, trade studies, and
 implementation handoff tables. Human-facing external identifiers such as
@@ -69,20 +73,16 @@ manufacturer part numbers stay text; internal model identity is semantic.
 
 | Path | Purpose |
 | --- | --- |
-| `00_project/Project.sysml` | Project information |
-| `05_requirements/` | Customer, system and module requirements, design limits, budgets, derivations |
-| `10_context/` | External actors and the residential operating boundary |
-| `20_usecases/` | Four representative operational scenarios |
-| `40_functions/` | Functional decomposition and operating states |
-| `50_logical/` | Domain model and firmware architecture |
-| `60_physical/` | Physical architecture and system-of-interest allocations |
-| `70_analysis/` | Four quantitative analyses |
-| `80_verification/` | Twelve verification cases and five validation cases |
-| `90_views/` | Nine focused views |
-| `95_documents/` | Generic document views using `Elan8::Documents` |
-| `99_library/` | Purchased parts and bill-of-materials classification |
-| `Root.sysml` | Workspace import hub |
-| `../documents/` | Prose, authored figures, the house template and generated tables |
+| `00_context/Context.sysml` | Household context, external participants and context view |
+| `10_usecases/UseCases.sysml` | Four operational scenarios |
+| `20_requirements/StakeholderRequirements.sysml` | Eleven customer requirements |
+| `50_library/` | Shared interfaces, component profiles, purchased parts and compatibility navigation |
+| `60_systems/<System>/system.sysml` | Fourteen flat systems with their specifications, architectures, integrations and relevant evidence/views |
+| `60_systems/VacuumCleanerSystem/Behavior.sysml` | Supporting behavior packages, publicly imported by the system |
+| `80_documents/` | Generic document definitions, prose, figures and retained template |
+| `Root.sysml` | Navigation; the workspace loads all model files |
+| `../generated/` | Ignored BOM, mass budget, validation reports and diagrams |
+| `../project.md` | Dependency baseline and model ownership conventions |
 
 See [MODEL_GUIDE.md](docs/MODEL_GUIDE.md), [ELAN8_METHOD_TOUR.md](docs/ELAN8_METHOD_TOUR.md),
 and [the purpose and scope of each view](docs/VIEWS.md).
@@ -90,7 +90,7 @@ and [the purpose and scope of each view](docs/VIEWS.md).
 ## Engineering documents
 
 Four engineering documents are defined in
-[`model/95_documents/Documents.sysml`](model/95_documents/Documents.sysml),
+[`model/80_documents/Documents.sysml`](model/80_documents/Documents.sysml),
 using the generic `Elan8::Documents` vocabulary:
 
 | Document | Number | Answers | Content |
@@ -118,22 +118,28 @@ python scripts/generate-document-data.py
 python scripts/generate-document-data.py --check  # optional local freshness check
 ```
 
-Its outputs go into ignored `documents/generated/`, which is absent from a
-clean checkout. No PDFs are generated. Sources in `documents/prose/`,
-`documents/figures/` and `documents/template/` remain tracked.
+Its outputs go into ignored `generated/`, which is absent from a clean checkout.
+No PDFs are generated. Authored sources remain tracked under `model/80_documents/`.
 
 ## Validation
 
-Requires [Spec42](https://github.com/elan8/spec42) 0.54.1 or later and sibling
-checkout of `sysml-domain-libraries`:
+Requires [Spec42](https://github.com/elan8/spec42) **0.56.0**, Python 3.9+,
+and the exact domain-library and methodology commits in
+[`dependencies.lock.json`](dependencies.lock.json). Put dependency checkouts
+beside this repository or under `.libraries/`.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1
+./scripts/validate.ps1 -Spec42Exe <path-to-spec42>
+python scripts/generate-document-data.py
+./scripts/render-views.ps1 -Spec42Exe <path-to-rendering-build>
 ```
 
-The release criterion is 0 errors, 0 warnings and 0 information diagnostics,
-followed by successful SVG export of the views. See
-[validation details](docs/VALIDATION.md).
+Validation checks language semantics, methodology definition structure and
+complete child selection. All errors and unexpected warnings fail. Four known
+Spec42 custom-view warnings are documented in [VALIDATION.md](docs/VALIDATION.md),
+along with the structural checker's coverage limits. Diagram export requires the
+separately pinned rendering source revision in the lock file for inherited views
+and Boolean filters. PDF generation stays disabled.
 
 ## Status and limitations
 

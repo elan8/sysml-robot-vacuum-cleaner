@@ -1,60 +1,44 @@
-<!--
-SPDX-FileCopyrightText: 2026 Elan8
-SPDX-License-Identifier: MIT
--->
+# MBSE methodology tour
 
-# Elan8 Method tour
+The model follows the updated MBSE methodology: one project context, stakeholder
+needs, shared types, flat systems and publication sources. Recursive composition
+is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/3837d43ac9d16f25b6d99e52e1e8e545bf16bc6b/docs/structure.md)
+and the project's [baseline](../project.md).
 
-This showcase is laid out with Elan8 Method folders and imports
-`sysml-domain-libraries`; the method itself needs no library. Engineering
-increments are a way to plan and review coherent changes; they are not product
-concepts. The resulting SysML therefore uses names from the robot-vacuum domain.
+Start with `00_context/Context.sysml`, then the four scenarios in `10_usecases`
+and eleven stakeholder requirements in `20_requirements`. Follow those needs
+into `RobotPlatformSystem::Specification`: its Requirements, Limits and
+Traceability packages own the 21 system obligations and their derivations.
 
-## Folder map
+Each of the fourteen developed systems has one `60_systems/<System>/system.sysml`.
+Its Specification is a black box with boundary ports/properties and authoritative
+requirements. Its Architecture specializes that specification and the independent
+architecture marker; child parts are typed by child specifications. Its Integration
+specializes the architecture and the integration marker, redefining those parts
+with selected compatible architectures or integrations. A leaf architecture can
+be selected directly. Shared leaf contracts/designs live in `50_library/ComponentProfiles.sysml`.
 
-| Folder | Content |
-| --- | --- |
-| `00_project/` | Project information |
-| `05_requirements/` | Customer, system and module requirements, design limits, budgets, derivations |
-| `10_context/` | External actors and the operating boundary |
-| `20_usecases/` | Operational scenarios |
-| `40_functions/` | Functional actions and operating states |
-| `50_logical/` | Domain model and firmware architecture |
-| `60_physical/` | Physical architecture and SOI allocations |
-| `70_analysis/` | Mission energy, safety reaction, localization and mass budget analyses |
-| `80_verification/` | Twelve verification cases including `'Cliff safe stop'`, and five validation cases |
-| `90_views/` | Nine focused views |
-| `99_library/` | Purchased parts catalog and bill-of-materials classification |
-| `Root.sysml` | Import hub |
+For example, `RobotPlatformSystem` decomposes into base, board, top, bin and
+harness contracts. Its integration selects their integrations. `BaseSystem`
+recursively selects drive, cleaning, power and docking designs. The two drive
+usages reuse `DriveTrainSystem`; neither requires a nested folder or copied model.
+Firmware has its own system contract, architecture and selected task/queue design.
 
-## Example increment coverage
+System and module requirements are owned by their accepting specifications and
+asserted there against implicit self. Budgets and child requirement derivations
+belong to the parent architecture. Concrete satisfaction links, behavior and
+allocations remain attached to the selected system baseline.
 
-| Method piece | Model anchor |
-| --- | --- |
-| Customer requirement | `StakeholderNeeds::'Safe operation in the household'` (`USR-SAFE-001`) |
-| Derived system requirements | `'Cliff detection'`, `'Safe stop on hazard'`, `'Mission status reporting'` |
-| Module budgets | `'Cliff sensing latency'`, `'Safety supervisor deadline'`, `'Drive disable latency'`, `'Drive braking time'` |
-| Scenario | `OperationalScenarios::CliffSafeStopScenario` |
-| Architecture | Allocations on `Architecture::robotSystem` / scenario satisfy links |
-| Evidence | `RobotAnalysisCases::SafetyReactionAnalysis` |
-| Verification | `Verification::'Cliff safe stop'` (VER-009) |
-| Validation | `Validation::'Household safety walkthrough'` (VAL-003) |
-| View | `ModelViews::cliffSafeStopScenario` |
+For a safety reading path, follow the household safety need to cliff detection,
+safe-stop and reporting requirements; then base sensing/braking, firmware deadline
+and board-disable budgets; then `CliffSafeStopScenario`, the selected allocations,
+`RobotPlatformSystem::Analysis::SafetyReactionAnalysis`, its cliff-safe-stop
+verification case and the household safety validation in `VacuumCleanerSystem`.
 
-This table is a method-oriented reading path across ordinary model elements. It
-does not introduce a separate trace object into the product model.
+Views live with the systems they review. The context and three system role views
+use `Elan8::SystemsEngineering`; nine focused views retain detailed engineering
+questions. `80_documents` selects the same authoritative graph for publication.
+PDF generation stays disabled. Shared document vocabulary is `Elan8::Documents`.
 
-## Operational scenario set
-
-1. `AutonomousCleaningScenario` — clean reachable floor and return to dock.
-2. `ObstacleAvoidanceScenario` — observe, replan, and continue safely.
-3. `LowBatteryReturnScenario` — terminate cleaning, dock, and recharge.
-4. `CliffSafeStopScenario` — detect a stair edge, stop, and report status.
-
-## Libraries
-
-- **Domain/technical:** namespaced `Elan8` electronics, mechanical, software,
-  communication, units, and procurement vocabularies
-
-See also [MODEL_GUIDE.md](MODEL_GUIDE.md) and
-[Elan8 Method guidance](../../mbse-methodology/docs/README.md).
+See [MODEL_GUIDE.md](MODEL_GUIDE.md), [VIEWS.md](VIEWS.md) and
+[migration mapping](METHODOLOGY_MIGRATION.md).

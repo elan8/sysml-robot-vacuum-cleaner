@@ -95,11 +95,9 @@ $catalogSelections = [ordered]@{
     "RobotBms" = "BQ40Z50R2"
 }
 $purchasedPartsText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "99_library/PurchasedParts.sysml"
+    Join-Path $resolvedModelPath "50_library/PurchasedParts.sysml"
 )
-$physicalText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "60_physical/PhysicalArchitecture.sysml"
-)
+$physicalText = $modelText
 foreach ($part in $catalogSelections.Values) {
     if ($purchasedPartsText -notmatch ("part\s+def\s+" + $part + "\b")) {
         Add-Failure "catalog part '$part' is missing"
@@ -109,11 +107,12 @@ foreach ($part in $catalogSelections.Values) {
     }
 }
 foreach ($selection in $catalogSelections.GetEnumerator()) {
-    $partBodyPattern = "part\s+def\s+" + [regex]::Escape($selection.Key) +
+    $designSuffix = if ($selection.Key -eq "RobotMainMcu") { "Integration" } else { "Architecture" }
+    $partBodyPattern = "part\s+def\s+" + [regex]::Escape($selection.Key) + $designSuffix +
         "\b[^{]*\{(?<body>[\s\S]*?)\n\s*\}"
     $partMatch = [regex]::Match($physicalText, $partBodyPattern)
     $dependencyPattern = "dependency\s+selectedImplementation\s+from\s+" +
-        [regex]::Escape($selection.Key) + "\s+to\s+" +
+        [regex]::Escape($selection.Key) + "(?:Architecture|Integration)\s+to\s+" +
         [regex]::Escape($selection.Value) + "\s*;"
     if (-not $partMatch.Success -or
         $partMatch.Groups["body"].Value -notmatch $dependencyPattern) {
@@ -139,9 +138,9 @@ foreach ($connection in $requiredPhysicalConnections) {
         Add-Failure "required physical connection is missing: $connection"
     }
 }
-foreach ($part in @("baseHarness : BaseWiringHarness", "topHarness : TopWiringHarness")) {
-    if ($physicalText -notmatch [regex]::Escape($part)) {
-        Add-Failure "required robot harness is missing: $part"
+foreach ($part in @("baseHarness", "topHarness")) {
+    if ($physicalText -notmatch ("part\s+" + $part + "\s*:[^;]+:>>\s*" + $part + "\s*;")) {
+        Add-Failure "required robot harness selection is missing: $part"
     }
 }
 if ($physicalText -match "(?m)^\s*port\s+hazard\s*:\s*GpioPort") {
@@ -159,12 +158,10 @@ foreach ($field in @(
     }
 }
 
-$firmwareText = Get-Content -Raw (
-    Join-Path $resolvedModelPath "50_logical/FirmwareArchitecture.sysml"
-)
+$firmwareText = $modelText
 if ([regex]::Matches(
         $firmwareText,
-        "part\s+def\s+\w+Task\s*:>\s*(?:Periodic|EventDriven)FirmwareTask"
+        "part\s+def\s+\w+TaskSpecification\s*:>\s*(?:Periodic|EventDriven)FirmwareTask"
     ).Count -ne 7) {
     Add-Failure "FirmwareArchitecture must define exactly seven concrete firmware tasks"
 }

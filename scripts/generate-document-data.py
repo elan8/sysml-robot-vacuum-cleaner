@@ -3,15 +3,15 @@
 # SPDX-License-Identifier: MIT
 """Generate the bill of materials and check the model for gaps.
 
-Reads one Spec42 export of `model/` and writes into `documents/generated/`:
+Reads one Spec42 export of `model/` and writes into `generated/`:
 
     bom.md           bill of materials with quantities, sourcing, cost and mass
     bom.csv          the same lines for a spreadsheet or an ERP import
     mass-budget.md   mass per module against the robot mass limit
 
-Trace tables and verification matrices are not generated here: Doc42 reads
-them from the model with `@Table`. A bill of materials needs the part tree
-walked through its definitions and quantities added up, which this script does.
+Trace tables and verification matrices are retained as model content selections;
+document rendering is disabled. A bill of materials needs the part tree walked
+through its definitions and quantities added up, which this script does.
 
 It also checks the model for gaps and fails when it finds one: a physical part
 without a bill-of-materials classification or a mass, a customer requirement
@@ -37,13 +37,20 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "documents" / "generated"
-ROBOT = "PhysicalArchitecture::AutonomousFloorCleaningRobot"
-SPECIFICATION = "SystemRequirements::robotSystemSpecification"
+OUT = ROOT / "generated"
+ROBOT = "RobotPlatformSystem::Integration::AutonomousFloorCleaningRobotIntegration"
+SPECIFICATION = "RobotPlatformSystem::Specification::Requirements::robotSystemSpecification"
 CUSTOMER = "StakeholderNeeds"
-MODULES = "ModuleRequirements"
+MODULES = (
+    "BaseSystem::Specification::Requirements::baseModuleSpecification",
+    "MainControlBoardSystem::Specification::Requirements::mainPcbSpecification",
+    "FirmwareSystem::Specification::Requirements::firmwareSpecification",
+    "TopSystem::Specification::Requirements::topModuleSpecification",
+    "DustBinSystem::Specification::Requirements::dustBinSpecification",
+    "RobotPlatformSystem::Specification::HarnessRequirements::harnessSpecification",
+)
 # Packages whose part definitions are logical, not purchasable or made items.
-LOGICAL_PACKAGES = ("DomainModel::", "FirmwareArchitecture::")
+LOGICAL_PACKAGES = ("DomainModel::", "FirmwareSystem::", "FirmwareLibrary::")
 
 
 def fail(message: str) -> "NoReturn":
@@ -76,7 +83,11 @@ def export() -> dict:
         fail("Spec42 could not export the model")
     data = json.loads(completed.stdout)
     summary = data["summary"]
-    if summary["error_count"] or summary["warning_count"]:
+    # The validator checks each diagnostic, including the four documented
+    # Spec42 0.56.0 custom-view warnings. Do not accept warnings on count alone.
+    from validate_model import check_language
+    check_language(spec42, library_arguments(), ROOT / "model")
+    if summary["error_count"]:
         fail(f"the model has {summary['error_count']} error(s) and "
              f"{summary['warning_count']} warning(s); run the validation first")
     projection = data["projection"]
@@ -104,6 +115,38 @@ class Model:
     def owned(self, element: dict, kind: str) -> list[dict]:
         return [child for child in self.children.get(element["token"], []) if child["kind"] == kind]
 
+    def lineage(self, element: dict, relation: str = "specialization", active=()):
+        """Most-specific first; retain semantic identity, never infer from names."""
+        if element["token"] in active:
+            fail("cyclic semantic inheritance")
+        yield element
+        for target in element["relationships"].get(relation, {}).get("targets", []):
+            parent = self.by_token.get(target["token"])
+            if parent is not None:
+                yield from self.lineage(parent, relation, (*active, element["token"]))
+
+    def feature_name(self, feature: dict) -> str:
+        for parent in self.lineage(feature, "redefinition"):
+            if parent.get("name"):
+                return parent["name"]
+        fail("unnamed feature with no named redefined feature")
+
+    def effective_parts(self, definition: dict) -> list[dict]:
+        candidates = {}
+        for base in self.lineage(definition):
+            for part in self.owned(base, "PartUsage"):
+                candidates.setdefault(part["token"], part)
+        hidden = {base["token"] for part in candidates.values()
+                  for base in list(self.lineage(part, "redefinition"))[1:]}
+        return [part for key, part in candidates.items() if key not in hidden]
+
+    def is_aggregate(self, usage: dict) -> bool:
+        # A collection whose members are the named subset features is not an
+        # additional physical item (e.g. PCBA mountedComponents).
+        return any(edge["kind"] == "subsetting" and edge.get("provenance") == "authored"
+                   for base in self.lineage(usage, "redefinition")
+                   for edge in base["relationships"]["incoming"])
+
     def definition(self, usage: dict) -> tuple[dict | None, str]:
         """The typing definition of a usage: (workspace element or None, qualified name)."""
         targets = usage["relationships"]["typing"]["targets"]
@@ -113,7 +156,9 @@ class Model:
 
     def annotation(self, element: dict, definition: str) -> dict | None:
         """The values of the element's annotation of one metadata definition."""
-        for annotation in element.get("metadata_annotations", []):
+        annotations = [annotation for base in self.lineage(element)
+                       for annotation in base.get("metadata_annotations", [])]
+        for annotation in annotations:
             if annotation["definition"].get("qualified_name") != definition:
                 continue
             values = {}
@@ -127,7 +172,8 @@ class Model:
 
     def redefined_value(self, element: dict, feature: str):
         """The literal value an owned attribute gives to a redefined feature."""
-        for attribute in self.owned(element, "AttributeUsage"):
+        for attribute in [child for base in self.lineage(element)
+                          for child in self.owned(base, "AttributeUsage")]:
             redefined = [target["qualified_name"]
                          for target in attribute["relationships"]["redefinition"]["targets"]]
             if not any(name.endswith("::" + feature) for name in redefined):
@@ -140,7 +186,8 @@ class Model:
 
     def selected_part(self, definition: dict) -> dict | None:
         """The catalogue part a definition selects through `selectedImplementation`."""
-        for dependency in self.owned(definition, "Dependency"):
+        for dependency in [child for base in self.lineage(definition)
+                           for child in self.owned(base, "Dependency")]:
             if dependency["name"] != "selectedImplementation":
                 continue
             for edge in dependency["relationships"]["outgoing"]:
@@ -187,12 +234,13 @@ class Bom:
     def walk(self, definition: dict, path: list[str], level: int, module: str | None) -> bool:
         """Adds the lines below a definition; returns whether any were added."""
         added = False
-        for usage in self.model.owned(definition, "PartUsage"):
-            if "ref" in usage["modifiers"]:
+        for usage in self.model.effective_parts(definition):
+            if "ref" in usage["modifiers"] or self.model.is_aggregate(usage):
                 continue
             typed, type_name = self.model.definition(usage)
-            here = path + [usage["name"]]
-            top = module or usage["name"]
+            name = self.model.feature_name(usage)
+            here = path + [name]
+            top = module or name
             item = self.model.annotation(usage, "Sourcing::BomItem")
             if item is None and typed is not None:
                 item = self.model.annotation(typed, "Sourcing::BomItem")
@@ -200,10 +248,12 @@ class Bom:
                 self.add_item(usage, typed, here, level, top, item)
                 added = True
                 continue
-            if type_name.startswith(LOGICAL_PACKAGES):
+            if type_name.startswith(LOGICAL_PACKAGES) or (typed is not None and any(
+                    base["qualified_name"].startswith(LOGICAL_PACKAGES)
+                    for base in self.model.lineage(typed))):
                 continue
             index = len(self.lines)
-            self.lines.append({"level": level, "item": humanize(usage["name"]),
+            self.lines.append({"level": level, "item": humanize(name),
                                "path": ".".join(here), "assembly": True, "module": top})
             if typed is not None and self.walk(typed, here, level + 1, top):
                 added = True
@@ -304,7 +354,7 @@ def bom_outputs(model: Model) -> tuple[dict[str, str], list[str], dict[str, floa
 
 def mass_budget(model: Model, modules: dict[str, float]) -> tuple[str, list[str]]:
     limit = None
-    for attribute in model.owned(model.element("RequirementLimits"), "AttributeUsage"):
+    for attribute in model.owned(model.element("RobotPlatformSystem::Specification::Limits"), "AttributeUsage"):
         if attribute["name"] == "maxRobotMass":
             for expression in model.owned(attribute, "Expression"):
                 limit = kilograms(expression["expression"]["nodes"][0]["value"])
@@ -335,7 +385,7 @@ def requirement_gaps(model: Model) -> list[str]:
     customer = model.owned(model.element(CUSTOMER), "RequirementUsage")
     system = model.owned(model.element(SPECIFICATION), "RequirementUsage")
     module = [requirement
-              for specification in model.owned(model.element(MODULES), "RequirementUsage")
+              for specification in (model.element(name) for name in MODULES)
               for requirement in model.owned(specification, "RequirementUsage")]
     names = {level: {requirement["qualified_name"] for requirement in requirements}
              for level, requirements in (("system", system), ("module", module))}
@@ -421,7 +471,7 @@ def main() -> None:
     if stale:
         fail("stale generated files: " + ", ".join(stale)
              + "; run python scripts/generate-document-data.py")
-    print(("Checked" if arguments.check else "Wrote") + f" {len(files)} files in documents/generated.")
+    print(("Checked" if arguments.check else "Wrote") + f" {len(files)} files in generated/.")
 
 
 if __name__ == "__main__":

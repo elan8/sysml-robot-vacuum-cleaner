@@ -5,8 +5,9 @@
 param(
     [string]$Spec42Exe = $(if ($env:SPEC42_EXE) { $env:SPEC42_EXE } else { "spec42" }),
     [string]$DomainLibrariesRoot,
-    [string]$OutputPath = "target/model-views",
-    [string]$ResvgExe
+    [string]$OutputPath = "generated/views",
+    [string]$ResvgExe,
+    [switch]$IncludeMethodologyViews
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,28 +33,36 @@ $diagramArguments = @(
 # Module-boundary connections are readable with internals closed. Composition
 # views show one level of members; a reviewer can expand further in the editor.
 $views = [ordered]@{
-    productDecomposition = 1
-    baseDecomposition = 1
-    topDecomposition = 1
-    mainPcbDecomposition = 1
-    powerDecomposition = 1
-    interconnections = 0
-    firmwareDeployment = 0
-    systemRequirements = 1
-    cliffSafeStopScenario = 1
+    'RobotPlatformSystem::Views::productDecomposition' = 1
+    'BaseSystem::Views::baseDecomposition' = 1
+    'TopSystem::Views::topDecomposition' = 1
+    'MainControlBoardSystem::Views::mainPcbDecomposition' = 1
+    'PowerSystem::Views::powerDecomposition' = 1
+    'RobotPlatformSystem::Views::interconnections' = 0
+    'FirmwareSystem::Views::firmwareDeployment' = 0
+    'RobotPlatformSystem::Views::systemRequirements' = 1
+    'VacuumCleanerSystem::Views::cliffSafeStopScenario' = 1
+}
+if ($IncludeMethodologyViews) {
+    # Released 0.56.0 does not discover derived GeneralView types. This opt-in
+    # requires a build containing Spec42's inherited-view support (2584874d4).
+    $views['ProductContext::context'] = 1
+    $views['VacuumCleanerSystem::Views::specification'] = 1
+    $views['VacuumCleanerSystem::Views::architecture'] = 1
+    $views['VacuumCleanerSystem::Views::integration'] = 2
 }
 $rows = @()
 foreach ($entry in $views.GetEnumerator()) {
-    $name = $entry.Key
+    $name = ($entry.Key -split '::')[-1]
     $svg = Join-Path $outputDirectory "$name.svg"
-    & $Spec42Exe @diagramArguments --view "ModelViews::$name" --depth $entry.Value --format svg --output $svg
+    & $Spec42Exe @diagramArguments --view $entry.Key --depth $entry.Value --format svg --output $svg
     if ($LASTEXITCODE -ne 0) { throw "SVG export failed: $name" }
     $json = Join-Path $outputDirectory "$name.json"
-    & $Spec42Exe @diagramArguments --view "ModelViews::$name" --format json --output $json
+    & $Spec42Exe @diagramArguments --view $entry.Key --format json --output $json
     if ($LASTEXITCODE -ne 0) { throw "Diagram product export failed: $name" }
     $product = Get-Content -LiteralPath $json -Raw | ConvertFrom-Json
     if ($product.completeness.status -ne "complete") {
-        throw "Incomplete diagram projection: $name (see $json)"
+        throw "Incomplete diagram projection: $name (see $json). Use the rendering source revision in dependencies.lock.json; released 0.56.0 lacks Boolean/inherited view support."
     }
     $pngLink = ""
     if ($ResvgExe) {
@@ -66,7 +75,7 @@ foreach ($entry in $views.GetEnumerator()) {
 $html = @"
 <!doctype html><meta charset="utf-8"><title>Robot model views</title>
 <style>body{font:16px system-ui;max-width:1200px;margin:32px auto;padding:16px}article{border-top:1px solid #ccc;margin-top:32px}img{width:100%;max-height:900px;object-fit:contain}</style>
-<h1>Robot model views</h1><p>See docs/VIEWS.md for each view's engineering question and scope. All nine exported diagram projections are complete.</p>
+<h1>Robot model views</h1><p>See docs/VIEWS.md for each view's engineering question and scope. All $($views.Count) exported diagram projections are complete.</p>
 $($rows -join "`n")
 "@
 Set-Content -LiteralPath (Join-Path $outputDirectory "index.html") -Value $html -Encoding utf8

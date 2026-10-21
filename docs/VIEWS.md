@@ -5,7 +5,8 @@ SPDX-License-Identifier: MIT
 
 # Focused model views
 
-Each view in `model/90_views/ModelViews.sysml` answers one engineering question.
+The nine focused views live in each reviewed system's `Views` package under
+`model/60_systems/<System>/system.sysml`. They answer one engineering question each.
 The view's `doc` states its scope alongside its exposes and filter.
 
 | View | Engineering question | Selected content | Export depth |
@@ -20,7 +21,9 @@ The view's `doc` states its scope alongside its exposes and filter.
 | `systemRequirements` | Which requirements constrain this baseline? | System requirement collection and its 21 requirements | 1 |
 | `cliffSafeStopScenario` | How does a cliff observation lead to stopped actuation and reported status? | Scenario actions, parameter flows and successions | Action-flow rendering |
 
-The five composition views select part usages in the robot context. A label such
+The five composition views select constituent part usages in the robot context,
+explicitly excluding connection and allocation usages (also subtypes of PartUsage).
+A label such
 as `charger : RobotBatteryCharger` identifies the reusable definition without
 adding a second definition tree. Inherited members remain part of the effective
 structure of the usage. These views do not claim to show procurement choices,
@@ -34,34 +37,33 @@ which is allocated to the processor.
 The interconnection view intentionally exposes modules separately rather than
 the whole robot: this avoids introducing the firmware task group into the
 hardware boundary diagram. Open a module in the editor to investigate an
-internal endpoint. The document views in `model/95_documents/Documents.sysml`
+internal endpoint. The document views in `model/80_documents/Documents.sysml`
 provide separate base, power, PCB and top interconnection diagrams; the document
 trace tables cover derivation, satisfaction and verification.
 
 ## Rendering
 
-With a Spec42 build supporting `spec42 diagram`, run:
+With the rendering build pinned in `dependencies.lock.json`, run:
 
 ```powershell
 ./scripts/render-views.ps1 -Spec42Exe <path-to-spec42>
 ```
 
 To also produce PNGs, supply `-ResvgExe <path-to-resvg>`. Outputs are written to
-the ignored `target/model-views/` directory: nine SVGs, their complete diagram
+the ignored `generated/views/` directory: nine SVGs, their complete diagram
 products, optional PNGs and an HTML gallery. The script fails on an export error
 or an incomplete diagram projection. Depth controls presentation only; the JSON
 products retain the selected content and relationships.
 
 The sibling library defaults match `validate.ps1`; override them with
-`-DomainLibrariesRoot` and `-MethodLibraryRoot` when necessary. The local Spec42
-rendering corrections for allocations, inherited ports, connections owned by
-enclosing assemblies and ownership layout must
-be present to reproduce the reviewed diagrams; model validation is independent
-of those renderer changes.
+`-DomainLibrariesRoot` when necessary. Validate before exporting. Released
+Spec42 0.56.0 lacks Boolean filter preparation and derived-view discovery;
+use the exact rendering source revision recorded in VALIDATION.md and the lock
+file. Pass `-IncludeMethodologyViews` to export all thirteen.
 
 ## Authored product illustrations
 
-`documents/figures/product-layout.svg` uses the physical model's longitudinal
+`model/80_documents/figures/product-layout.svg` uses the physical model's longitudinal
 coordinates: forward side brushes at +100 mm, main roller at +75 mm, suction
 intake at +55 mm and rear caster at -140 mm, relative to the drive axle.
 Forward is up in plan and left in the side elevation. The plan includes
@@ -77,3 +79,27 @@ The other authored figures were checked against the context and timing model:
 three ToF sensors, four cliff sensors, two wheel-drop switches, seven firmware
 tasks, a 14.4 V battery, a 2 A charger, and a 72 ms safe-stop design against the
 100 ms limit. Authored figures must be reviewed when those model values change.
+
+
+## Canonical view owners and methodology views
+
+| Focused view | System owner |
+| --- | --- |
+| `productDecomposition` | `RobotPlatformSystem::Views` |
+| `baseDecomposition` | `BaseSystem::Views` |
+| `topDecomposition` | `TopSystem::Views` |
+| `mainPcbDecomposition` | `MainControlBoardSystem::Views` |
+| `powerDecomposition` | `PowerSystem::Views` |
+| `interconnections` | `RobotPlatformSystem::Views` |
+| `firmwareDeployment` | `FirmwareSystem::Views` |
+| `systemRequirements` | `RobotPlatformSystem::Views` |
+| `cliffSafeStopScenario` | `VacuumCleanerSystem::Views` |
+
+The additional context view is `ProductContext::context`. The three role views
+are `VacuumCleanerSystem::Views::{specification,architecture,integration}`.
+They use shared `Elan8::SystemsEngineering` view definitions to select project
+boundary/context, contracts, decomposition and the selected product integration.
+The context boundary role is separate from the selected product assembly.
+The architecture role view types children by specifications; the integration
+role view exposes the existing `robotSystem`, not a duplicate design.
+Four custom-view diagnostics are a documented Spec42 limitation; see VALIDATION.md.

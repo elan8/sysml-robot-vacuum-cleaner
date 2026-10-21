@@ -1,125 +1,82 @@
-<!--
-SPDX-FileCopyrightText: 2026 Elan8
-SPDX-License-Identifier: MIT
--->
-
 # Model guide
 
-The model is intentionally small enough to read end to end. File paths follow
-the Elan8 Method layout; SysML packages remain the semantic ownership boundary.
+Load all of `model/`, with the pinned domain library. `Root.sysml` is navigation.
+The [methodology tour](ELAN8_METHOD_TOUR.md) explains contracts, decomposition
+and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
 
-Start with the [Elan8 Method tour](ELAN8_METHOD_TOUR.md) to see how the method
-organizes a model while the SysML elements retain product-domain names.
+## Reading path
 
-## Recommended tour
+1. Read `00_context/Context.sysml`, `10_usecases/UseCases.sysml` and
+   `20_requirements/StakeholderRequirements.sysml` for the home, four scenarios
+   and eleven customer requirements.
+2. Read `60_systems/RobotPlatformSystem/system.sysml`. Specification owns the
+   21 measurable system requirements, limits and customer derivations.
+   Architecture owns module budgets and their derivations. Integration selects
+   the six hardware modules and referenced firmware design.
+3. Read `60_systems/VacuumCleanerSystem/system.sysml`. Its single selected usage
+   `Integration::robotSystem` composes the physical baseline, performs the
+   functional behavior and exhibits the operating states. Allocations and
+   detailed satisfaction claims refer to those concrete usages.
+4. Follow BaseSystem, MainControlBoardSystem, TopSystem, DustBinSystem and both
+   harness systems. Their Specification/Architecture/Integration packages show
+   boundary contracts, child contracts and compatible selected child designs.
+   Shared leaf profiles and purchased part metadata live in `50_library`.
+5. Follow FirmwareSystem: seven periodic/event-driven task profiles, five typed
+   runtime queues, scheduling priorities/deadlines and deployment through a
+   scheduler execution platform to the main controller.
+6. Inspect RobotPlatformSystem's four analyses and twelve verification cases,
+   then VacuumCleanerSystem's five household validation cases.
+7. Export the nine focused views described in [VIEWS.md](VIEWS.md). Four additional
+   methodology views can be exported with a development build supporting inheritance.
 
-1. Start in `05_requirements/`. `CustomerRequirements.sysml` holds eleven needs in
-   the household's words. `SystemRequirements.sysml` holds twenty-one testable
-   requirements with quantities, constraints and Elan8 requirement roles.
-   `ModuleRequirements.sysml` splits five of them into budgets for the modules.
-   `RequirementTraceability.sysml` and `RequirementAllocation.sysml` hold the
-   derivations between the levels, each with the reason the derived set is
-   complete or the budget closes.
-2. Read `40_functions/Functions.sysml`: `OperateCleaningRobot` decomposes
-   product behavior. Compare the autonomous-cleaning, obstacle-avoidance,
-   low-battery-return, and cliff-safe-stop scenarios in
-   `20_usecases/UseCases.sysml`.
-3. Open `60_physical/PhysicalArchitecture.sysml`: the selected baseline
-   contains the major LRUs, typed interfaces, power rails, and catalog selections.
-4. Follow `Architecture::robotSystem`. Its `operate` behavior usage is used for
-   allocation and requirement satisfaction.
-5. Inspect `50_logical/FirmwareArchitecture.sysml`: seven periodic or
-   event-driven tasks, typed queues, scheduling priorities, and deadlines.
-6. Continue into `70_analysis/Analysis.sysml` (`SafetyReactionAnalysis`) and
-   `80_verification/Verification.sysml` (`'Cliff safe stop'`, VER-009), and the
-   validation cases for the customer requirements in `Validation.sysml`.
-7. Finish with the nine focused views in `90_views/ModelViews.sysml`.
+## Ownership and identity
 
-## Semantic backbone
+Stakeholder needs remain in `StakeholderNeeds`. Authoritative system/module
+requirements belong to the accepting system's Specification, including
+boundary properties that express capacity, latency and mass without reaching
+through child implementation structure. Contracts assert their requirement
+collections against self; integrations provide the actual values.
 
-```mermaid
-flowchart LR
-  N["Customer requirement"] -->|derive| R["System requirement"]
-  R -->|derive, with budget| M["Module requirement"]
-  M -->|satisfy by| P
-  R -->|satisfy by| B["robotSystem.operate / scenario"]
-  B -->|allocate to| P["Physical LRU / firmware task"]
-  P -->|selected implementation dependency| T["Purchased part definition"]
-  P -->|typed connect / flow| P
-  V["Verification case / analysis"] -->|verify| R
-  W["View"] -->|expose| R
-  W -->|expose| B
-  W -->|expose| P
-  W -->|expose| V
-```
+Behavior is authored in the supporting `FunctionalArchitecture` and `BehaviorStates`
+packages in VacuumCleanerSystem/Behavior.sysml, explicitly publicly imported as
+`VacuumCleanerSystem::Behavior`. The import provides navigation, not new ownership.
+`DomainModel` owns shared protocol items, ports and logical buses. `PhysicalShared`
+and `FirmwareLibrary` own common helper definitions. `PurchasedParts` owns six
+catalog choices; `Sourcing` owns make/buy BOM metadata.
 
-## Package ownership
+`ComponentProfiles` adapts reusable domain classifiers to project contracts and
+leaf architectures. Controller, harness and PCBA domain classifiers contain
+inherited structural parts; those are introduced at architecture level so their
+specifications remain boundary-only. The selected designs retain the same ports,
+connections and component data. PCBA `mountedComponents` and harness connector
+groups collect named subset parts, rather than creating additional purchases.
 
-| Package | Owns |
-| --- | --- |
-| `Project` | Tailoring and method profile |
-| `Elan8::Units::Engineering` | Shared Ah/mAh/ms unit literals |
-| `Elan8::Procurement` | `BuyPart` metadata and `PartLifecycleStatus` |
-| `PurchasedParts` | Concrete catalog part selections annotated with `Elan8::Procurement::BuyPart` |
-| `DomainModel` | Protocol vocabulary, items, ports, buses |
-| `RequirementLimits`, `StakeholderNeeds`, `SystemRequirements` | Product intent and constraints |
-| `ModuleBudgets`, `ModuleRequirements` | Budgets per module and the requirements that hold each module to its budget |
-| `RequirementTraceability` | Derivations from customer requirements to system requirements |
-| `RequirementAllocation` | Derivations from system requirements to module requirements |
-| `Sourcing` | `BomItem` metadata: description, make or buy, unit cost |
-| `FunctionalArchitecture`, `BehaviorStates`, `OperationalScenarios` | Capabilities, states, scenarios |
-| `ProductContext` | Users, app, network, dock, home, robot boundary |
-| `Elan8::Software` | `Task`, `PeriodicTask`, `EventDrivenTask`, `SoftwareQueue`, `ExecutionPlatform`, and their criticality/discipline/policy enums |
-| `FirmwareArchitecture` | Vacuum-specific periodic and event-driven tasks plus typed runtime queues |
-| `Elan8::Electronics::Actuation` | BLDC and brushed-DC motors, H-bridge and three-phase drivers, and mechanical outputs |
-| `Elan8::Electronics::Sensing` | Powered/data sensors, I2C IMU, passive bumper/lift switches, and typed measurements |
-| `Elan8::Electronics::Power` | `BatteryPack`, `BatteryCharger`, protected `BatteryManagementSystem` power paths, and `VoltageRegulator` |
-| `Elan8::Electronics::{Board, Assembly}` | Bare `PrintedCircuitBoard` versus populated `PrintedCircuitBoardAssembly` |
-| `Elan8::Mechanical::Core` | `MechanicalComponent` (`mass` only, purely mechanical parts — no ports, no `powerDraw`) |
-| `Elan8::Mechanical::Drivetrain` | `Gearbox`, `Wheel`, `CasterWheel` |
-| `PhysicalArchitecture` | Assembly-oriented baseline with an end-to-end dock/charger/BMS/battery path, explicit base and top wiring harnesses, separate safety GPIOs, mechanically connected drivetrains, a powered beacon receiver, debris transfer to the removable bin, and the local HMI integrated into `TopModule`. `MainPcbModule` is the populated PCB assembly. |
-| `Architecture` | Concrete system, allocations, satisfaction |
-| `RobotAnalysisCases` | Four analyses: mission energy, safety reaction, localization, mass budget |
-| `Verification` | Twelve verification cases with identifier, method and pass criterion |
-| `Validation` | Five validation cases for the customer requirements |
-| `ModelViews` | Nine focused stakeholder views; see [VIEWS.md](VIEWS.md) |
+`Navigation.sysml` preserves older qualified access paths through aliases and
+public imports. The old PhysicalArchitecture, FirmwareArchitecture, requirement,
+analysis, verification and ModelViews names are navigation facades. Tools use
+canonical owners. Stable engineering IDs are unchanged; source-based tool tokens
+change when a definition moves.
 
-## One source for every number
+## Engineering backbone
 
-A limit is written once, as an attribute in `RequirementLimits` or `ModuleBudgets`. The
-requirement's constraint refers to the attribute, and the requirement's text shows it
-with a placeholder that Doc42 replaces by the value when it builds a document:
+Customer requirements derive system requirements; parent architecture budgets
+derive module requirements. Satisfaction claims identify concrete behavior or
+parts, and verification cases identify the obligations they assess. Quantitative
+analyses share the same authoritative limits and selected design values.
+There are 11 customer, 21 system and 13 module requirements, four analyses,
+12 verification cases and five validation cases.
 
-```sysml
-requirement <'SYS-015'> 'Robot mass' {
-  require constraint { robot.robotMass <= maxRobotMass }
-  doc /* The robot shall have a mass of at most {{= RequirementLimits::maxRobotMass}} with an empty dust bin. */
-}
-```
+The physical baseline retains a dock/charger/BMS/battery path, separate safety
+signals, two module harnesses, mechanically connected drivetrains, a powered
+beacon receiver, debris transfer to the removable bin, and the top-module HMI.
+Two forward side brushes share the brush transmission. The main roller and
+suction intake are ahead of the rear caster. Nominal body diameter is 340 mm;
+illustrative design height is 55 + 37 mm. The 49-item BOM totals 3.694 kg and
+EUR 121.10. These are teaching estimates, not released production data.
 
-The analyses and budgets use the same attributes, so changing a limit changes the
-constraint, the analysis and the text of the requirement together. One number is still
-typed in its requirement text, the cleaning area, because Spec42 does not evaluate a unit
-written as an expression (`[m^2]`) yet.
-
-## Bill of materials
-
-Every physical part that is bought or made carries `@BomItem`, on its definition
-when the part is used more than once and on its usage otherwise. Assemblies carry
-none: they are the indented levels of the bill of materials. Mass is the ordinary
-`mass` attribute that the mass roll-up uses, so the bill of materials and the mass
-budget cannot disagree. `scripts/generate-document-data.py` walks the part tree of
-`AutonomousFloorCleaningRobot` and fails for a part it cannot classify.
-
-## Purchased parts
-
-`BuyPart` is metadata for `SysML::PartDefinition`. Project definitions specialize
-domain kinds; a named `dependency selectedImplementation` points at catalog parts.
-
-## Deliberate boundaries
-
-This baseline omits product-line engineering, trade studies, and handoff record
-tables. It **does** use Elan8 Method libraries for requirement roles and concerns.
-Engineering increments organize the work and its review; the resulting SysML model
-uses domain-oriented names. Narrative guidance beyond semantics belongs in `doc`
-and markdown tours.
+Limits are defined once in RobotPlatformSystem::Specification::Limits; module
+budgets are in Architecture::Budgets. Document placeholders can retain old
+navigation aliases, but resolve to those authoritative values. Document views,
+prose, figures and the inactive house template live in `80_documents`.
+The BOM and mass-budget script operates independently of document rendering.
+PDF generation remains disabled; see [VALIDATION.md](VALIDATION.md).
