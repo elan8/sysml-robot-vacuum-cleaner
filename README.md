@@ -132,7 +132,7 @@ No PDFs are generated. Authored sources remain tracked under `model/80_documents
 
 ## Validation
 
-Requires [Spec42](https://github.com/elan8/spec42) **0.56.0**, Python 3.9+,
+Requires [Spec42](https://github.com/elan8/spec42) **0.57.0**, Python 3.9+,
 and the exact domain-library and methodology commits in
 [`dependencies.lock.json`](dependencies.lock.json). Put dependency checkouts
 beside this repository or under `.libraries/`.

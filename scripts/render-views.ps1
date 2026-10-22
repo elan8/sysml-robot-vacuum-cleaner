@@ -44,8 +44,7 @@ $views = [ordered]@{
     'VacuumCleanerSystem::Views::cliffSafeStopScenario' = 1
 }
 if ($IncludeMethodologyViews) {
-    # Released 0.56.0 does not discover derived GeneralView types. This opt-in
-    # requires a build containing Spec42's inherited-view support (2584874d4).
+    # The four methodology role views, typed by GeneralView specializations.
     $views['ProductContext::context'] = 1
     $views['VacuumCleanerSystem::Views::specification'] = 1
     $views['VacuumCleanerSystem::Views::architecture'] = 1
@@ -62,7 +61,7 @@ foreach ($entry in $views.GetEnumerator()) {
     if ($LASTEXITCODE -ne 0) { throw "Diagram product export failed: $name" }
     $product = Get-Content -LiteralPath $json -Raw | ConvertFrom-Json
     if ($product.completeness.status -ne "complete") {
-        throw "Incomplete diagram projection: $name (see $json). Use the rendering source revision in dependencies.lock.json; released 0.56.0 lacks Boolean/inherited view support."
+        throw "Incomplete diagram projection: $name (see $json). Use the Spec42 release pinned in dependencies.lock.json."
     }
     $pngLink = ""
     if ($ResvgExe) {

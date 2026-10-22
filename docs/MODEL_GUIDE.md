@@ -30,7 +30,7 @@ and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
 6. Inspect RobotPlatformSystem's four analyses and twelve verification cases,
    then VacuumCleanerSystem's five household validation cases.
 7. Export the nine focused views described in [VIEWS.md](VIEWS.md). Four additional
-   methodology views can be exported with a development build supporting inheritance.
+   methodology views are exported with `-IncludeMethodologyViews`.
 
 ## Ownership and identity
 
