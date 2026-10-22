@@ -1,6 +1,6 @@
 # Methodology migration
 
-Baseline: methodology commit `3837d43ac9d16f25b6d99e52e1e8e545bf16bc6b` (0.3.0).
+Baseline: methodology commit `d4fa2f0dad0c6886cd96d4409677a7dc95c1974f` (0.4.0).
 The old discipline folders are replaced by context, use cases, stakeholder
 requirements, shared library, flat systems and document sources. No old source
 tree is inside the active `model/` load boundary.
@@ -8,30 +8,43 @@ tree is inside the active `model/` load boundary.
 Engineering identifiers survive: all customer/system/module requirements,
 verification and validation case IDs retain their meanings. File-derived Spec42
 tokens change on moves; use semantic names and engineering IDs for migration.
-Compatibility imports/aliases in `50_library/Navigation.sysml` preserve prior
-access paths without duplicating the authoritative definitions.
+Compatibility imports/aliases in `50_library/Navigation.sysml` preserve the older
+discipline-based access paths without duplicating authoritative definitions.
+
+Role definitions now belong directly to their system or component profile package.
+For example, `DriveTrainSystem::DriveTrainSpecification` and
+`DriveTrainSystem::DriveTrainIntegration` replace the intermediate role-package
+paths. The old Specification/Architecture/Integration wrappers are removed,
+including those around shared leaf profiles. Their names are not retained as
+empty compatibility packages. Requirements, Limits, Budgets, Analysis,
+Verification and Views remain useful groupings under their systems.
+
+The namespace change preserves all 62 engineering IDs and names, all 10,096
+selected engineering relationship edges after namespace mapping, and byte-identical
+BOM and mass-budget outputs. Specification views select contracts/requirements
+explicitly so flattening does not broaden their scope to designs.
 
 ## System definition mapping
 
 | Original definition | Specification | Selected design |
 | --- | --- | --- |
-| `DriveTrain` | `DriveTrainSystem::Specification::DriveTrainSpecification` | `DriveTrainSystem::Integration::DriveTrainIntegration` |
-| `CleaningHeadModule` | `CleaningHeadSystem::Specification::CleaningHeadModuleSpecification` | `CleaningHeadSystem::Integration::CleaningHeadModuleIntegration` |
-| `PowerModule` | `PowerSystem::Specification::PowerModuleSpecification` | `PowerSystem::Integration::PowerModuleIntegration` |
-| `DockInterfaceModule` | `DockInterfaceSystem::Specification::DockInterfaceModuleSpecification` | `DockInterfaceSystem::Integration::DockInterfaceModuleIntegration` |
-| `BaseModule` | `BaseSystem::Specification::BaseModuleSpecification` | `BaseSystem::Integration::BaseModuleIntegration` |
-| `RobotMainMcu` | `ControllerSystem::Specification::RobotMainMcuSpecification` | `ControllerSystem::Integration::RobotMainMcuIntegration` |
-| `MainPcbModule` | `MainControlBoardSystem::Specification::MainPcbModuleSpecification` | `MainControlBoardSystem::Integration::MainPcbModuleIntegration` |
-| `TopModule` | `TopSystem::Specification::TopModuleSpecification` | `TopSystem::Integration::TopModuleIntegration` |
-| `DustBin` | `DustBinSystem::Specification::DustBinSpecification` | `DustBinSystem::Integration::DustBinIntegration` |
-| `BaseWiringHarness` | `BaseHarnessSystem::Specification::BaseWiringHarnessSpecification` | `BaseHarnessSystem::Integration::BaseWiringHarnessIntegration` |
-| `TopWiringHarness` | `TopHarnessSystem::Specification::TopWiringHarnessSpecification` | `TopHarnessSystem::Integration::TopWiringHarnessIntegration` |
-| `AutonomousFloorCleaningRobot` | `RobotPlatformSystem::Specification::AutonomousFloorCleaningRobotSpecification` | `RobotPlatformSystem::Integration::AutonomousFloorCleaningRobotIntegration` |
-| `FirmwareTaskArchitecture` | `FirmwareSystem::Specification::FirmwareTaskArchitectureSpecification` | `FirmwareSystem::Integration::FirmwareTaskArchitectureIntegration` |
-| `CleaningRobotSystemOfInterest` | `VacuumCleanerSystem::Specification::CleaningRobotSystemOfInterestSpecification` | `VacuumCleanerSystem::Integration::CleaningRobotSystemOfInterestIntegration` |
+| `DriveTrain` | `DriveTrainSystem::DriveTrainSpecification` | `DriveTrainSystem::DriveTrainIntegration` |
+| `CleaningHeadModule` | `CleaningHeadSystem::CleaningHeadModuleSpecification` | `CleaningHeadSystem::CleaningHeadModuleIntegration` |
+| `PowerModule` | `PowerSystem::PowerModuleSpecification` | `PowerSystem::PowerModuleIntegration` |
+| `DockInterfaceModule` | `DockInterfaceSystem::DockInterfaceModuleSpecification` | `DockInterfaceSystem::DockInterfaceModuleIntegration` |
+| `BaseModule` | `BaseSystem::BaseModuleSpecification` | `BaseSystem::BaseModuleIntegration` |
+| `RobotMainMcu` | `ControllerSystem::RobotMainMcuSpecification` | `ControllerSystem::RobotMainMcuIntegration` |
+| `MainPcbModule` | `MainControlBoardSystem::MainPcbModuleSpecification` | `MainControlBoardSystem::MainPcbModuleIntegration` |
+| `TopModule` | `TopSystem::TopModuleSpecification` | `TopSystem::TopModuleIntegration` |
+| `DustBin` | `DustBinSystem::DustBinSpecification` | `DustBinSystem::DustBinIntegration` |
+| `BaseWiringHarness` | `BaseHarnessSystem::BaseWiringHarnessSpecification` | `BaseHarnessSystem::BaseWiringHarnessIntegration` |
+| `TopWiringHarness` | `TopHarnessSystem::TopWiringHarnessSpecification` | `TopHarnessSystem::TopWiringHarnessIntegration` |
+| `AutonomousFloorCleaningRobot` | `RobotPlatformSystem::AutonomousFloorCleaningRobotSpecification` | `RobotPlatformSystem::AutonomousFloorCleaningRobotIntegration` |
+| `FirmwareTaskArchitecture` | `FirmwareSystem::FirmwareTaskArchitectureSpecification` | `FirmwareSystem::FirmwareTaskArchitectureIntegration` |
+| `CleaningRobotSystemOfInterest` | `VacuumCleanerSystem::CleaningRobotSystemOfInterestSpecification` | `VacuumCleanerSystem::CleaningRobotSystemOfInterestIntegration` |
 
 Leaf definitions now live under
-`ComponentProfiles::<OriginalName>::{Specification,Architecture}` with matching
+`ComponentProfiles::<OriginalName>` with matching
 `<OriginalName>Specification` and `<OriginalName>Architecture` classifiers.
 Shared abstract tasks remain in FirmwareLibrary; common physical relations
 remain in PhysicalShared. PurchasedParts, Sourcing and DomainModel retain names.
@@ -40,16 +53,16 @@ remain in PhysicalShared. PurchasedParts, Sourcing and DomainModel retain names.
 
 | Previous owner | Current owner |
 | --- | --- |
-| SystemRequirements | RobotPlatformSystem::Specification::Requirements |
-| RequirementLimits | RobotPlatformSystem::Specification::Limits |
-| RequirementTraceability | RobotPlatformSystem::Specification::Traceability |
-| ModuleBudgets | RobotPlatformSystem::Architecture::Budgets |
-| RequirementAllocation | RobotPlatformSystem::Architecture::RequirementAllocation |
-| ModuleRequirements | Accepting system's Specification::Requirements; harness obligations in RobotPlatformSystem::Specification::HarnessRequirements |
+| SystemRequirements | RobotPlatformSystem::Requirements |
+| RequirementLimits | RobotPlatformSystem::Limits |
+| RequirementTraceability | RobotPlatformSystem::Traceability |
+| ModuleBudgets | RobotPlatformSystem::Budgets |
+| RequirementAllocation | RobotPlatformSystem::RequirementAllocation |
+| ModuleRequirements | Accepting system's Requirements; harness obligations in RobotPlatformSystem::HarnessRequirements |
 | RobotAnalysisCases | RobotPlatformSystem::Analysis |
 | Verification | RobotPlatformSystem::Verification |
 | Validation | VacuumCleanerSystem::Verification::Validation |
-| Architecture::robotSystem | VacuumCleanerSystem::Integration::robotSystem |
+| Architecture::robotSystem | VacuumCleanerSystem::robotSystem |
 | ModelViews | Each reviewed system's Views package; see VIEWS.md |
 
 Customer requirements remain in StakeholderNeeds. The retained RobotDocuments

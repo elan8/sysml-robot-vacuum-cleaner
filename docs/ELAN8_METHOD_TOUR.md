@@ -2,21 +2,25 @@
 
 The model follows the updated MBSE methodology: one project context, stakeholder
 needs, shared types, flat systems and publication sources. Recursive composition
-is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/3837d43ac9d16f25b6d99e52e1e8e545bf16bc6b/docs/structure.md)
+is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/d4fa2f0dad0c6886cd96d4409677a7dc95c1974f/docs/structure.md)
 and the project's [baseline](../project.md).
 
 Start with `00_context/Context.sysml`, then the four scenarios in `10_usecases`
 and eleven stakeholder requirements in `20_requirements`. Follow those needs
-into `RobotPlatformSystem::Specification`: its Requirements, Limits and
+into `RobotPlatformSystem`: its Requirements, Limits and
 Traceability packages own the 21 system obligations and their derivations.
 
 Each of the fourteen developed systems has one `60_systems/<System>/system.sysml`.
-Its Specification is a black box with boundary ports/properties and authoritative
-requirements. Its Architecture specializes that specification and the independent
-architecture marker; child parts are typed by child specifications. Its Integration
+Its specification definition is a black box with boundary ports/properties and
+asserted requirements. Its architecture specializes that specification and the independent
+architecture marker; child parts are typed by child specifications. Its integration
 specializes the architecture and the integration marker, redefining those parts
 with selected compatible architectures or integrations. A leaf architecture can
 be selected directly. Shared leaf contracts/designs live in `50_library/ComponentProfiles.sysml`.
+
+The three role definitions belong directly to the system package. Role subpackages
+are optional in the methodology; this model does not use them. `Requirements`,
+`Analysis`, `Verification` and `Views` remain where they organize useful content.
 
 For example, `RobotPlatformSystem` decomposes into base, board, top, bin and
 harness contracts. Its integration selects their integrations. `BaseSystem`
@@ -24,9 +28,9 @@ recursively selects drive, cleaning, power and docking designs. The two drive
 usages reuse `DriveTrainSystem`; neither requires a nested folder or copied model.
 Firmware has its own system contract, architecture and selected task/queue design.
 
-System and module requirements are owned by their accepting specifications and
-asserted there against implicit self. Budgets and child requirement derivations
-belong to the parent architecture. Concrete satisfaction links, behavior and
+System and module requirements are owned by their accepting systems and
+asserted inside their specifications against implicit self. Budgets and child requirement
+derivations are owned by the parent system alongside its architecture. Concrete satisfaction links, behavior and
 allocations remain attached to the selected system baseline.
 
 For a safety reading path, follow the household safety need to cliff detection,

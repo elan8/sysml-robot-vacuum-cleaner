@@ -39,110 +39,107 @@ package VacuumCleanerSystem {
         public import FunctionalArchitecture::*;
         public import BehaviorStates::*;
     }
-    package Specification {
-        part def CleaningRobotSystemOfInterestSpecification :> Elan8::SystemsEngineering::SystemSpecification {
+    part def CleaningRobotSystemOfInterestSpecification :> Elan8::SystemsEngineering::SystemSpecification {
 
-        }
     }
-    package Architecture {
-        part def CleaningRobotSystemOfInterestArchitecture :> Specification::CleaningRobotSystemOfInterestSpecification, Elan8::SystemsEngineering::SystemArchitecture {
-            part physical : RobotPlatformSystem::Specification::AutonomousFloorCleaningRobotSpecification;
-        }
+
+    part def CleaningRobotSystemOfInterestArchitecture :> CleaningRobotSystemOfInterestSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part physical : RobotPlatformSystem::AutonomousFloorCleaningRobotSpecification;
     }
-    package Integration {
-        part def CleaningRobotSystemOfInterestIntegration :> Architecture::CleaningRobotSystemOfInterestArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-            part physical : RobotPlatformSystem::Integration::AutonomousFloorCleaningRobotIntegration :>> physical;
-            perform action operate : OperateCleaningRobot;
-            exhibit state operatingBehavior : RobotOperatingBehavior;
-            allocate operate.locomotion to physical.base;
-            allocate operate.locomotion to physical.firmwareTasks.actuatorControl;
-            allocate operate.cleaning to physical.base.cleaningHead;
-            allocate operate.cleaning to physical.firmwareTasks.actuatorControl;
-            allocate operate.perception to physical.base;
-            allocate operate.perception to physical.top;
-            allocate operate.perception to physical.firmwareTasks.sensorAcquisition;
-            allocate operate.navigation to physical.firmwareTasks.navigation;
-            allocate operate.powerManagement to physical.base.powerModule;
-            allocate operate.powerManagement to physical.firmwareTasks.powerManager;
-            allocate operate.docking to physical.base.dockInterface;
-            allocate operate.missionControl to physical.firmwareTasks.missionController;
-            allocate operate.safetySupervision
-                  to physical.firmwareTasks.safetySupervisor;
-            allocate operate.userInteraction to physical.top.hmi;
-            allocate operate.userInteraction to physical.firmwareTasks.appService;
-        }
-        part robotSystem : CleaningRobotSystemOfInterestIntegration;
-        satisfy robotSystemSpecification.'Cleaning area per charge'
-            by robotSystem.operate.cleaning;
-        satisfy robotSystemSpecification.'Floor coverage'
-            by robotSystem.operate.navigation;
-        satisfy robotSystemSpecification.'Obstacle avoidance'
-            by robotSystem.operate.perception;
-        satisfy robotSystemSpecification.'Cliff detection'
-            by robotSystem.operate.perception;
-        satisfy robotSystemSpecification.'Safe stop on hazard'
-            by robotSystem.operate.safetySupervision;
-        satisfy robotSystemSpecification.'Localization accuracy'
-            by robotSystem.operate.navigation;
-        satisfy robotSystemSpecification.'Coverage map maintenance'
-            by robotSystem.operate.navigation;
-        satisfy robotSystemSpecification.'Wheel stall detection and recovery'
-            by robotSystem.operate.missionControl;
-        satisfy robotSystemSpecification.'Return to dock on low battery'
-            by robotSystem.operate.docking;
-        satisfy robotSystemSpecification.'Charging within the battery safe operating area'
-            by robotSystem.operate.powerManagement;
-        satisfy robotSystemSpecification.'Mission status reporting'
-            by robotSystem.operate.userInteraction;
-        satisfy robotSystemSpecification.'Local storage of map data'
-            by robotSystem.operate.userInteraction;
-        satisfy robotSystemSpecification.'Operating modes'
-            by robotSystem.operate.missionControl;
-        satisfy robotSystemSpecification.'Safe stop held until cleared'
-            by robotSystem.operate.safetySupervision;
-        // Physical properties are claimed by the element that determines them.
-          satisfy robotSystemSpecification.'Overall height'
-            by robotSystem.physical.top;
-        satisfy robotSystemSpecification.'Acoustic noise'
-            by robotSystem.physical.base.cleaningHead;
-        satisfy robotSystemSpecification.'Dust bin capacity'
-            by robotSystem.physical.dustBin;
-        satisfy robotSystemSpecification.'Threshold climbing'
-            by robotSystem.operate.locomotion;
-        satisfy robotSystemSpecification.'Robot mass'
-            by robotSystem.physical;
-        satisfy robotSystemSpecification.'Recharge time'
-            by robotSystem.operate.powerManagement;
-        satisfy robotSystemSpecification.'Battery protection independent of firmware'
-            by robotSystem.physical.base.powerModule.bms;
-        // Module requirements are claimed by the module they are allocated to.
-          satisfy baseModuleSpecification.'Cliff sensing latency'
-            by robotSystem.physical.base;
-        satisfy baseModuleSpecification.'Drive braking time'
-            by robotSystem.physical.base;
-        satisfy baseModuleSpecification.'Base module mass'
-            by robotSystem.physical.base;
-        satisfy baseModuleSpecification.'Base module height'
-            by robotSystem.physical.base;
-        satisfy baseModuleSpecification.'Battery capacity'
-            by robotSystem.physical.base.powerModule;
-        satisfy baseModuleSpecification.'Charge current'
-            by robotSystem.physical.base.powerModule;
-        satisfy mainPcbSpecification.'Drive disable latency'
-            by robotSystem.physical.mainPcb;
-        satisfy mainPcbSpecification.'Main board mass'
-            by robotSystem.physical.mainPcb;
-        satisfy firmwareSpecification.'Safety supervisor deadline'
-            by robotSystem.physical.firmwareTasks.safetySupervisor;
-        satisfy topModuleSpecification.'Top module height'
-            by robotSystem.physical.top;
-        satisfy topModuleSpecification.'Top module mass'
-            by robotSystem.physical.top;
-        satisfy dustBinSpecification.'Dust bin mass'
-            by robotSystem.physical.dustBin;
-        satisfy harnessSpecification.'Wiring harness mass'
-            by robotSystem.physical;
+
+    part def CleaningRobotSystemOfInterestIntegration :> CleaningRobotSystemOfInterestArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+        part physical : RobotPlatformSystem::AutonomousFloorCleaningRobotIntegration :>> physical;
+        perform action operate : OperateCleaningRobot;
+        exhibit state operatingBehavior : RobotOperatingBehavior;
+        allocate operate.locomotion to physical.base;
+        allocate operate.locomotion to physical.firmwareTasks.actuatorControl;
+        allocate operate.cleaning to physical.base.cleaningHead;
+        allocate operate.cleaning to physical.firmwareTasks.actuatorControl;
+        allocate operate.perception to physical.base;
+        allocate operate.perception to physical.top;
+        allocate operate.perception to physical.firmwareTasks.sensorAcquisition;
+        allocate operate.navigation to physical.firmwareTasks.navigation;
+        allocate operate.powerManagement to physical.base.powerModule;
+        allocate operate.powerManagement to physical.firmwareTasks.powerManager;
+        allocate operate.docking to physical.base.dockInterface;
+        allocate operate.missionControl to physical.firmwareTasks.missionController;
+        allocate operate.safetySupervision
+              to physical.firmwareTasks.safetySupervisor;
+        allocate operate.userInteraction to physical.top.hmi;
+        allocate operate.userInteraction to physical.firmwareTasks.appService;
     }
+    part robotSystem : CleaningRobotSystemOfInterestIntegration;
+    satisfy robotSystemSpecification.'Cleaning area per charge'
+        by robotSystem.operate.cleaning;
+    satisfy robotSystemSpecification.'Floor coverage'
+        by robotSystem.operate.navigation;
+    satisfy robotSystemSpecification.'Obstacle avoidance'
+        by robotSystem.operate.perception;
+    satisfy robotSystemSpecification.'Cliff detection'
+        by robotSystem.operate.perception;
+    satisfy robotSystemSpecification.'Safe stop on hazard'
+        by robotSystem.operate.safetySupervision;
+    satisfy robotSystemSpecification.'Localization accuracy'
+        by robotSystem.operate.navigation;
+    satisfy robotSystemSpecification.'Coverage map maintenance'
+        by robotSystem.operate.navigation;
+    satisfy robotSystemSpecification.'Wheel stall detection and recovery'
+        by robotSystem.operate.missionControl;
+    satisfy robotSystemSpecification.'Return to dock on low battery'
+        by robotSystem.operate.docking;
+    satisfy robotSystemSpecification.'Charging within the battery safe operating area'
+        by robotSystem.operate.powerManagement;
+    satisfy robotSystemSpecification.'Mission status reporting'
+        by robotSystem.operate.userInteraction;
+    satisfy robotSystemSpecification.'Local storage of map data'
+        by robotSystem.operate.userInteraction;
+    satisfy robotSystemSpecification.'Operating modes'
+        by robotSystem.operate.missionControl;
+    satisfy robotSystemSpecification.'Safe stop held until cleared'
+        by robotSystem.operate.safetySupervision;
+    // Physical properties are claimed by the element that determines them.
+      satisfy robotSystemSpecification.'Overall height'
+        by robotSystem.physical.top;
+    satisfy robotSystemSpecification.'Acoustic noise'
+        by robotSystem.physical.base.cleaningHead;
+    satisfy robotSystemSpecification.'Dust bin capacity'
+        by robotSystem.physical.dustBin;
+    satisfy robotSystemSpecification.'Threshold climbing'
+        by robotSystem.operate.locomotion;
+    satisfy robotSystemSpecification.'Robot mass'
+        by robotSystem.physical;
+    satisfy robotSystemSpecification.'Recharge time'
+        by robotSystem.operate.powerManagement;
+    satisfy robotSystemSpecification.'Battery protection independent of firmware'
+        by robotSystem.physical.base.powerModule.bms;
+    // Module requirements are claimed by the module they are allocated to.
+      satisfy baseModuleSpecification.'Cliff sensing latency'
+        by robotSystem.physical.base;
+    satisfy baseModuleSpecification.'Drive braking time'
+        by robotSystem.physical.base;
+    satisfy baseModuleSpecification.'Base module mass'
+        by robotSystem.physical.base;
+    satisfy baseModuleSpecification.'Base module height'
+        by robotSystem.physical.base;
+    satisfy baseModuleSpecification.'Battery capacity'
+        by robotSystem.physical.base.powerModule;
+    satisfy baseModuleSpecification.'Charge current'
+        by robotSystem.physical.base.powerModule;
+    satisfy mainPcbSpecification.'Drive disable latency'
+        by robotSystem.physical.mainPcb;
+    satisfy mainPcbSpecification.'Main board mass'
+        by robotSystem.physical.mainPcb;
+    satisfy firmwareSpecification.'Safety supervisor deadline'
+        by robotSystem.physical.firmwareTasks.safetySupervisor;
+    satisfy topModuleSpecification.'Top module height'
+        by robotSystem.physical.top;
+    satisfy topModuleSpecification.'Top module mass'
+        by robotSystem.physical.top;
+    satisfy dustBinSpecification.'Dust bin mass'
+        by robotSystem.physical.dustBin;
+    satisfy harnessSpecification.'Wiring harness mass'
+        by robotSystem.physical;
+
     package Verification {
         package Validation {
             private import VerificationCases::*;
@@ -229,8 +226,8 @@ package VacuumCleanerSystem {
             satisfy safeStopScenarioPerspective;
             expose OperationalScenarios::CliffSafeStopScenario;
           }
-        view specification : Elan8::SystemsEngineering::SpecificationView { expose VacuumCleanerSystem::Specification::**; }
-        view architecture : Elan8::SystemsEngineering::ArchitectureView { expose VacuumCleanerSystem::Architecture::CleaningRobotSystemOfInterestArchitecture; }
-        view integration : Elan8::SystemsEngineering::IntegrationView { expose VacuumCleanerSystem::Integration::robotSystem; }
+        view specification : Elan8::SystemsEngineering::SpecificationView { expose VacuumCleanerSystem::CleaningRobotSystemOfInterestSpecification; }
+        view architecture : Elan8::SystemsEngineering::ArchitectureView { expose VacuumCleanerSystem::CleaningRobotSystemOfInterestArchitecture; }
+        view integration : Elan8::SystemsEngineering::IntegrationView { expose VacuumCleanerSystem::robotSystem; }
     }
 }

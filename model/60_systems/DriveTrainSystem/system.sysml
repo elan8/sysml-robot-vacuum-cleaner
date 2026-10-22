@@ -35,50 +35,47 @@ package DriveTrainSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    package Specification {
-        part def DriveTrainSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::Specification::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
-            port phases : ThreePhaseDrivePort;
-            port odometry : QuadratureEncoderPort;
-            port liftHazard : GpioPort;
-        }
+    part def DriveTrainSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+        port phases : ThreePhaseDrivePort;
+        port odometry : QuadratureEncoderPort;
+        port liftHazard : GpioPort;
     }
-    package Architecture {
-        part def DriveTrainArchitecture :> Specification::DriveTrainSpecification, ComponentProfiles::PhysicalComponent::Architecture::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-            part motor : ComponentProfiles::DriveMotor::Specification::DriveMotorSpecification;
-            part gearbox : ComponentProfiles::Gearbox::Specification::GearboxSpecification;
-            part wheel : ComponentProfiles::Wheel::Specification::WheelSpecification;
-            part encoder : ComponentProfiles::QuadratureEncoder::Specification::QuadratureEncoderSpecification;
-            part lift : ComponentProfiles::LiftSwitch::Specification::LiftSwitchSpecification;
-        }
+
+    part def DriveTrainArchitecture :> DriveTrainSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
+        part motor : ComponentProfiles::DriveMotor::DriveMotorSpecification;
+        part gearbox : ComponentProfiles::Gearbox::GearboxSpecification;
+        part wheel : ComponentProfiles::Wheel::WheelSpecification;
+        part encoder : ComponentProfiles::QuadratureEncoder::QuadratureEncoderSpecification;
+        part lift : ComponentProfiles::LiftSwitch::LiftSwitchSpecification;
     }
-    package Integration {
-        part def DriveTrainIntegration :> Architecture::DriveTrainArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-            part motor : ComponentProfiles::DriveMotor::Architecture::DriveMotorArchitecture :>> motor;
-            part gearbox : ComponentProfiles::Gearbox::Architecture::GearboxArchitecture :>> gearbox {
-                  @BomItem { description = "Planetary gearbox, 30:1"; sourcing = SourcingKind::buy; unitCostEur = 1.60; }
-                  attribute :>> gearRatio = 30 [one]; /* illustrative estimate */
-                  attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
-                }
-            part wheel : ComponentProfiles::Wheel::Architecture::WheelArchitecture :>> wheel {
-                  @BomItem { description = "Drive wheel with tyre, 65 mm"; sourcing = SourcingKind::make; unitCostEur = 0.90; }
-                  attribute :>> diameter = 65 [mm]; /* illustrative estimate */
-                  attribute :>> mass = 0.08 [kg]; /* illustrative estimate */
-                }
-            part encoder : ComponentProfiles::QuadratureEncoder::Architecture::QuadratureEncoderArchitecture :>> encoder {
-                  @BomItem { description = "Quadrature encoder, magnetic"; sourcing = SourcingKind::buy; unitCostEur = 0.70; }
-                  attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
-                }
-            part lift : ComponentProfiles::LiftSwitch::Architecture::LiftSwitchArchitecture :>> lift {
-                  @BomItem { description = "Wheel-drop switch"; sourcing = SourcingKind::buy; unitCostEur = 0.15; }
-                  attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
-                }
-            attribute :>> mass =
-                  sum(motor.mass, gearbox.mass, wheel.mass, encoder.mass, lift.mass);
-            connect motor.electricalInput to phases;
-            connect motor.mechanicalOutput to gearbox.rotationalInput;
-            connect gearbox.rotationalOutput to wheel.axle;
-            connect encoder.odometry to odometry;
-            connect lift.signal to liftHazard;
-        }
+
+    part def DriveTrainIntegration :> DriveTrainArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+        part motor : ComponentProfiles::DriveMotor::DriveMotorArchitecture :>> motor;
+        part gearbox : ComponentProfiles::Gearbox::GearboxArchitecture :>> gearbox {
+              @BomItem { description = "Planetary gearbox, 30:1"; sourcing = SourcingKind::buy; unitCostEur = 1.60; }
+              attribute :>> gearRatio = 30 [one]; /* illustrative estimate */
+              attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
+            }
+        part wheel : ComponentProfiles::Wheel::WheelArchitecture :>> wheel {
+              @BomItem { description = "Drive wheel with tyre, 65 mm"; sourcing = SourcingKind::make; unitCostEur = 0.90; }
+              attribute :>> diameter = 65 [mm]; /* illustrative estimate */
+              attribute :>> mass = 0.08 [kg]; /* illustrative estimate */
+            }
+        part encoder : ComponentProfiles::QuadratureEncoder::QuadratureEncoderArchitecture :>> encoder {
+              @BomItem { description = "Quadrature encoder, magnetic"; sourcing = SourcingKind::buy; unitCostEur = 0.70; }
+              attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
+            }
+        part lift : ComponentProfiles::LiftSwitch::LiftSwitchArchitecture :>> lift {
+              @BomItem { description = "Wheel-drop switch"; sourcing = SourcingKind::buy; unitCostEur = 0.15; }
+              attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
+            }
+        attribute :>> mass =
+              sum(motor.mass, gearbox.mass, wheel.mass, encoder.mass, lift.mass);
+        connect motor.electricalInput to phases;
+        connect motor.mechanicalOutput to gearbox.rotationalInput;
+        connect gearbox.rotationalOutput to wheel.axle;
+        connect encoder.odometry to odometry;
+        connect lift.signal to liftHazard;
     }
+
 }

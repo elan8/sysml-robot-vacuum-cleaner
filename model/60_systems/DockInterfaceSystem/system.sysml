@@ -35,36 +35,33 @@ package DockInterfaceSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    package Specification {
-        part def DockInterfaceModuleSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::Specification::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
-            port dockPowerInput : ~PowerRailPort;
-            port chargePowerOutput : PowerRailPort;
-            port beaconDetected : GpioPort;
-        }
+    part def DockInterfaceModuleSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+        port dockPowerInput : ~PowerRailPort;
+        port chargePowerOutput : PowerRailPort;
+        port beaconDetected : GpioPort;
     }
-    package Architecture {
-        part def DockInterfaceModuleArchitecture :> Specification::DockInterfaceModuleSpecification, ComponentProfiles::PhysicalComponent::Architecture::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-            part contacts : ComponentProfiles::DockContactAssembly::Specification::DockContactAssemblySpecification;
-            part beaconReceiver : ComponentProfiles::HomingBeaconReceiver::Specification::HomingBeaconReceiverSpecification;
-        }
+
+    part def DockInterfaceModuleArchitecture :> DockInterfaceModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
+        part contacts : ComponentProfiles::DockContactAssembly::DockContactAssemblySpecification;
+        part beaconReceiver : ComponentProfiles::HomingBeaconReceiver::HomingBeaconReceiverSpecification;
     }
-    package Integration {
-        part def DockInterfaceModuleIntegration :> Architecture::DockInterfaceModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-            part contacts : ComponentProfiles::DockContactAssembly::Architecture::DockContactAssemblyArchitecture :>> contacts;
-            part beaconReceiver : ComponentProfiles::HomingBeaconReceiver::Architecture::HomingBeaconReceiverArchitecture :>> beaconReceiver {
-                  @BomItem { description = "Infrared homing-beacon receiver"; sourcing = SourcingKind::buy; unitCostEur = 0.35; }
-                  attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
-                  attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
-                }
-            doc /*
-                  Robot-side docking interface with charging contacts and an optical
-                  homing-beacon receiver. The receiver converts the external beacon into
-                  an internal GPIO indication for the main controller.
-                */
-            attribute :>> powerDraw = 2 [W];
-            attribute :>> mass = sum(beaconReceiver.mass, contacts.mass);
-            connect dockPowerInput to chargePowerOutput;
-            connect beaconReceiver.detection to beaconDetected;
-        }
+
+    part def DockInterfaceModuleIntegration :> DockInterfaceModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+        part contacts : ComponentProfiles::DockContactAssembly::DockContactAssemblyArchitecture :>> contacts;
+        part beaconReceiver : ComponentProfiles::HomingBeaconReceiver::HomingBeaconReceiverArchitecture :>> beaconReceiver {
+              @BomItem { description = "Infrared homing-beacon receiver"; sourcing = SourcingKind::buy; unitCostEur = 0.35; }
+              attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
+              attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
+            }
+        doc /*
+              Robot-side docking interface with charging contacts and an optical
+              homing-beacon receiver. The receiver converts the external beacon into
+              an internal GPIO indication for the main controller.
+            */
+        attribute :>> powerDraw = 2 [W];
+        attribute :>> mass = sum(beaconReceiver.mass, contacts.mass);
+        connect dockPowerInput to chargePowerOutput;
+        connect beaconReceiver.detection to beaconDetected;
     }
+
 }

@@ -35,42 +35,39 @@ package TopHarnessSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    package Specification {
-        part def TopWiringHarnessSpecification :> Elan8::Core::PhysicalComponent, ComponentProfiles::PhysicalComponent::Specification::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
-            port pcbSensorBus : I2cControllerPort;
-            port topSensorBus : I2cControllerPort;
-            port pcbLidarSerial : UartPort;
-            port topLidarSerial : ~UartPort;
-            port baseSensorPower : PowerRailPort;
-            port topSensorPower : PowerRailPort;
-            port pcbBumperHazard : GpioPort;
-            port topBumperHazard : GpioPort;
-            port pcbHmiControl : LocalHmiControllerPort;
-            port topHmiControl : ~LocalHmiControllerPort;
-        }
+    part def TopWiringHarnessSpecification :> Elan8::Core::PhysicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+        port pcbSensorBus : I2cControllerPort;
+        port topSensorBus : I2cControllerPort;
+        port pcbLidarSerial : UartPort;
+        port topLidarSerial : ~UartPort;
+        port baseSensorPower : PowerRailPort;
+        port topSensorPower : PowerRailPort;
+        port pcbBumperHazard : GpioPort;
+        port topBumperHazard : GpioPort;
+        port pcbHmiControl : LocalHmiControllerPort;
+        port topHmiControl : ~LocalHmiControllerPort;
     }
-    package Architecture {
-        part def TopWiringHarnessArchitecture :> Specification::TopWiringHarnessSpecification, ComponentProfiles::PhysicalComponent::Architecture::PhysicalComponentArchitecture, WiringHarness, Elan8::SystemsEngineering::SystemArchitecture {
-            part pcbConnector : ComponentProfiles::BoardConnector::Specification::BoardConnectorSpecification :> connectors;
-            part topConnector : ComponentProfiles::ElectronicConnector::Specification::ElectronicConnectorSpecification :> connectors;
-            part connectors : ComponentProfiles::ElectronicConnector::Specification::ElectronicConnectorSpecification [2..*] :>> connectors;
-            part conductors : ComponentProfiles::HarnessConductor::Specification::HarnessConductorSpecification [1..*] :>> conductors;
-        }
+
+    part def TopWiringHarnessArchitecture :> TopWiringHarnessSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, WiringHarness, Elan8::SystemsEngineering::SystemArchitecture {
+        part pcbConnector : ComponentProfiles::BoardConnector::BoardConnectorSpecification :> connectors;
+        part topConnector : ComponentProfiles::ElectronicConnector::ElectronicConnectorSpecification :> connectors;
+        part connectors : ComponentProfiles::ElectronicConnector::ElectronicConnectorSpecification [2..*] :>> connectors;
+        part conductors : ComponentProfiles::HarnessConductor::HarnessConductorSpecification [1..*] :>> conductors;
     }
-    package Integration {
-        part def TopWiringHarnessIntegration :> Architecture::TopWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-            /* illustrative estimate */
-                part pcbConnector : ComponentProfiles::BoardConnector::Architecture::BoardConnectorArchitecture :>> pcbConnector :> connectors;
-            part topConnector : ComponentProfiles::ElectronicConnector::Architecture::ElectronicConnectorArchitecture :>> topConnector :> connectors;
-            part connectors : ComponentProfiles::ElectronicConnector::Architecture::ElectronicConnectorArchitecture[2] :>> connectors = (pcbConnector, topConnector);
-            part conductors : ComponentProfiles::HarnessConductor::Architecture::HarnessConductorArchitecture[1..*] :>> conductors;
-            @BomItem { description = "Top wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
-            attribute :>> mass = 0.06 [kg];
-            connect pcbSensorBus to topSensorBus;
-            connect pcbLidarSerial to topLidarSerial;
-            connect baseSensorPower to topSensorPower;
-            connect pcbBumperHazard to topBumperHazard;
-            connect pcbHmiControl to topHmiControl;
-        }
+
+    part def TopWiringHarnessIntegration :> TopWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+        /* illustrative estimate */
+            part pcbConnector : ComponentProfiles::BoardConnector::BoardConnectorArchitecture :>> pcbConnector :> connectors;
+        part topConnector : ComponentProfiles::ElectronicConnector::ElectronicConnectorArchitecture :>> topConnector :> connectors;
+        part connectors : ComponentProfiles::ElectronicConnector::ElectronicConnectorArchitecture[2] :>> connectors = (pcbConnector, topConnector);
+        part conductors : ComponentProfiles::HarnessConductor::HarnessConductorArchitecture[1..*] :>> conductors;
+        @BomItem { description = "Top wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
+        attribute :>> mass = 0.06 [kg];
+        connect pcbSensorBus to topSensorBus;
+        connect pcbLidarSerial to topLidarSerial;
+        connect baseSensorPower to topSensorPower;
+        connect pcbBumperHazard to topBumperHazard;
+        connect pcbHmiControl to topHmiControl;
     }
+
 }

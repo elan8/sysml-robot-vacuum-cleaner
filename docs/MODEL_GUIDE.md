@@ -9,16 +9,18 @@ and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
 1. Read `00_context/Context.sysml`, `10_usecases/UseCases.sysml` and
    `20_requirements/StakeholderRequirements.sysml` for the home, four scenarios
    and eleven customer requirements.
-2. Read `60_systems/RobotPlatformSystem/system.sysml`. Specification owns the
-   21 measurable system requirements, limits and customer derivations.
-   Architecture owns module budgets and their derivations. Integration selects
-   the six hardware modules and referenced firmware design.
+2. Read `60_systems/RobotPlatformSystem/system.sysml`. Its specification,
+   architecture and integration definitions live directly in the system package.
+   `Requirements`, `Limits` and `Traceability` contain the 21 measurable system
+   obligations and their customer derivations; `Budgets` and `RequirementAllocation`
+   contain module budgets and derivations. The integration selects six hardware
+   modules and the referenced firmware design.
 3. Read `60_systems/VacuumCleanerSystem/system.sysml`. Its single selected usage
-   `Integration::robotSystem` composes the physical baseline, performs the
+   `VacuumCleanerSystem::robotSystem` composes the physical baseline, performs the
    functional behavior and exhibits the operating states. Allocations and
    detailed satisfaction claims refer to those concrete usages.
 4. Follow BaseSystem, MainControlBoardSystem, TopSystem, DustBinSystem and both
-   harness systems. Their Specification/Architecture/Integration packages show
+   harness systems. Their specification, architecture and integration definitions show
    boundary contracts, child contracts and compatible selected child designs.
    Shared leaf profiles and purchased part metadata live in `50_library`.
 5. Follow FirmwareSystem: seven periodic/event-driven task profiles, five typed
@@ -32,7 +34,7 @@ and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
 ## Ownership and identity
 
 Stakeholder needs remain in `StakeholderNeeds`. Authoritative system/module
-requirements belong to the accepting system's Specification, including
+requirements live alongside the accepting system's specification, including
 boundary properties that express capacity, latency and mass without reaching
 through child implementation structure. Contracts assert their requirement
 collections against self; integrations provide the actual values.
@@ -74,8 +76,8 @@ suction intake are ahead of the rear caster. Nominal body diameter is 340 mm;
 illustrative design height is 55 + 37 mm. The 49-item BOM totals 3.694 kg and
 EUR 121.10. These are teaching estimates, not released production data.
 
-Limits are defined once in RobotPlatformSystem::Specification::Limits; module
-budgets are in Architecture::Budgets. Document placeholders can retain old
+Limits are defined once in RobotPlatformSystem::Limits; module
+budgets are in RobotPlatformSystem::Budgets. Document placeholders can retain old
 navigation aliases, but resolve to those authoritative values. Document views,
 prose, figures and the inactive house template live in `80_documents`.
 The BOM and mass-budget script operates independently of document rendering.

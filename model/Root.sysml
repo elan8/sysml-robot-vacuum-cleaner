@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: MIT */
 package AutonomousFloorCleaningRobotDemo {
     doc /* Navigation only: flat system packages own contracts, designs, selections and evidence.
-         * The selected robot occurrence is VacuumCleanerSystem::Integration::robotSystem. */
+         * The selected robot occurrence is VacuumCleanerSystem::robotSystem. */
     private import VacuumCleanerSystem;
     private import RobotPlatformSystem;
     private import ProductContext;

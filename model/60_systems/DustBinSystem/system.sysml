@@ -35,46 +35,43 @@ package DustBinSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    package Specification {
-        part def DustBinSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::Specification::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
-            port debrisIn : ~CleaningFlowPort;
-            attribute capacity : VolumeValue;
-            satisfy Requirements::dustBinSpecification;
-        }
-        package Requirements {
-            private import ModuleBudgets::*;
-            private import RequirementLimits::*;
-            private import ISQ::*;
-            private import SI::*;
-            requirement dustBinSpecification {
-                subject bin : DustBinSystem::Specification::DustBinSpecification;
+    part def DustBinSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+        port debrisIn : ~CleaningFlowPort;
+        attribute capacity : VolumeValue;
+        satisfy Requirements::dustBinSpecification;
+    }
+    package Requirements {
+        private import ModuleBudgets::*;
+        private import RequirementLimits::*;
+        private import ISQ::*;
+        private import SI::*;
+        requirement dustBinSpecification {
+            subject bin : DustBinSystem::DustBinSpecification;
 
-                requirement <'BIN-001'> 'Dust bin mass' {
-                  require constraint { bin.mass <= dustBinMassBudget }
-                  doc /* The empty dust bin with its filter shall have a mass of at most {{= ModuleBudgets::dustBinMassBudget}}. */
-                }
-              }
-        }
+            requirement <'BIN-001'> 'Dust bin mass' {
+              require constraint { bin.mass <= dustBinMassBudget }
+              doc /* The empty dust bin with its filter shall have a mass of at most {{= ModuleBudgets::dustBinMassBudget}}. */
+            }
+          }
     }
-    package Architecture {
-        part def DustBinArchitecture :> Specification::DustBinSpecification, ComponentProfiles::PhysicalComponent::Architecture::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-            part body : ComponentProfiles::DustBinBody::Specification::DustBinBodySpecification;
-            part lid : ComponentProfiles::DustBinLid::Specification::DustBinLidSpecification;
-            part 'filter' : ComponentProfiles::DustFilter::Specification::DustFilterSpecification;
-        }
+
+    part def DustBinArchitecture :> DustBinSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
+        part body : ComponentProfiles::DustBinBody::DustBinBodySpecification;
+        part lid : ComponentProfiles::DustBinLid::DustBinLidSpecification;
+        part 'filter' : ComponentProfiles::DustFilter::DustFilterSpecification;
     }
-    package Integration {
-        part def DustBinIntegration :> Architecture::DustBinArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-            part body : ComponentProfiles::DustBinBody::Architecture::DustBinBodyArchitecture :>> body;
-            part lid : ComponentProfiles::DustBinLid::Architecture::DustBinLidArchitecture :>> lid;
-            part redefines 'filter' : ComponentProfiles::DustFilter::Architecture::DustFilterArchitecture;
-            doc /*
-                  Tool-free-removable module, independent of Base/Top — matches it being a
-                  separately replaceable real-world spare part. Purely mechanical: no ports,
-                  no electronics.
-                */
-            attribute :>> mass = sum(body.mass, lid.mass, 'filter'.mass);
-            attribute :>> capacity = 450 [mL];
-        }
+
+    part def DustBinIntegration :> DustBinArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+        part body : ComponentProfiles::DustBinBody::DustBinBodyArchitecture :>> body;
+        part lid : ComponentProfiles::DustBinLid::DustBinLidArchitecture :>> lid;
+        part redefines 'filter' : ComponentProfiles::DustFilter::DustFilterArchitecture;
+        doc /*
+              Tool-free-removable module, independent of Base/Top — matches it being a
+              separately replaceable real-world spare part. Purely mechanical: no ports,
+              no electronics.
+            */
+        attribute :>> mass = sum(body.mass, lid.mass, 'filter'.mass);
+        attribute :>> capacity = 450 [mL];
     }
+
 }

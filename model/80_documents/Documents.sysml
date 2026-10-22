@@ -293,35 +293,35 @@ package RobotDocuments {
         @Section { title = "Module interconnection"; }
         doc /* The six line-replaceable units and the electrical, signal and material
              * connections between them. */
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.base;
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.mainPcb;
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.baseHarness;
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.topHarness;
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.top;
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.dustBin;
+        expose VacuumCleanerSystem::robotSystem.physical.base;
+        expose VacuumCleanerSystem::robotSystem.physical.mainPcb;
+        expose VacuumCleanerSystem::robotSystem.physical.baseHarness;
+        expose VacuumCleanerSystem::robotSystem.physical.topHarness;
+        expose VacuumCleanerSystem::robotSystem.physical.top;
+        expose VacuumCleanerSystem::robotSystem.physical.dustBin;
       }
       view baseModule : InterconnectionView {
         @Section { title = "Base module"; }
         doc /* Chassis, both drive trains, the cleaning head, the four cliff sensors, the power
              * module and the dock interface. */
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.base;
+        expose VacuumCleanerSystem::robotSystem.physical.base;
       }
       view powerModule : InterconnectionView {
         @Section { title = "Power module"; }
         doc /* Battery, battery management, charger and the two regulated rails. All loads are
              * fed through the protected output of the battery management system. */
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.base.powerModule;
+        expose VacuumCleanerSystem::robotSystem.physical.base.powerModule;
       }
       view mainPcb : InterconnectionView {
         @Section { title = "Main control board"; }
         doc /* Microcontroller, motor drivers, inertial measurement unit and wireless module. */
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.mainPcb;
+        expose VacuumCleanerSystem::robotSystem.physical.mainPcb;
       }
       view topModule : InterconnectionView {
         @Section { title = "Top module"; }
         doc /* LiDAR, the three time-of-flight sensors, the bumper and the human-machine
              * interface. */
-        expose VacuumCleanerSystem::Integration::robotSystem.physical.top;
+        expose VacuumCleanerSystem::robotSystem.physical.top;
       }
     }
 

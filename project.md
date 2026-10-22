@@ -1,7 +1,7 @@
 # Robot vacuum model baseline
 
-This project follows MBSE methodology 0.3.0 at commit
-`3837d43ac9d16f25b6d99e52e1e8e545bf16bc6b`. Exact dependencies are in
+This project follows MBSE methodology 0.4.0 at commit
+`d4fa2f0dad0c6886cd96d4409677a7dc95c1974f`. Exact dependencies are in
 `dependencies.lock.json`; validation verifies both dependency checkout revisions.
 Use Spec42 0.56.0 with its 2026-04 standard libraries. The domain source pin also
 includes `Elan8::Documents`; it is intentionally newer than the methodology's
@@ -15,15 +15,17 @@ with the released binary and does not render diagrams.
 
 Load the complete `model/` tree. `Root.sysml` provides navigation. Systems are
 flat under `60_systems`; part usages define their recursive composition.
-Each developed system owns its Specification, Architecture and Integration.
-System requirements belong to its Specification, allocations and budgets to
-Architecture, and analyses/verification/views to their assessed system.
+Each developed system directly owns its specification, architecture and integration
+definitions. Role subpackages are optional organizational choices in the methodology;
+this example omits them. Requirements, limits and budgets remain in useful named
+system-owned packages, and specifications assert their applicable requirements.
+Analyses, verification cases and views stay with their assessed system.
 `20_requirements` owns stakeholder needs. `50_library` contains shared interfaces,
 component contract/design profiles and purchased parts. `80_documents` owns
 publication sources. All disposable outputs belong in ignored `generated/`.
 
 The single selected product usage is
-`VacuumCleanerSystem::Integration::robotSystem`. Its physical baseline is
+`VacuumCleanerSystem::robotSystem`. Its physical baseline is
 `robotSystem.physical`. The residential context has a separate boundary role;
 it is an environment model, not a second selected product assembly.
 

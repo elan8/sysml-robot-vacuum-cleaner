@@ -38,16 +38,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "generated"
-ROBOT = "RobotPlatformSystem::Integration::AutonomousFloorCleaningRobotIntegration"
-SPECIFICATION = "RobotPlatformSystem::Specification::Requirements::robotSystemSpecification"
+ROBOT = "RobotPlatformSystem::AutonomousFloorCleaningRobotIntegration"
+SPECIFICATION = "RobotPlatformSystem::Requirements::robotSystemSpecification"
 CUSTOMER = "StakeholderNeeds"
 MODULES = (
-    "BaseSystem::Specification::Requirements::baseModuleSpecification",
-    "MainControlBoardSystem::Specification::Requirements::mainPcbSpecification",
-    "FirmwareSystem::Specification::Requirements::firmwareSpecification",
-    "TopSystem::Specification::Requirements::topModuleSpecification",
-    "DustBinSystem::Specification::Requirements::dustBinSpecification",
-    "RobotPlatformSystem::Specification::HarnessRequirements::harnessSpecification",
+    "BaseSystem::Requirements::baseModuleSpecification",
+    "MainControlBoardSystem::Requirements::mainPcbSpecification",
+    "FirmwareSystem::Requirements::firmwareSpecification",
+    "TopSystem::Requirements::topModuleSpecification",
+    "DustBinSystem::Requirements::dustBinSpecification",
+    "RobotPlatformSystem::HarnessRequirements::harnessSpecification",
 )
 # Packages whose part definitions are logical, not purchasable or made items.
 LOGICAL_PACKAGES = ("DomainModel::", "FirmwareSystem::", "FirmwareLibrary::")
@@ -354,7 +354,7 @@ def bom_outputs(model: Model) -> tuple[dict[str, str], list[str], dict[str, floa
 
 def mass_budget(model: Model, modules: dict[str, float]) -> tuple[str, list[str]]:
     limit = None
-    for attribute in model.owned(model.element("RobotPlatformSystem::Specification::Limits"), "AttributeUsage"):
+    for attribute in model.owned(model.element("RobotPlatformSystem::Limits"), "AttributeUsage"):
         if attribute["name"] == "maxRobotMass":
             for expression in model.owned(attribute, "Expression"):
                 limit = kilograms(expression["expression"]["nodes"][0]["value"])

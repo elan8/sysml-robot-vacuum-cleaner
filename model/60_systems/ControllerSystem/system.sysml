@@ -35,52 +35,49 @@ package ControllerSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    package Specification {
-        part def RobotMainMcuSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::Specification::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
-            /* illustrative estimate */
-                port sensorI2c : I2cControllerPort;
-            port lidarUart : UartPort;
-            port bmsSmbus : I2cControllerPort;
-            port wirelessUart : UartPort;
-            port leftMotorPwm : PwmPort;
-            port rightMotorPwm : PwmPort;
-            port brushPwm : PwmPort;
-            port vacuumPwm : PwmPort;
-            port leftOdometry : QuadratureEncoderPort;
-            port rightOdometry : QuadratureEncoderPort;
-            port leftLiftHazard : GpioPort;
-            port rightLiftHazard : GpioPort;
-            port frontLeftCliffHazard : GpioPort;
-            port frontRightCliffHazard : GpioPort;
-            port rearLeftCliffHazard : GpioPort;
-            port rearRightCliffHazard : GpioPort;
-            port cleaningFault : GpioPort;
-            port bmsAlert : GpioPort;
-            port dockBeaconDetected : GpioPort;
-            port topBumperHazard : GpioPort;
-            port leftMotorFault : GpioPort;
-            port rightMotorFault : GpioPort;
-            port localHmi : LocalHmiControllerPort;
-            port power : ~PowerRailPort;
-        }
+    part def RobotMainMcuSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+        /* illustrative estimate */
+            port sensorI2c : I2cControllerPort;
+        port lidarUart : UartPort;
+        port bmsSmbus : I2cControllerPort;
+        port wirelessUart : UartPort;
+        port leftMotorPwm : PwmPort;
+        port rightMotorPwm : PwmPort;
+        port brushPwm : PwmPort;
+        port vacuumPwm : PwmPort;
+        port leftOdometry : QuadratureEncoderPort;
+        port rightOdometry : QuadratureEncoderPort;
+        port leftLiftHazard : GpioPort;
+        port rightLiftHazard : GpioPort;
+        port frontLeftCliffHazard : GpioPort;
+        port frontRightCliffHazard : GpioPort;
+        port rearLeftCliffHazard : GpioPort;
+        port rearRightCliffHazard : GpioPort;
+        port cleaningFault : GpioPort;
+        port bmsAlert : GpioPort;
+        port dockBeaconDetected : GpioPort;
+        port topBumperHazard : GpioPort;
+        port leftMotorFault : GpioPort;
+        port rightMotorFault : GpioPort;
+        port localHmi : LocalHmiControllerPort;
+        port power : ~PowerRailPort;
     }
-    package Architecture {
-        part def RobotMainMcuArchitecture :> Specification::RobotMainMcuSpecification, ComponentProfiles::PhysicalComponent::Architecture::PhysicalComponentArchitecture, Microcontroller, Elan8::SystemsEngineering::SystemArchitecture {
-            part memories : ComponentProfiles::MemoryBlock::Specification::MemoryBlockSpecification [0..*] :>> memories;
-            part peripherals : ComponentProfiles::PeripheralBlock::Specification::PeripheralBlockSpecification [0..*] :>> peripherals;
-            port power : ~PowerRailPort :>> Specification::RobotMainMcuSpecification::power, Microcontroller::power;
-        }
+
+    part def RobotMainMcuArchitecture :> RobotMainMcuSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Microcontroller, Elan8::SystemsEngineering::SystemArchitecture {
+        part memories : ComponentProfiles::MemoryBlock::MemoryBlockSpecification [0..*] :>> memories;
+        part peripherals : ComponentProfiles::PeripheralBlock::PeripheralBlockSpecification [0..*] :>> peripherals;
+        port power : ~PowerRailPort :>> RobotMainMcuSpecification::power, Microcontroller::power;
     }
-    package Integration {
-        part def RobotMainMcuIntegration :> Architecture::RobotMainMcuArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-            part memories : ComponentProfiles::MemoryBlock::Architecture::MemoryBlockArchitecture[0..*] :>> memories;
-            part peripherals : ComponentProfiles::PeripheralBlock::Architecture::PeripheralBlockArchitecture[0..*] :>> peripherals;
-            @BomItem { description = "Main microcontroller"; sourcing = SourcingKind::buy; unitCostEur = 4.60; }
-            attribute :>> mass = 0.01 [kg];
-            /* illustrative estimate */
-                attribute :>> powerDraw = 3 [W];
-            dependency selectedImplementation
-                  from RobotMainMcuIntegration to STM32U575VGT6;
-        }
+
+    part def RobotMainMcuIntegration :> RobotMainMcuArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+        part memories : ComponentProfiles::MemoryBlock::MemoryBlockArchitecture[0..*] :>> memories;
+        part peripherals : ComponentProfiles::PeripheralBlock::PeripheralBlockArchitecture[0..*] :>> peripherals;
+        @BomItem { description = "Main microcontroller"; sourcing = SourcingKind::buy; unitCostEur = 4.60; }
+        attribute :>> mass = 0.01 [kg];
+        /* illustrative estimate */
+            attribute :>> powerDraw = 3 [W];
+        dependency selectedImplementation
+              from RobotMainMcuIntegration to STM32U575VGT6;
     }
+
 }

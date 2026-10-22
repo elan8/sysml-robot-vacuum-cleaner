@@ -42,6 +42,9 @@ carry the engineering, not only describe it:
 - Independent specification, architecture and integration roles from
   `Elan8::SystemsEngineering`; architectures type children by their contracts,
   and integrations select compatible child designs through redefinition.
+- Role definitions live directly in each system package, without nested
+  Specification/Architecture/Integration packages. Useful requirement, evidence
+  and view groupings remain.
 - Elan8 requirement roles, native SysML requirement identifiers, and folder conventions
   without exposing methodology jargon as product-domain behavior.
 - Definition/usage separation and one concrete `robotSystem` usage.

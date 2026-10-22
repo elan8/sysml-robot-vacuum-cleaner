@@ -62,6 +62,12 @@ does not assess usage-local root overrides, contextual constraints or verificati
 correctness. Passing it is not proof of complete methodology or product conformance.
 The product usage currently adds no local root overrides.
 
+Role definitions are directly system-owned. The checker recognizes semantic
+inheritance and child selections independently of namespace layout; the methodology
+tests cover both direct ownership and optional grouping packages. The flattening
+retains all 62 engineering IDs/names and 10,096 selected relationship edges after
+mapping retired role-package prefixes, with identical BOM and mass-budget data.
+
 Model guards separately check required physical connections, catalog dependencies,
 metadata, seven task profiles, five runtime queue flows and satisfaction/verification
 paths. The independent BOM script checks classification, mass, requirement
