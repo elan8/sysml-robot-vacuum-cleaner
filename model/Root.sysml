@@ -3,6 +3,8 @@
 package AutonomousFloorCleaningRobotDemo {
     doc /* Navigation only: flat system packages own contracts, designs, selections and evidence.
          * The selected robot occurrence is VacuumCleanerSystem::robotSystem. */
+    alias systemOfInterest for VacuumCleanerSystem::robotSystem;
+
     private import VacuumCleanerSystem;
     private import RobotPlatformSystem;
     private import ProductContext;

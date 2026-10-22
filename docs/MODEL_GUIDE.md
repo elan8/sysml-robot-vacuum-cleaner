@@ -15,7 +15,7 @@ and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
    obligations and their customer derivations; `Budgets` and `RequirementAllocation`
    contain module budgets and derivations. The integration selects six hardware
    modules and the referenced firmware design.
-3. Read `60_systems/VacuumCleanerSystem/system.sysml`. Its single selected usage
+3. Read `60_systems/00_VacuumCleanerSystem/system.sysml`. Its single selected usage
    `VacuumCleanerSystem::robotSystem` composes the physical baseline, performs the
    functional behavior and exhibits the operating states. Allocations and
    detailed satisfaction claims refer to those concrete usages.

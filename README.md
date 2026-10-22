@@ -82,10 +82,11 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `10_usecases/UseCases.sysml` | Four operational scenarios |
 | `20_requirements/StakeholderRequirements.sysml` | Eleven customer requirements |
 | `50_library/` | Shared interfaces, firmware types, purchased parts and compatibility navigation |
-| `60_systems/<System>/system.sysml` | Fourteen flat systems with their specifications, architectures, integrations and relevant evidence/views |
-| `60_systems/VacuumCleanerSystem/Behavior.sysml` | Supporting behavior packages, publicly imported by the system |
+| `60_systems/00_VacuumCleanerSystem/system.sysml` | Root system and selected `robotSystem` occurrence |
+| `60_systems/<System>/system.sysml` | Other systems with their specifications, architectures, integrations and relevant evidence/views |
+| `60_systems/00_VacuumCleanerSystem/Behavior.sysml` | Supporting behavior packages, publicly imported by the system |
 | `80_documents/` | Generic document definitions, prose, figures and retained template |
-| `Root.sysml` | Navigation; the workspace loads all model files |
+| `Root.sysml` | Aliases `VacuumCleanerSystem::robotSystem` as `systemOfInterest`; the workspace loads all model files |
 | `../generated/` | Ignored BOM, mass budget, validation reports and diagrams |
 | `../project.md` | Dependency baseline and model ownership conventions |
 

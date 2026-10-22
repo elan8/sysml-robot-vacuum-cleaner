@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 # Focused model views
 
 The nine focused views live in each reviewed system's `Views` package under
-`model/60_systems/<System>/system.sysml`. They answer one engineering question each.
+`model/60_systems/<System>/system.sysml` (root: `00_VacuumCleanerSystem`). They answer one engineering question each.
 The view's `doc` states its scope alongside its exposes and filter.
 
 | View | Engineering question | Selected content | Export depth |

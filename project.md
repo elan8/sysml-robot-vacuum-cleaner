@@ -1,7 +1,7 @@
 # Robot vacuum model baseline
 
 This project follows MBSE methodology 0.5.0 at commit
-`44d63e9342db3455479de34b6b929776f7c4e6c9`. Exact dependencies are in
+`0cb3ee0e7b5e64cf4f850a46da5f26acb280a4c2`. Exact dependencies are in
 `dependencies.lock.json`; validation verifies both dependency checkout revisions.
 Use Spec42 0.56.0 with its 2026-04 standard libraries. The domain source pin also
 includes `Elan8::Documents`; it is intentionally newer than the methodology's
@@ -14,7 +14,7 @@ See `docs/VALIDATION.md` for build and export commands. CI validates the model
 with the released binary and does not render diagrams.
 
 Load the complete `model/` tree. `Root.sysml` provides navigation. Systems are
-flat under `60_systems`; part usages define their recursive composition.
+flat under `60_systems`, with the root in `00_VacuumCleanerSystem`; part usages define their recursive composition. `Root.sysml` aliases the selected `VacuumCleanerSystem::robotSystem` occurrence as `systemOfInterest`.
 Each developed system directly owns its specification, architecture and integration
 definitions. Role subpackages are optional organizational choices in the methodology;
 this example omits them. Requirements, limits and budgets remain in useful named

@@ -1,6 +1,6 @@
 # Methodology migration
 
-Baseline: methodology commit `44d63e9342db3455479de34b6b929776f7c4e6c9` (0.5.0).
+Baseline: methodology commit `0cb3ee0e7b5e64cf4f850a46da5f26acb280a4c2` (0.5.0).
 The old discipline folders are replaced by context, use cases, stakeholder
 requirements, shared library, flat systems and document sources. No old source
 tree is inside the active `model/` load boundary.

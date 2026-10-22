@@ -32,7 +32,7 @@ definitions. The validator accepts only one occurrence of each named view type:
 | Source | Type |
 | --- | --- |
 | `model/00_context/Context.sysml` | `ContextView` |
-| `model/60_systems/VacuumCleanerSystem/system.sysml` | `SpecificationView` |
+| `model/60_systems/00_VacuumCleanerSystem/system.sysml` | `SpecificationView` |
 | Same system | `ArchitectureView` |
 | Same system | `IntegrationView` |
 

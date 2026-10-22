@@ -25,9 +25,9 @@ def check_language(executable, libraries, model):
     report = run_json([executable, *libraries, "check", model, "--format", "json"])
     allowed = {
         ("00_context/Context.sysml", "ContextView"),
-        ("60_systems/VacuumCleanerSystem/system.sysml", "SpecificationView"),
-        ("60_systems/VacuumCleanerSystem/system.sysml", "ArchitectureView"),
-        ("60_systems/VacuumCleanerSystem/system.sysml", "IntegrationView"),
+        ("60_systems/00_VacuumCleanerSystem/system.sysml", "SpecificationView"),
+        ("60_systems/00_VacuumCleanerSystem/system.sysml", "ArchitectureView"),
+        ("60_systems/00_VacuumCleanerSystem/system.sysml", "IntegrationView"),
     }
     seen = set()
     failures = []

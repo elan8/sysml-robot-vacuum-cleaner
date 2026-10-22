@@ -2,7 +2,7 @@
 
 The model follows the updated MBSE methodology: one project context, stakeholder
 needs, shared types, flat systems and publication sources. Recursive composition
-is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/44d63e9342db3455479de34b6b929776f7c4e6c9/docs/structure.md)
+is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/0cb3ee0e7b5e64cf4f850a46da5f26acb280a4c2/docs/structure.md)
 and the project's [baseline](../project.md).
 
 Start with `00_context/Context.sysml`, then the four scenarios in `10_usecases`
@@ -10,7 +10,7 @@ and eleven stakeholder requirements in `20_requirements`. Follow those needs
 into `RobotPlatformSystem`: its Requirements, Limits and
 Traceability packages own the 21 system obligations and their derivations.
 
-Each of the fourteen developed systems has one `60_systems/<System>/system.sysml`.
+Each of the fourteen developed systems has one `60_systems/<System>/system.sysml` (root: `00_VacuumCleanerSystem`).
 Its specification definition is a black box with boundary ports/properties and
 asserted requirements. Its architecture specializes that specification and the independent
 architecture marker; developed children are typed by child specifications, while
