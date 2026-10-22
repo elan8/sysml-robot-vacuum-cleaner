@@ -55,23 +55,23 @@ package FirmwareSystem {
     }
 
     part def FirmwareTaskArchitectureArchitecture :> FirmwareTaskArchitectureSpecification, Elan8::SystemsEngineering::SystemArchitecture {
-        part scheduler : ComponentProfiles::ExecutionPlatform::ExecutionPlatformSpecification;
-        part missionController : ComponentProfiles::MissionControllerTask::MissionControllerTaskSpecification;
-        part safetySupervisor : ComponentProfiles::SafetySupervisorTask::SafetySupervisorTaskSpecification;
-        part actuatorControl : ComponentProfiles::ActuatorControlTask::ActuatorControlTaskSpecification;
-        part sensorAcquisition : ComponentProfiles::SensorAcquisitionTask::SensorAcquisitionTaskSpecification;
-        part navigation : ComponentProfiles::NavigationTask::NavigationTaskSpecification;
-        part powerManager : ComponentProfiles::PowerManagerTask::PowerManagerTaskSpecification;
-        part appService : ComponentProfiles::AppServiceTask::AppServiceTaskSpecification;
-        part hazardQueue : ComponentProfiles::HazardEventQueue::HazardEventQueueSpecification;
-        part userCommandQueue : ComponentProfiles::UserCommandQueue::UserCommandQueueSpecification;
-        part plannerCommandQueue : ComponentProfiles::DriveCommandQueue::DriveCommandQueueSpecification;
-        part safetyCommandQueue : ComponentProfiles::DriveCommandQueue::DriveCommandQueueSpecification;
-        part mapUpdateQueue : ComponentProfiles::MapUpdateQueue::MapUpdateQueueSpecification;
+        part scheduler : Elan8::Software::ExecutionPlatform;
+        part missionController : FirmwareLibrary::MissionControllerTask;
+        part safetySupervisor : FirmwareLibrary::SafetySupervisorTask;
+        part actuatorControl : FirmwareLibrary::ActuatorControlTask;
+        part sensorAcquisition : FirmwareLibrary::SensorAcquisitionTask;
+        part navigation : FirmwareLibrary::NavigationTask;
+        part powerManager : FirmwareLibrary::PowerManagerTask;
+        part appService : FirmwareLibrary::AppServiceTask;
+        part hazardQueue : FirmwareLibrary::HazardEventQueue;
+        part userCommandQueue : FirmwareLibrary::UserCommandQueue;
+        part plannerCommandQueue : FirmwareLibrary::DriveCommandQueue;
+        part safetyCommandQueue : FirmwareLibrary::DriveCommandQueue;
+        part mapUpdateQueue : FirmwareLibrary::MapUpdateQueue;
     }
 
     part def FirmwareTaskArchitectureIntegration :> FirmwareTaskArchitectureArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part scheduler : ComponentProfiles::ExecutionPlatform::ExecutionPlatformArchitecture :>> scheduler {
+        part scheduler : Elan8::Software::ExecutionPlatform :>> scheduler {
               doc /*
                 Safety and actuator loops execute before mission and app work. Overload
                 sheds noncritical app/status work before safety or control work.
@@ -80,26 +80,26 @@ package FirmwareSystem {
               attribute :>> schedulingPolicy =
                 SchedulingPolicy::fixedPriorityCooperative;
             }
-        part missionController : ComponentProfiles::MissionControllerTask::MissionControllerTaskArchitecture :>> missionController;
-        part safetySupervisor : ComponentProfiles::SafetySupervisorTask::SafetySupervisorTaskArchitecture :>> safetySupervisor;
-        part actuatorControl : ComponentProfiles::ActuatorControlTask::ActuatorControlTaskArchitecture :>> actuatorControl;
-        part sensorAcquisition : ComponentProfiles::SensorAcquisitionTask::SensorAcquisitionTaskArchitecture :>> sensorAcquisition;
-        part navigation : ComponentProfiles::NavigationTask::NavigationTaskArchitecture :>> navigation;
-        part powerManager : ComponentProfiles::PowerManagerTask::PowerManagerTaskArchitecture :>> powerManager;
-        part appService : ComponentProfiles::AppServiceTask::AppServiceTaskArchitecture :>> appService;
-        part hazardQueue : ComponentProfiles::HazardEventQueue::HazardEventQueueArchitecture :>> hazardQueue {
+        part missionController : FirmwareLibrary::MissionControllerTask :>> missionController;
+        part safetySupervisor : FirmwareLibrary::SafetySupervisorTask :>> safetySupervisor;
+        part actuatorControl : FirmwareLibrary::ActuatorControlTask :>> actuatorControl;
+        part sensorAcquisition : FirmwareLibrary::SensorAcquisitionTask :>> sensorAcquisition;
+        part navigation : FirmwareLibrary::NavigationTask :>> navigation;
+        part powerManager : FirmwareLibrary::PowerManagerTask :>> powerManager;
+        part appService : FirmwareLibrary::AppServiceTask :>> appService;
+        part hazardQueue : FirmwareLibrary::HazardEventQueue :>> hazardQueue {
               attribute :>> discipline = QueueDiscipline::fifoDropNewest;
             }
-        part userCommandQueue : ComponentProfiles::UserCommandQueue::UserCommandQueueArchitecture :>> userCommandQueue {
+        part userCommandQueue : FirmwareLibrary::UserCommandQueue :>> userCommandQueue {
               attribute :>> discipline = QueueDiscipline::overwriteLatest;
             }
-        part plannerCommandQueue : ComponentProfiles::DriveCommandQueue::DriveCommandQueueArchitecture :>> plannerCommandQueue {
+        part plannerCommandQueue : FirmwareLibrary::DriveCommandQueue :>> plannerCommandQueue {
               attribute :>> discipline = QueueDiscipline::overwriteLatest;
             }
-        part safetyCommandQueue : ComponentProfiles::DriveCommandQueue::DriveCommandQueueArchitecture :>> safetyCommandQueue {
+        part safetyCommandQueue : FirmwareLibrary::DriveCommandQueue :>> safetyCommandQueue {
               attribute :>> discipline = QueueDiscipline::overwriteLatest;
             }
-        part mapUpdateQueue : ComponentProfiles::MapUpdateQueue::MapUpdateQueueArchitecture :>> mapUpdateQueue {
+        part mapUpdateQueue : FirmwareLibrary::MapUpdateQueue :>> mapUpdateQueue {
               attribute :>> discipline = QueueDiscipline::fifoDropOldest;
             }
         flow sensorAcquisition.run.lidarScanOut to navigation.run.lidarScanIn;

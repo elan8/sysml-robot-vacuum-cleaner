@@ -35,7 +35,7 @@ package CleaningHeadSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def CleaningHeadModuleSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def CleaningHeadModuleSpecification :> ElectronicsComponent, Elan8::SystemsEngineering::SystemSpecification {
         port power : PowerRailPort;
         port brushCommand : PwmPort;
         port vacuumCommand : PwmPort;
@@ -45,43 +45,43 @@ package CleaningHeadSystem {
         attribute suctionIntakeLongitudinalPosition : LengthValue;
     }
 
-    part def CleaningHeadModuleArchitecture :> CleaningHeadModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part brushTransmission : ComponentProfiles::BrushTransmission::BrushTransmissionSpecification;
-        part leftSideBrush : ComponentProfiles::SideBrush::SideBrushSpecification;
-        part rightSideBrush : ComponentProfiles::SideBrush::SideBrushSpecification;
-        part housing : ComponentProfiles::CleaningHeadHousing::CleaningHeadHousingSpecification;
-        part brushMotor : ComponentProfiles::BrushedDcMotor::BrushedDcMotorSpecification;
-        part brushDriver : ComponentProfiles::HBridgeMotorDriver::HBridgeMotorDriverSpecification;
-        part vacuumMotor : ComponentProfiles::BrushedDcMotor::BrushedDcMotorSpecification;
-        part vacuumDriver : ComponentProfiles::HBridgeMotorDriver::HBridgeMotorDriverSpecification;
+    part def CleaningHeadModuleArchitecture :> CleaningHeadModuleSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part brushTransmission : CleaningHeadSystem::BrushTransmission;
+        part leftSideBrush : CleaningHeadSystem::SideBrush;
+        part rightSideBrush : CleaningHeadSystem::SideBrush;
+        part housing : CleaningHeadSystem::CleaningHeadHousing;
+        part brushMotor : Elan8::Electronics::Actuation::BrushedDcMotor;
+        part brushDriver : Elan8::Electronics::Actuation::HBridgeMotorDriver;
+        part vacuumMotor : Elan8::Electronics::Actuation::BrushedDcMotor;
+        part vacuumDriver : Elan8::Electronics::Actuation::HBridgeMotorDriver;
     }
 
     part def CleaningHeadModuleIntegration :> CleaningHeadModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part brushTransmission : ComponentProfiles::BrushTransmission::BrushTransmissionArchitecture :>> brushTransmission;
-        part leftSideBrush : ComponentProfiles::SideBrush::SideBrushArchitecture :>> leftSideBrush {
+        part brushTransmission : CleaningHeadSystem::BrushTransmission :>> brushTransmission;
+        part leftSideBrush : CleaningHeadSystem::SideBrush :>> leftSideBrush {
               attribute longitudinalPosition : LengthValue = 100 [mm];
               attribute lateralPosition : LengthValue = 125 [mm];
             }
-        part rightSideBrush : ComponentProfiles::SideBrush::SideBrushArchitecture :>> rightSideBrush {
+        part rightSideBrush : CleaningHeadSystem::SideBrush :>> rightSideBrush {
               attribute longitudinalPosition : LengthValue = 100 [mm];
               attribute lateralPosition : LengthValue = -125 [mm];
             }
-        part housing : ComponentProfiles::CleaningHeadHousing::CleaningHeadHousingArchitecture :>> housing;
-        part brushMotor : ComponentProfiles::BrushedDcMotor::BrushedDcMotorArchitecture :>> brushMotor {
+        part housing : CleaningHeadSystem::CleaningHeadHousing :>> housing;
+        part brushMotor : Elan8::Electronics::Actuation::BrushedDcMotor :>> brushMotor {
               @BomItem { description = "Brush motor, brushed DC, 8 W"; sourcing = SourcingKind::buy; unitCostEur = 1.80; }
               attribute :>> ratedPower = 8 [W]; /* illustrative estimate */
               attribute :>> mass = 0.07 [kg]; /* illustrative estimate */
             }
-        part brushDriver : ComponentProfiles::HBridgeMotorDriver::HBridgeMotorDriverArchitecture :>> brushDriver {
+        part brushDriver : Elan8::Electronics::Actuation::HBridgeMotorDriver :>> brushDriver {
               @BomItem { description = "H-bridge motor driver"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
               attribute :>> mass = 0.002 [kg]; /* illustrative estimate */
             }
-        part vacuumMotor : ComponentProfiles::BrushedDcMotor::BrushedDcMotorArchitecture :>> vacuumMotor {
+        part vacuumMotor : Elan8::Electronics::Actuation::BrushedDcMotor :>> vacuumMotor {
               @BomItem { description = "Vacuum fan motor, brushed DC, 10 W"; sourcing = SourcingKind::buy; unitCostEur = 3.20; }
               attribute :>> ratedPower = 10 [W]; /* illustrative estimate */
               attribute :>> mass = 0.16 [kg]; /* illustrative estimate */
             }
-        part vacuumDriver : ComponentProfiles::HBridgeMotorDriver::HBridgeMotorDriverArchitecture :>> vacuumDriver {
+        part vacuumDriver : Elan8::Electronics::Actuation::HBridgeMotorDriver :>> vacuumDriver {
               @BomItem { description = "H-bridge motor driver"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
               attribute :>> mass = 0.002 [kg]; /* illustrative estimate */
             }
@@ -107,4 +107,33 @@ package CleaningHeadSystem {
         connect vacuumDriver.fault to fault;
     }
 
+    part def CleaningHeadHousing :> MechanicalComponent {
+        /* illustrative estimate */
+        port mainBrushAxle : RotationalMechanicalPort;
+        doc /* Brush chamber with main roller, suction duct and impeller housing. */
+        @BomItem { description = "Cleaning head housing with main brush and duct"; sourcing = SourcingKind::make; unitCostEur = 2.60; }
+        attribute :>> mass = 0.4 [kg];
+    }
+
+    part def SideBrush :> MechanicalComponent {
+        port axle : RotationalMechanicalPort;
+        attribute sweptDiameter : LengthValue = 80 [mm];
+        doc /* Three-arm edge-sweeping brush, mechanically driven by the shared brush motor.
+        * Left and right outputs counter-rotate to sweep debris towards the main roller. */
+        @BomItem { description = "Side brush, three-arm"; sourcing = SourcingKind::make; unitCostEur = 0.30; }
+        attribute :>> mass = 0.015 [kg];
+        /* illustrative estimate */
+    }
+
+    part def BrushTransmission :> MechanicalComponent {
+        /* illustrative estimate */
+        port inputShaft : RotationalMechanicalPort;
+        port mainRollerOutput : RotationalMechanicalPort;
+        port leftOutput : RotationalMechanicalPort;
+        port rightOutput : RotationalMechanicalPort;
+        doc /* Belt and gear transmission from the brush motor to the main roller and both side
+        * brushes. The mirrored side outputs sweep inward; no independent brush motors. */
+        @BomItem { description = "Brush belt and gear transmission"; sourcing = SourcingKind::make; unitCostEur = 0.60; }
+        attribute :>> mass = 0.03 [kg];
+    }
 }

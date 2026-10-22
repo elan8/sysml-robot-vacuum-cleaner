@@ -107,12 +107,12 @@ foreach ($part in $catalogSelections.Values) {
     }
 }
 foreach ($selection in $catalogSelections.GetEnumerator()) {
-    $designSuffix = if ($selection.Key -eq "RobotMainMcu") { "Integration" } else { "Architecture" }
+    $designSuffix = if ($selection.Key -eq "RobotMainMcu") { "Integration" } else { "" }
     $partBodyPattern = "part\s+def\s+" + [regex]::Escape($selection.Key) + $designSuffix +
         "\b[^{]*\{(?<body>[\s\S]*?)\n\s*\}"
     $partMatch = [regex]::Match($physicalText, $partBodyPattern)
     $dependencyPattern = "dependency\s+selectedImplementation\s+from\s+" +
-        [regex]::Escape($selection.Key) + "(?:Architecture|Integration)\s+to\s+" +
+        [regex]::Escape($selection.Key) + "(?:Integration)?\s+to\s+" +
         [regex]::Escape($selection.Value) + "\s*;"
     if (-not $partMatch.Success -or
         $partMatch.Groups["body"].Value -notmatch $dependencyPattern) {
@@ -161,9 +161,9 @@ foreach ($field in @(
 $firmwareText = $modelText
 if ([regex]::Matches(
         $firmwareText,
-        "part\s+def\s+\w+TaskSpecification\s*:>\s*(?:Periodic|EventDriven)FirmwareTask"
+        "part\s+def\s+\w+Task\s*:>\s*(?:Periodic|EventDriven)FirmwareTask"
     ).Count -ne 7) {
-    Add-Failure "FirmwareArchitecture must define exactly seven concrete firmware tasks"
+    Add-Failure "FirmwareLibrary must define exactly seven concrete firmware tasks"
 }
 foreach ($queue in @(
     "hazardQueue", "userCommandQueue", "plannerCommandQueue",

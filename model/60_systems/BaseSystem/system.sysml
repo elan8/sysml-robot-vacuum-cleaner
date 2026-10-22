@@ -35,7 +35,7 @@ package BaseSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def BaseModuleSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def BaseModuleSpecification :> MechanicalComponent, Elan8::SystemsEngineering::SystemSpecification {
         port leftPhases : ThreePhaseDrivePort;
         port rightPhases : ThreePhaseDrivePort;
         port leftOdometry : QuadratureEncoderPort;
@@ -106,35 +106,35 @@ package BaseSystem {
           }
     }
 
-    part def BaseModuleArchitecture :> BaseModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part chassis : ComponentProfiles::Chassis::ChassisSpecification;
+    part def BaseModuleArchitecture :> BaseModuleSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part chassis : BaseSystem::Chassis;
         part leftDriveTrain : DriveTrainSystem::DriveTrainSpecification;
         part rightDriveTrain : DriveTrainSystem::DriveTrainSpecification;
-        part casterWheel : ComponentProfiles::CasterWheel::CasterWheelSpecification;
-        part frontLeftCliff : ComponentProfiles::CliffSensor::CliffSensorSpecification;
-        part frontRightCliff : ComponentProfiles::CliffSensor::CliffSensorSpecification;
-        part rearLeftCliff : ComponentProfiles::CliffSensor::CliffSensorSpecification;
-        part rearRightCliff : ComponentProfiles::CliffSensor::CliffSensorSpecification;
+        part casterWheel : Elan8::Mechanical::Drivetrain::CasterWheel;
+        part frontLeftCliff : BaseSystem::CliffSensor;
+        part frontRightCliff : BaseSystem::CliffSensor;
+        part rearLeftCliff : BaseSystem::CliffSensor;
+        part rearRightCliff : BaseSystem::CliffSensor;
         part cleaningHead : CleaningHeadSystem::CleaningHeadModuleSpecification;
         part powerModule : PowerSystem::PowerModuleSpecification;
         part dockInterface : DockInterfaceSystem::DockInterfaceModuleSpecification;
     }
 
     part def BaseModuleIntegration :> BaseModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part chassis : ComponentProfiles::Chassis::ChassisArchitecture :>> chassis;
+        part chassis : BaseSystem::Chassis :>> chassis;
         part leftDriveTrain : DriveTrainSystem::DriveTrainIntegration :>> leftDriveTrain;
         part rightDriveTrain : DriveTrainSystem::DriveTrainIntegration :>> rightDriveTrain;
-        part casterWheel : ComponentProfiles::CasterWheel::CasterWheelArchitecture :>> casterWheel {
+        part casterWheel : Elan8::Mechanical::Drivetrain::CasterWheel :>> casterWheel {
               doc /* Rear support: always aft of the main roller and suction intake in the
                    * normal forward cleaning direction. Positive longitudinal position is forward. */
               attribute longitudinalPosition : LengthValue = -140 [mm];
               @BomItem { description = "Rear caster wheel"; sourcing = SourcingKind::buy; unitCostEur = 0.60; }
               attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
             }
-        part frontLeftCliff : ComponentProfiles::CliffSensor::CliffSensorArchitecture :>> frontLeftCliff;
-        part frontRightCliff : ComponentProfiles::CliffSensor::CliffSensorArchitecture :>> frontRightCliff;
-        part rearLeftCliff : ComponentProfiles::CliffSensor::CliffSensorArchitecture :>> rearLeftCliff;
-        part rearRightCliff : ComponentProfiles::CliffSensor::CliffSensorArchitecture :>> rearRightCliff;
+        part frontLeftCliff : BaseSystem::CliffSensor :>> frontLeftCliff;
+        part frontRightCliff : BaseSystem::CliffSensor :>> frontRightCliff;
+        part rearLeftCliff : BaseSystem::CliffSensor :>> rearLeftCliff;
+        part rearRightCliff : BaseSystem::CliffSensor :>> rearRightCliff;
         part cleaningHead : CleaningHeadSystem::CleaningHeadModuleIntegration :>> cleaningHead;
         part powerModule : PowerSystem::PowerModuleIntegration :>> powerModule;
         part dockInterface : DockInterfaceSystem::DockInterfaceModuleIntegration :>> dockInterface;
@@ -215,5 +215,22 @@ package BaseSystem {
             filter not @SysML::AllocationUsage;
             expose VacuumCleanerSystem::robotSystem.physical.base;
           }
+    }
+
+    part def CliffSensor :> DcPoweredSensor {
+        /* illustrative estimate */
+        port signal : GpioPort;
+        attribute triggerHeight : LengthValue = 50 [mm];
+        @BomItem { description = "Cliff sensor, infrared reflective"; sourcing = SourcingKind::buy; unitCostEur = 0.45; }
+
+        attribute :>> mass = 0.02 [kg];
+        /* illustrative estimate */
+        attribute :>> powerDraw = 0.25 [W];
+    }
+
+    part def Chassis :> MechanicalComponent {
+        doc /* Bare structural tub; everything else in BaseModule mounts on it. */
+        @BomItem { description = "Chassis tub, injection moulded"; sourcing = SourcingKind::make; unitCostEur = 3.50; }
+        attribute :>> mass = 0.3 [kg];
     }
 }

@@ -20,7 +20,7 @@ Managed `domain` and `method` archives are disabled; pinned source libraries are
 
 ## Language diagnostics
 
-The migrated baseline has 28 SysML source files, zero errors, four warnings and
+The migrated baseline has 27 SysML source files, zero errors, four warnings and
 16 informational diagnostics. The information concerns document/section views
 which compose content and intentionally have no direct exposes.
 
@@ -53,7 +53,7 @@ both forms by following semantic redefinition relationships.
 The validator exports the complete model and the domain dependency, then invokes
 the pinned methodology's `scripts/check_structure.py --complete-selection`.
 It checks independent role ancestry, boundary-only specifications, architecture
-children typed by project specifications, integration redefinition and compatible
+developed children typed by project specifications and ordinary typed leaf parts, integration redefinition and compatible
 complete child design selection. The current baseline has no structural diagnostics.
 Dependency export is essential for inherited harness, controller and PCBA parts.
 
@@ -65,8 +65,10 @@ The product usage currently adds no local root overrides.
 Role definitions are directly system-owned. The checker recognizes semantic
 inheritance and child selections independently of namespace layout; the methodology
 tests cover both direct ownership and optional grouping packages. The flattening
-retains all 62 engineering IDs/names and 10,096 selected relationship edges after
-mapping retired role-package prefixes, with identical BOM and mass-budget data.
+retained all 62 engineering IDs/names and 10,096 selected relationship edges after
+mapping retired role-package prefixes. The subsequent removal of component adapters
+changes the artificial type chains deliberately, while retaining IDs, actual
+engineering data, behavior and byte-identical BOM/mass-budget outputs.
 
 Model guards separately check required physical connections, catalog dependencies,
 metadata, seven task profiles, five runtime queue flows and satisfaction/verification

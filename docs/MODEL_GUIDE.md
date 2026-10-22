@@ -22,7 +22,8 @@ and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
 4. Follow BaseSystem, MainControlBoardSystem, TopSystem, DustBinSystem and both
    harness systems. Their specification, architecture and integration definitions show
    boundary contracts, child contracts and compatible selected child designs.
-   Shared leaf profiles and purchased part metadata live in `50_library`.
+   Ordinary leaf types come directly from the domain library; robot-specific leaf
+   definitions live with their owning systems. Purchased part metadata stays in `50_library`.
 5. Follow FirmwareSystem: seven periodic/event-driven task profiles, five typed
    runtime queues, scheduling priorities/deadlines and deployment through a
    scheduler execution platform to the main controller.
@@ -46,12 +47,19 @@ packages in VacuumCleanerSystem/Behavior.sysml, explicitly publicly imported as
 and `FirmwareLibrary` own common helper definitions. `PurchasedParts` owns six
 catalog choices; `Sourcing` owns make/buy BOM metadata.
 
-`ComponentProfiles` adapts reusable domain classifiers to project contracts and
-leaf architectures. Controller, harness and PCBA domain classifiers contain
-inherited structural parts; those are introduced at architecture level so their
-specifications remain boundary-only. The selected designs retain the same ports,
-connections and component data. PCBA `mountedComponents` and harness connector
-groups collect named subset parts, rather than creating additional purchases.
+Ordinary leaf components use the native domain types directly: BatteryPack,
+Wheel, Gearbox, BoardConnector and others. Thirty definitions with real robot
+content remain as plain specializations: brush geometry/ports, motor and sensor
+mass/power, selected catalog parts, enclosures, firmware tasks and typed queues.
+They belong to their owning systems; shared software definitions live in FirmwareLibrary.
+There is no ComponentProfiles package or synthetic PhysicalComponent role hierarchy.
+The PCB mountedComponents collection uses Elan8::Core::PhysicalComponent directly.
+
+Developed subsystems retain their actual specification/architecture/integration
+chains. Ordinary leaves need no method-role wrappers. The checker permits only
+typed leaves with no inherited or usage-local structural parts, so a hidden
+composite cannot bypass recursive subsystem checks. PCBA mountedComponents and
+harness connector groups still collect named subset parts, not extra purchases.
 
 `Navigation.sysml` preserves older qualified access paths through aliases and
 public imports. The old PhysicalArchitecture, FirmwareArchitecture, requirement,

@@ -35,7 +35,7 @@ package RobotPlatformSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def AutonomousFloorCleaningRobotSpecification :> CleaningRobot, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def AutonomousFloorCleaningRobotSpecification :> CleaningRobot, Elan8::Core::PhysicalComponent, Elan8::SystemsEngineering::SystemSpecification {
         attribute harnessMass : MassValue;
         satisfy HarnessRequirements::harnessSpecification;
         satisfy Requirements::robotSystemSpecification;
@@ -314,7 +314,7 @@ package RobotPlatformSystem {
         }
     }
 
-    part def AutonomousFloorCleaningRobotArchitecture :> AutonomousFloorCleaningRobotSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
+    part def AutonomousFloorCleaningRobotArchitecture :> AutonomousFloorCleaningRobotSpecification, Elan8::SystemsEngineering::SystemArchitecture {
         part base : BaseSystem::BaseModuleSpecification;
         part mainPcb : MainControlBoardSystem::MainPcbModuleSpecification;
         part top : TopSystem::TopModuleSpecification;

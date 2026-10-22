@@ -35,7 +35,7 @@ package TopSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def TopModuleSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def TopModuleSpecification :> MechanicalComponent, Elan8::SystemsEngineering::SystemSpecification {
         port sensorBus : I2cControllerPort;
         port lidarSerial : UartPort;
         port power : PowerRailPort;
@@ -65,31 +65,31 @@ package TopSystem {
           }
     }
 
-    part def TopModuleArchitecture :> TopModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part shell : ComponentProfiles::TopShell::TopShellSpecification;
-        part lidar : ComponentProfiles::RobotLidar::RobotLidarSpecification;
-        part frontTof : ComponentProfiles::RobotTofSensor::RobotTofSensorSpecification;
-        part leftTof : ComponentProfiles::RobotTofSensor::RobotTofSensorSpecification;
-        part rightTof : ComponentProfiles::RobotTofSensor::RobotTofSensorSpecification;
-        part frontBumper : ComponentProfiles::BumperSwitch::BumperSwitchSpecification;
-        part hmi : ComponentProfiles::HumanMachineInterface::HumanMachineInterfaceSpecification;
-        part i2c : ComponentProfiles::SensorI2cBus::SensorI2cBusSpecification;
-        part uart : ComponentProfiles::LidarUartBus::LidarUartBusSpecification;
+    part def TopModuleArchitecture :> TopModuleSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part shell : TopSystem::TopShell;
+        part lidar : TopSystem::RobotLidar;
+        part frontTof : TopSystem::RobotTofSensor;
+        part leftTof : TopSystem::RobotTofSensor;
+        part rightTof : TopSystem::RobotTofSensor;
+        part frontBumper : DomainModel::BumperSwitch;
+        part hmi : TopSystem::HumanMachineInterface;
+        part i2c : DomainModel::SensorI2cBus;
+        part uart : DomainModel::LidarUartBus;
     }
 
     part def TopModuleIntegration :> TopModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part shell : ComponentProfiles::TopShell::TopShellArchitecture :>> shell;
-        part lidar : ComponentProfiles::RobotLidar::RobotLidarArchitecture :>> lidar;
-        part frontTof : ComponentProfiles::RobotTofSensor::RobotTofSensorArchitecture :>> frontTof;
-        part leftTof : ComponentProfiles::RobotTofSensor::RobotTofSensorArchitecture :>> leftTof;
-        part rightTof : ComponentProfiles::RobotTofSensor::RobotTofSensorArchitecture :>> rightTof;
-        part frontBumper : ComponentProfiles::BumperSwitch::BumperSwitchArchitecture :>> frontBumper {
+        part shell : TopSystem::TopShell :>> shell;
+        part lidar : TopSystem::RobotLidar :>> lidar;
+        part frontTof : TopSystem::RobotTofSensor :>> frontTof;
+        part leftTof : TopSystem::RobotTofSensor :>> leftTof;
+        part rightTof : TopSystem::RobotTofSensor :>> rightTof;
+        part frontBumper : DomainModel::BumperSwitch :>> frontBumper {
               @BomItem { description = "Bumper switch assembly"; sourcing = SourcingKind::buy; unitCostEur = 0.20; }
               attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
             }
-        part hmi : ComponentProfiles::HumanMachineInterface::HumanMachineInterfaceArchitecture :>> hmi;
-        part i2c : ComponentProfiles::SensorI2cBus::SensorI2cBusArchitecture :>> i2c;
-        part uart : ComponentProfiles::LidarUartBus::LidarUartBusArchitecture :>> uart;
+        part hmi : TopSystem::HumanMachineInterface :>> hmi;
+        part i2c : DomainModel::SensorI2cBus :>> i2c;
+        part uart : DomainModel::LidarUartBus :>> uart;
         attribute :>> mass = sum(
               lidar.mass, frontTof.mass, leftTof.mass, rightTof.mass,
               frontBumper.mass, hmi.mass, shell.mass
@@ -133,5 +133,44 @@ package TopSystem {
             filter not @SysML::AllocationUsage;
             expose VacuumCleanerSystem::robotSystem.physical.top;
           }
+    }
+
+    part def RobotTofSensor :> DcPoweredSensor, I2cDataSensor {
+        attribute range : LengthValue = 1200 [mm];
+        @BomItem { description = "Time-of-flight distance sensor module"; sourcing = SourcingKind::buy; unitCostEur = 2.60; }
+
+        attribute :>> mass = 0.03 [kg];
+        /* illustrative estimate */
+        attribute :>> powerDraw = 0.1 [W];
+        /* illustrative estimate */
+        dependency selectedImplementation
+            from RobotTofSensor to VL53L1CX;
+    }
+
+    part def RobotLidar :> DcPoweredSensor, UartDataSensor {
+        attribute scanRate : FrequencyValue = 10 [Hz];
+        attribute range : LengthValue = 6000 [mm];
+        @BomItem { description = "360° laser distance scanner"; sourcing = SourcingKind::buy; unitCostEur = 35.00; }
+
+        attribute :>> mass = 0.15 [kg];
+        /* illustrative estimate */
+        attribute :>> powerDraw = 3.5 [W];
+        /* illustrative estimate */
+        dependency selectedImplementation
+            from RobotLidar to RPLIDARC1;
+    }
+
+    part def HumanMachineInterface :> ElectronicsComponent {
+        port power : ~PowerRailPort;
+        port control : ~LocalHmiControllerPort;
+        @BomItem { description = "Button and indicator board"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
+        attribute :>> powerDraw = 1 [W];
+        attribute :>> mass = 0.08 [kg];
+    }
+
+    part def TopShell :> MechanicalComponent {
+        doc /* Outer cover with the bumper carrier and the LiDAR turret opening. */
+        @BomItem { description = "Top shell with bumper carrier, moulded"; sourcing = SourcingKind::make; unitCostEur = 2.80; }
+        attribute :>> mass = 0.2 [kg];
     }
 }

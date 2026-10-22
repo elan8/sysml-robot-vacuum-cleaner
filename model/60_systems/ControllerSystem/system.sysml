@@ -35,7 +35,7 @@ package ControllerSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def RobotMainMcuSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def RobotMainMcuSpecification :> ElectronicsComponent, Elan8::SystemsEngineering::SystemSpecification {
         /* illustrative estimate */
             port sensorI2c : I2cControllerPort;
         port lidarUart : UartPort;
@@ -63,15 +63,15 @@ package ControllerSystem {
         port power : ~PowerRailPort;
     }
 
-    part def RobotMainMcuArchitecture :> RobotMainMcuSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Microcontroller, Elan8::SystemsEngineering::SystemArchitecture {
-        part memories : ComponentProfiles::MemoryBlock::MemoryBlockSpecification [0..*] :>> memories;
-        part peripherals : ComponentProfiles::PeripheralBlock::PeripheralBlockSpecification [0..*] :>> peripherals;
+    part def RobotMainMcuArchitecture :> RobotMainMcuSpecification, Microcontroller, Elan8::SystemsEngineering::SystemArchitecture {
+        part memories : Elan8::Electronics::Compute::MemoryBlock [0..*] :>> memories;
+        part peripherals : Elan8::Electronics::Compute::PeripheralBlock [0..*] :>> peripherals;
         port power : ~PowerRailPort :>> RobotMainMcuSpecification::power, Microcontroller::power;
     }
 
     part def RobotMainMcuIntegration :> RobotMainMcuArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part memories : ComponentProfiles::MemoryBlock::MemoryBlockArchitecture[0..*] :>> memories;
-        part peripherals : ComponentProfiles::PeripheralBlock::PeripheralBlockArchitecture[0..*] :>> peripherals;
+        part memories : Elan8::Electronics::Compute::MemoryBlock[0..*] :>> memories;
+        part peripherals : Elan8::Electronics::Compute::PeripheralBlock[0..*] :>> peripherals;
         @BomItem { description = "Main microcontroller"; sourcing = SourcingKind::buy; unitCostEur = 4.60; }
         attribute :>> mass = 0.01 [kg];
         /* illustrative estimate */

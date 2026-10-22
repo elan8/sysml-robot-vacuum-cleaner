@@ -3,33 +3,33 @@
 // Public import paths preserve references without duplicating authoritative elements.
 package PhysicalArchitecture {
     public import PhysicalShared::*;
-    alias DriveMotor for ComponentProfiles::DriveMotor::DriveMotorArchitecture;
+    alias DriveMotor for DriveTrainSystem::DriveMotor;
     alias DriveTrain for DriveTrainSystem::DriveTrainIntegration;
-    alias CleaningHeadHousing for ComponentProfiles::CleaningHeadHousing::CleaningHeadHousingArchitecture;
-    alias SideBrush for ComponentProfiles::SideBrush::SideBrushArchitecture;
-    alias BrushTransmission for ComponentProfiles::BrushTransmission::BrushTransmissionArchitecture;
+    alias CleaningHeadHousing for CleaningHeadSystem::CleaningHeadHousing;
+    alias SideBrush for CleaningHeadSystem::SideBrush;
+    alias BrushTransmission for CleaningHeadSystem::BrushTransmission;
     alias CleaningHeadModule for CleaningHeadSystem::CleaningHeadModuleIntegration;
-    alias RobotTofSensor for ComponentProfiles::RobotTofSensor::RobotTofSensorArchitecture;
-    alias RobotLidar for ComponentProfiles::RobotLidar::RobotLidarArchitecture;
-    alias CliffSensor for ComponentProfiles::CliffSensor::CliffSensorArchitecture;
-    alias RobotBms for ComponentProfiles::RobotBms::RobotBmsArchitecture;
-    alias RobotBatteryCharger for ComponentProfiles::RobotBatteryCharger::RobotBatteryChargerArchitecture;
+    alias RobotTofSensor for TopSystem::RobotTofSensor;
+    alias RobotLidar for TopSystem::RobotLidar;
+    alias CliffSensor for BaseSystem::CliffSensor;
+    alias RobotBms for PowerSystem::RobotBms;
+    alias RobotBatteryCharger for PowerSystem::RobotBatteryCharger;
     alias PowerModule for PowerSystem::PowerModuleIntegration;
-    alias DockContactAssembly for ComponentProfiles::DockContactAssembly::DockContactAssemblyArchitecture;
+    alias DockContactAssembly for DockInterfaceSystem::DockContactAssembly;
     alias DockInterfaceModule for DockInterfaceSystem::DockInterfaceModuleIntegration;
-    alias Chassis for ComponentProfiles::Chassis::ChassisArchitecture;
+    alias Chassis for BaseSystem::Chassis;
     alias BaseModule for BaseSystem::BaseModuleIntegration;
     alias RobotMainMcu for ControllerSystem::RobotMainMcuIntegration;
-    alias RobotMotorDriver for ComponentProfiles::RobotMotorDriver::RobotMotorDriverArchitecture;
-    alias RobotWirelessModule for ComponentProfiles::RobotWirelessModule::RobotWirelessModuleArchitecture;
-    alias RobotControlBoard for ComponentProfiles::RobotControlBoard::RobotControlBoardArchitecture;
+    alias RobotMotorDriver for MainControlBoardSystem::RobotMotorDriver;
+    alias RobotWirelessModule for MainControlBoardSystem::RobotWirelessModule;
+    alias RobotControlBoard for MainControlBoardSystem::RobotControlBoard;
     alias MainPcbModule for MainControlBoardSystem::MainPcbModuleIntegration;
-    alias HumanMachineInterface for ComponentProfiles::HumanMachineInterface::HumanMachineInterfaceArchitecture;
-    alias TopShell for ComponentProfiles::TopShell::TopShellArchitecture;
+    alias HumanMachineInterface for TopSystem::HumanMachineInterface;
+    alias TopShell for TopSystem::TopShell;
     alias TopModule for TopSystem::TopModuleIntegration;
-    alias DustBinLid for ComponentProfiles::DustBinLid::DustBinLidArchitecture;
-    alias DustFilter for ComponentProfiles::DustFilter::DustFilterArchitecture;
-    alias DustBinBody for ComponentProfiles::DustBinBody::DustBinBodyArchitecture;
+    alias DustBinLid for DustBinSystem::DustBinLid;
+    alias DustFilter for DustBinSystem::DustFilter;
+    alias DustBinBody for DustBinSystem::DustBinBody;
     alias DustBin for DustBinSystem::DustBinIntegration;
     alias BaseWiringHarness for BaseHarnessSystem::BaseWiringHarnessIntegration;
     alias TopWiringHarness for TopHarnessSystem::TopWiringHarnessIntegration;
@@ -38,17 +38,7 @@ package PhysicalArchitecture {
 
 package FirmwareArchitecture {
     public import FirmwareLibrary::*;
-    alias HazardEventQueue for ComponentProfiles::HazardEventQueue::HazardEventQueueArchitecture;
-    alias UserCommandQueue for ComponentProfiles::UserCommandQueue::UserCommandQueueArchitecture;
-    alias DriveCommandQueue for ComponentProfiles::DriveCommandQueue::DriveCommandQueueArchitecture;
-    alias MapUpdateQueue for ComponentProfiles::MapUpdateQueue::MapUpdateQueueArchitecture;
-    alias MissionControllerTask for ComponentProfiles::MissionControllerTask::MissionControllerTaskArchitecture;
-    alias SafetySupervisorTask for ComponentProfiles::SafetySupervisorTask::SafetySupervisorTaskArchitecture;
-    alias ActuatorControlTask for ComponentProfiles::ActuatorControlTask::ActuatorControlTaskArchitecture;
-    alias SensorAcquisitionTask for ComponentProfiles::SensorAcquisitionTask::SensorAcquisitionTaskArchitecture;
-    alias NavigationTask for ComponentProfiles::NavigationTask::NavigationTaskArchitecture;
-    alias PowerManagerTask for ComponentProfiles::PowerManagerTask::PowerManagerTaskArchitecture;
-    alias AppServiceTask for ComponentProfiles::AppServiceTask::AppServiceTaskArchitecture;
+
     alias FirmwareTaskArchitecture for FirmwareSystem::FirmwareTaskArchitectureIntegration;
 }
 

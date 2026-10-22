@@ -35,37 +35,37 @@ package DriveTrainSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def DriveTrainSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def DriveTrainSpecification :> MechanicalComponent, Elan8::SystemsEngineering::SystemSpecification {
         port phases : ThreePhaseDrivePort;
         port odometry : QuadratureEncoderPort;
         port liftHazard : GpioPort;
     }
 
-    part def DriveTrainArchitecture :> DriveTrainSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part motor : ComponentProfiles::DriveMotor::DriveMotorSpecification;
-        part gearbox : ComponentProfiles::Gearbox::GearboxSpecification;
-        part wheel : ComponentProfiles::Wheel::WheelSpecification;
-        part encoder : ComponentProfiles::QuadratureEncoder::QuadratureEncoderSpecification;
-        part lift : ComponentProfiles::LiftSwitch::LiftSwitchSpecification;
+    part def DriveTrainArchitecture :> DriveTrainSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part motor : DriveTrainSystem::DriveMotor;
+        part gearbox : Elan8::Mechanical::Drivetrain::Gearbox;
+        part wheel : Elan8::Mechanical::Drivetrain::Wheel;
+        part encoder : Elan8::Electronics::Sensing::QuadratureEncoder;
+        part lift : DomainModel::LiftSwitch;
     }
 
     part def DriveTrainIntegration :> DriveTrainArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part motor : ComponentProfiles::DriveMotor::DriveMotorArchitecture :>> motor;
-        part gearbox : ComponentProfiles::Gearbox::GearboxArchitecture :>> gearbox {
+        part motor : DriveTrainSystem::DriveMotor :>> motor;
+        part gearbox : Elan8::Mechanical::Drivetrain::Gearbox :>> gearbox {
               @BomItem { description = "Planetary gearbox, 30:1"; sourcing = SourcingKind::buy; unitCostEur = 1.60; }
               attribute :>> gearRatio = 30 [one]; /* illustrative estimate */
               attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
             }
-        part wheel : ComponentProfiles::Wheel::WheelArchitecture :>> wheel {
+        part wheel : Elan8::Mechanical::Drivetrain::Wheel :>> wheel {
               @BomItem { description = "Drive wheel with tyre, 65 mm"; sourcing = SourcingKind::make; unitCostEur = 0.90; }
               attribute :>> diameter = 65 [mm]; /* illustrative estimate */
               attribute :>> mass = 0.08 [kg]; /* illustrative estimate */
             }
-        part encoder : ComponentProfiles::QuadratureEncoder::QuadratureEncoderArchitecture :>> encoder {
+        part encoder : Elan8::Electronics::Sensing::QuadratureEncoder :>> encoder {
               @BomItem { description = "Quadrature encoder, magnetic"; sourcing = SourcingKind::buy; unitCostEur = 0.70; }
               attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
             }
-        part lift : ComponentProfiles::LiftSwitch::LiftSwitchArchitecture :>> lift {
+        part lift : DomainModel::LiftSwitch :>> lift {
               @BomItem { description = "Wheel-drop switch"; sourcing = SourcingKind::buy; unitCostEur = 0.15; }
               attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
             }
@@ -78,4 +78,9 @@ package DriveTrainSystem {
         connect lift.signal to liftHazard;
     }
 
+    part def DriveMotor :> BldcMotor {
+        @BomItem { description = "Drive motor, brushless DC, 14 W"; sourcing = SourcingKind::buy; unitCostEur = 4.80; }
+        attribute :>> ratedPower = 14 [W];
+        attribute :>> mass = 0.14 [kg];
+    }
 }

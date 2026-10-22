@@ -35,20 +35,20 @@ package DockInterfaceSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def DockInterfaceModuleSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def DockInterfaceModuleSpecification :> ElectronicsComponent, Elan8::SystemsEngineering::SystemSpecification {
         port dockPowerInput : ~PowerRailPort;
         port chargePowerOutput : PowerRailPort;
         port beaconDetected : GpioPort;
     }
 
-    part def DockInterfaceModuleArchitecture :> DockInterfaceModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part contacts : ComponentProfiles::DockContactAssembly::DockContactAssemblySpecification;
-        part beaconReceiver : ComponentProfiles::HomingBeaconReceiver::HomingBeaconReceiverSpecification;
+    part def DockInterfaceModuleArchitecture :> DockInterfaceModuleSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part contacts : DockInterfaceSystem::DockContactAssembly;
+        part beaconReceiver : DomainModel::HomingBeaconReceiver;
     }
 
     part def DockInterfaceModuleIntegration :> DockInterfaceModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part contacts : ComponentProfiles::DockContactAssembly::DockContactAssemblyArchitecture :>> contacts;
-        part beaconReceiver : ComponentProfiles::HomingBeaconReceiver::HomingBeaconReceiverArchitecture :>> beaconReceiver {
+        part contacts : DockInterfaceSystem::DockContactAssembly :>> contacts;
+        part beaconReceiver : DomainModel::HomingBeaconReceiver :>> beaconReceiver {
               @BomItem { description = "Infrared homing-beacon receiver"; sourcing = SourcingKind::buy; unitCostEur = 0.35; }
               attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
               attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
@@ -64,4 +64,9 @@ package DockInterfaceSystem {
         connect beaconReceiver.detection to beaconDetected;
     }
 
+    part def DockContactAssembly :> MechanicalComponent {
+        doc /* Two sprung charging contacts in their carrier. */
+        @BomItem { description = "Charging contact assembly"; sourcing = SourcingKind::make; unitCostEur = 0.80; }
+        attribute :>> mass = 0.05 [kg];
+    }
 }

@@ -35,7 +35,7 @@ package DustBinSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def DustBinSpecification :> MechanicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def DustBinSpecification :> MechanicalComponent, Elan8::SystemsEngineering::SystemSpecification {
         port debrisIn : ~CleaningFlowPort;
         attribute capacity : VolumeValue;
         satisfy Requirements::dustBinSpecification;
@@ -55,16 +55,16 @@ package DustBinSystem {
           }
     }
 
-    part def DustBinArchitecture :> DustBinSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part body : ComponentProfiles::DustBinBody::DustBinBodySpecification;
-        part lid : ComponentProfiles::DustBinLid::DustBinLidSpecification;
-        part 'filter' : ComponentProfiles::DustFilter::DustFilterSpecification;
+    part def DustBinArchitecture :> DustBinSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part body : DustBinSystem::DustBinBody;
+        part lid : DustBinSystem::DustBinLid;
+        part 'filter' : DustBinSystem::DustFilter;
     }
 
     part def DustBinIntegration :> DustBinArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part body : ComponentProfiles::DustBinBody::DustBinBodyArchitecture :>> body;
-        part lid : ComponentProfiles::DustBinLid::DustBinLidArchitecture :>> lid;
-        part redefines 'filter' : ComponentProfiles::DustFilter::DustFilterArchitecture;
+        part body : DustBinSystem::DustBinBody :>> body;
+        part lid : DustBinSystem::DustBinLid :>> lid;
+        part redefines 'filter' : DustBinSystem::DustFilter;
         doc /*
               Tool-free-removable module, independent of Base/Top — matches it being a
               separately replaceable real-world spare part. Purely mechanical: no ports,
@@ -74,4 +74,18 @@ package DustBinSystem {
         attribute :>> capacity = 450 [mL];
     }
 
+    part def DustBinLid :> MechanicalComponent {
+        @BomItem { description = "Dust bin lid, moulded"; sourcing = SourcingKind::make; unitCostEur = 0.30; }
+        attribute :>> mass = 0.03 [kg];
+    }
+
+    part def DustFilter :> MechanicalComponent {
+        @BomItem { description = "Pleated dust filter"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
+        attribute :>> mass = 0.02 [kg];
+    }
+
+    part def DustBinBody :> MechanicalComponent {
+        @BomItem { description = "Dust bin body, moulded"; sourcing = SourcingKind::make; unitCostEur = 0.70; }
+        attribute :>> mass = 0.15 [kg];
+    }
 }

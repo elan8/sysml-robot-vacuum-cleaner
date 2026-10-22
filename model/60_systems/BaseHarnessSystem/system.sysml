@@ -35,7 +35,7 @@ package BaseHarnessSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def BaseWiringHarnessSpecification :> Elan8::Core::PhysicalComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def BaseWiringHarnessSpecification :> Elan8::Core::PhysicalComponent, Elan8::SystemsEngineering::SystemSpecification {
         port pcbBatteryPower : PowerRailPort;
         port baseBatteryRail : PowerRailPort;
         port pcbLogicPower : PowerRailPort;
@@ -74,19 +74,19 @@ package BaseHarnessSystem {
         port baseDockBeaconDetected : GpioPort;
     }
 
-    part def BaseWiringHarnessArchitecture :> BaseWiringHarnessSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, WiringHarness, Elan8::SystemsEngineering::SystemArchitecture {
-        part pcbConnector : ComponentProfiles::BoardConnector::BoardConnectorSpecification :> connectors;
-        part baseConnector : ComponentProfiles::ElectronicConnector::ElectronicConnectorSpecification :> connectors;
-        part connectors : ComponentProfiles::ElectronicConnector::ElectronicConnectorSpecification [2..*] :>> connectors;
-        part conductors : ComponentProfiles::HarnessConductor::HarnessConductorSpecification [1..*] :>> conductors;
+    part def BaseWiringHarnessArchitecture :> BaseWiringHarnessSpecification, WiringHarness, Elan8::SystemsEngineering::SystemArchitecture {
+        part pcbConnector : Elan8::Electronics::Interconnection::BoardConnector :> connectors;
+        part baseConnector : Elan8::Electronics::Interconnection::ElectronicConnector :> connectors;
+        part connectors : Elan8::Electronics::Interconnection::ElectronicConnector [2..*] :>> connectors;
+        part conductors : Elan8::Electronics::Interconnection::HarnessConductor [1..*] :>> conductors;
     }
 
     part def BaseWiringHarnessIntegration :> BaseWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration {
         /* illustrative estimate */
-            part pcbConnector : ComponentProfiles::BoardConnector::BoardConnectorArchitecture :>> pcbConnector :> connectors;
-        part baseConnector : ComponentProfiles::ElectronicConnector::ElectronicConnectorArchitecture :>> baseConnector :> connectors;
-        part connectors : ComponentProfiles::ElectronicConnector::ElectronicConnectorArchitecture[2] :>> connectors = (pcbConnector, baseConnector);
-        part conductors : ComponentProfiles::HarnessConductor::HarnessConductorArchitecture[1..*] :>> conductors;
+            part pcbConnector : Elan8::Electronics::Interconnection::BoardConnector :>> pcbConnector :> connectors;
+        part baseConnector : Elan8::Electronics::Interconnection::ElectronicConnector :>> baseConnector :> connectors;
+        part connectors : Elan8::Electronics::Interconnection::ElectronicConnector[2] :>> connectors = (pcbConnector, baseConnector);
+        part conductors : Elan8::Electronics::Interconnection::HarnessConductor[1..*] :>> conductors;
         @BomItem { description = "Base wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.90; }
         attribute :>> mass = 0.12 [kg];
         connect pcbBatteryPower to baseBatteryRail;

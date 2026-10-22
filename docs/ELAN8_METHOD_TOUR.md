@@ -2,7 +2,7 @@
 
 The model follows the updated MBSE methodology: one project context, stakeholder
 needs, shared types, flat systems and publication sources. Recursive composition
-is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/d4fa2f0dad0c6886cd96d4409677a7dc95c1974f/docs/structure.md)
+is semantic, not folder nesting. See [structure](https://github.com/elan8/mbse-methodology/blob/44d63e9342db3455479de34b6b929776f7c4e6c9/docs/structure.md)
 and the project's [baseline](../project.md).
 
 Start with `00_context/Context.sysml`, then the four scenarios in `10_usecases`
@@ -13,10 +13,12 @@ Traceability packages own the 21 system obligations and their derivations.
 Each of the fourteen developed systems has one `60_systems/<System>/system.sysml`.
 Its specification definition is a black box with boundary ports/properties and
 asserted requirements. Its architecture specializes that specification and the independent
-architecture marker; child parts are typed by child specifications. Its integration
+architecture marker; developed children are typed by child specifications, while
+ordinary leaf components use native types or plain product specializations. Its integration
 specializes the architecture and the integration marker, redefining those parts
 with selected compatible architectures or integrations. A leaf architecture can
-be selected directly. Shared leaf contracts/designs live in `50_library/ComponentProfiles.sysml`.
+be selected directly. Ordinary leaf parts use domain types directly. Robot-specific leaf definitions live
+with their systems; shared firmware types live in `50_library/FirmwareLibrary.sysml`.
 
 The three role definitions belong directly to the system package. Role subpackages
 are optional in the methodology; this model does not use them. `Requirements`,

@@ -35,7 +35,7 @@ package PowerSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def PowerModuleSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def PowerModuleSpecification :> ElectronicsComponent, Elan8::SystemsEngineering::SystemSpecification {
         port batteryRail : PowerRailPort;
         port logicRail : PowerRailPort;
         port sensorRail : PowerRailPort;
@@ -46,37 +46,37 @@ package PowerSystem {
         attribute sensorRailBudget : PowerRailBudget;
     }
 
-    part def PowerModuleArchitecture :> PowerModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, Elan8::SystemsEngineering::SystemArchitecture {
-        part battery : ComponentProfiles::BatteryPack::BatteryPackSpecification;
-        part charger : ComponentProfiles::RobotBatteryCharger::RobotBatteryChargerSpecification;
-        part bms : ComponentProfiles::RobotBms::RobotBmsSpecification;
-        part logicRegulator : ComponentProfiles::VoltageRegulator::VoltageRegulatorSpecification;
-        part sensorRegulator : ComponentProfiles::VoltageRegulator::VoltageRegulatorSpecification;
-        part smbus : ComponentProfiles::BmsSmbusBus::BmsSmbusBusSpecification;
+    part def PowerModuleArchitecture :> PowerModuleSpecification, Elan8::SystemsEngineering::SystemArchitecture {
+        part battery : Elan8::Electronics::Power::BatteryPack;
+        part charger : PowerSystem::RobotBatteryCharger;
+        part bms : PowerSystem::RobotBms;
+        part logicRegulator : Elan8::Electronics::Power::VoltageRegulator;
+        part sensorRegulator : Elan8::Electronics::Power::VoltageRegulator;
+        part smbus : DomainModel::BmsSmbusBus;
     }
 
     part def PowerModuleIntegration :> PowerModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part battery : ComponentProfiles::BatteryPack::BatteryPackArchitecture :>> battery {
+        part battery : Elan8::Electronics::Power::BatteryPack :>> battery {
               @BomItem { description = "Lithium-ion battery pack, 4S2P, 14.4 V"; sourcing = SourcingKind::buy; unitCostEur = 16.00; }
               attribute :>> nominalCapacity = 6400 [mAh];
               attribute :>> nominalVoltage = 14.4 [V];
               attribute :>> mass = 0.50 [kg]; /* eight 18650 cells and pack hardware */
             }
-        part charger : ComponentProfiles::RobotBatteryCharger::RobotBatteryChargerArchitecture :>> charger;
-        part bms : ComponentProfiles::RobotBms::RobotBmsArchitecture :>> bms;
-        part logicRegulator : ComponentProfiles::VoltageRegulator::VoltageRegulatorArchitecture :>> logicRegulator {
+        part charger : PowerSystem::RobotBatteryCharger :>> charger;
+        part bms : PowerSystem::RobotBms :>> bms;
+        part logicRegulator : Elan8::Electronics::Power::VoltageRegulator :>> logicRegulator {
               @BomItem { description = "Buck regulator, 3.3 V"; sourcing = SourcingKind::buy; unitCostEur = 0.40; }
               attribute :>> outputVoltage = 3.3 [V];
               attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
               attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
             }
-        part sensorRegulator : ComponentProfiles::VoltageRegulator::VoltageRegulatorArchitecture :>> sensorRegulator {
+        part sensorRegulator : Elan8::Electronics::Power::VoltageRegulator :>> sensorRegulator {
               @BomItem { description = "Buck regulator, 5 V"; sourcing = SourcingKind::buy; unitCostEur = 0.40; }
               attribute :>> outputVoltage = 5 [V];
               attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
               attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
             }
-        part smbus : ComponentProfiles::BmsSmbusBus::BmsSmbusBusArchitecture :>> smbus;
+        part smbus : DomainModel::BmsSmbusBus :>> smbus;
         attribute :>> powerDraw =
               sum(charger.quiescentPower, bms.quiescentPower,
                   logicRegulator.quiescentPower, sensorRegulator.quiescentPower);
@@ -121,5 +121,25 @@ package PowerSystem {
             filter not @SysML::AllocationUsage;
             expose VacuumCleanerSystem::robotSystem.physical.base.powerModule;
           }
+    }
+
+    part def RobotBms :> BatteryManagementSystem {
+        @BomItem { description = "Battery gauge and protection circuit"; sourcing = SourcingKind::buy; unitCostEur = 2.90; }
+        attribute :>> maxChargeCurrent = 2 [A];
+        attribute :>> maxCellTemperature = 328.15 [K];
+        attribute :>> mass = 0.03 [kg];
+        /* illustrative estimate */
+        attribute :>> quiescentPower = 1 [W];
+        /* illustrative estimate */
+        dependency selectedImplementation
+            from RobotBms to BQ40Z50R2;
+    }
+
+    part def RobotBatteryCharger :> BatteryCharger {
+        @BomItem { description = "Battery charger stage, 2 A"; sourcing = SourcingKind::buy; unitCostEur = 1.20; }
+        attribute :>> maxChargeCurrent = 2 [A];
+        attribute :>> quiescentPower = 0.5 [W];
+        attribute :>> powerDraw = 0.5 [W];
+        attribute :>> mass = 0.04 [kg];
     }
 }

@@ -1,6 +1,6 @@
 # Methodology migration
 
-Baseline: methodology commit `d4fa2f0dad0c6886cd96d4409677a7dc95c1974f` (0.4.0).
+Baseline: methodology commit `44d63e9342db3455479de34b6b929776f7c4e6c9` (0.5.0).
 The old discipline folders are replaced by context, use cases, stakeholder
 requirements, shared library, flat systems and document sources. No old source
 tree is inside the active `model/` load boundary.
@@ -11,7 +11,7 @@ tokens change on moves; use semantic names and engineering IDs for migration.
 Compatibility imports/aliases in `50_library/Navigation.sysml` preserve the older
 discipline-based access paths without duplicating authoritative definitions.
 
-Role definitions now belong directly to their system or component profile package.
+Role definitions now belong directly to their system package.
 For example, `DriveTrainSystem::DriveTrainSpecification` and
 `DriveTrainSystem::DriveTrainIntegration` replace the intermediate role-package
 paths. The old Specification/Architecture/Integration wrappers are removed,
@@ -43,11 +43,17 @@ explicitly so flattening does not broaden their scope to designs.
 | `FirmwareTaskArchitecture` | `FirmwareSystem::FirmwareTaskArchitectureSpecification` | `FirmwareSystem::FirmwareTaskArchitectureIntegration` |
 | `CleaningRobotSystemOfInterest` | `VacuumCleanerSystem::CleaningRobotSystemOfInterestSpecification` | `VacuumCleanerSystem::CleaningRobotSystemOfInterestIntegration` |
 
-Leaf definitions now live under
-`ComponentProfiles::<OriginalName>` with matching
-`<OriginalName>Specification` and `<OriginalName>Architecture` classifiers.
-Shared abstract tasks remain in FirmwareLibrary; common physical relations
-remain in PhysicalShared. PurchasedParts, Sourcing and DomainModel retain names.
+The subsequent simplification removes ComponentProfiles.sysml and all 53 adapter
+pairs. Twenty-three ordinary types reference domain definitions directly. Thirty
+plain definitions preserve actual robot data/ports/behavior with their owning
+systems or FirmwareLibrary. For example SideBrush is CleaningHeadSystem::SideBrush,
+RobotMotorDriver is MainControlBoardSystem::RobotMotorDriver, and SafetySupervisorTask
+is FirmwareLibrary::SafetySupervisorTask. There is no substitute profile hierarchy.
+The core PhysicalComponent domain type is used directly for mountedComponents.
+The developed systems in the table above retain their recursive role definitions.
+All 62 engineering IDs/names and 580 behavior, connection, dependency and
+traceability relationship edges remain unchanged after mapping the moved definitions.
+The 53 artificial contract/design pairs are deliberately no longer present.
 
 ## Other canonical owners
 

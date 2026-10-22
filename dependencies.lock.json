@@ -8,7 +8,7 @@
   },
   "methodology": {
     "repository": "https://github.com/elan8/mbse-methodology",
-    "commit": "d4fa2f0dad0c6886cd96d4409677a7dc95c1974f"
+    "commit": "44d63e9342db3455479de34b6b929776f7c4e6c9"
   },
   "domain": {
     "repository": "https://github.com/elan8/sysml-domain-libraries",

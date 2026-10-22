@@ -1,7 +1,7 @@
 # Robot vacuum model baseline
 
-This project follows MBSE methodology 0.4.0 at commit
-`d4fa2f0dad0c6886cd96d4409677a7dc95c1974f`. Exact dependencies are in
+This project follows MBSE methodology 0.5.0 at commit
+`44d63e9342db3455479de34b6b929776f7c4e6c9`. Exact dependencies are in
 `dependencies.lock.json`; validation verifies both dependency checkout revisions.
 Use Spec42 0.56.0 with its 2026-04 standard libraries. The domain source pin also
 includes `Elan8::Documents`; it is intentionally newer than the methodology's
@@ -21,7 +21,8 @@ this example omits them. Requirements, limits and budgets remain in useful named
 system-owned packages, and specifications assert their applicable requirements.
 Analyses, verification cases and views stay with their assessed system.
 `20_requirements` owns stakeholder needs. `50_library` contains shared interfaces,
-component contract/design profiles and purchased parts. `80_documents` owns
+shared firmware types and purchased parts. Ordinary leaf components use domain
+types directly; product-specific leaf definitions live with their owning systems. `80_documents` owns
 publication sources. All disposable outputs belong in ignored `generated/`.
 
 The single selected product usage is

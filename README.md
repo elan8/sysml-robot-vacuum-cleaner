@@ -23,10 +23,10 @@ carry the engineering, not only describe it:
 
 | Question a project has to answer | Where the model answers it |
 | --- | --- |
-| What does the customer need? | 11 customer requirements in the household's words (`USR-…`) |
-| What must the system do, measurably? | 21 system requirements, each a constraint against a design limit (`SYS-…`) |
+| What does the customer need? | 11 customer requirements in the household's words (`USR-â€¦`) |
+| What must the system do, measurably? | 21 system requirements, each a constraint against a design limit (`SYS-â€¦`) |
 | Is every need covered, and why? | One derivation per customer requirement, with the reason the set is complete |
-| Who has to deliver what? | 13 module requirements with budgets for safe-stop time, mass, height and energy (`BASE-…`, `PCB-…`, `FW-…`, `TOP-…`) |
+| Who has to deliver what? | 13 module requirements with budgets for safe-stop time, mass, height and energy (`BASE-â€¦`, `PCB-â€¦`, `FW-â€¦`, `TOP-â€¦`) |
 | What is it made of, and what does it cost and weigh? | Physical architecture with 49 parts; generated bill of materials and mass budget |
 | Does the design hold? | Four analyses: mission energy, safe-stop timing, localization, mass |
 | How will we know? | Twelve verification cases and five validation cases with methods and pass criteria; verification and validation matrices |
@@ -40,8 +40,10 @@ carry the engineering, not only describe it:
 - Updated MBSE methodology areas: project context and stakeholder needs,
   shared library, flat systems, and document sources.
 - Independent specification, architecture and integration roles from
-  `Elan8::SystemsEngineering`; architectures type children by their contracts,
+  `Elan8::SystemsEngineering`; architectures type developed children by their contracts,
   and integrations select compatible child designs through redefinition.
+- Ordinary leaf parts use native domain types; product-specific values, ports and
+  catalog choices live with their owning systems. No component-profile adapters.
 - Role definitions live directly in each system package, without nested
   Specification/Architecture/Integration packages. Useful requirement, evidence
   and view groupings remain.
@@ -79,7 +81,7 @@ manufacturer part numbers stay text; internal model identity is semantic.
 | `00_context/Context.sysml` | Household context, external participants and context view |
 | `10_usecases/UseCases.sysml` | Four operational scenarios |
 | `20_requirements/StakeholderRequirements.sysml` | Eleven customer requirements |
-| `50_library/` | Shared interfaces, component profiles, purchased parts and compatibility navigation |
+| `50_library/` | Shared interfaces, firmware types, purchased parts and compatibility navigation |
 | `60_systems/<System>/system.sysml` | Fourteen flat systems with their specifications, architectures, integrations and relevant evidence/views |
 | `60_systems/VacuumCleanerSystem/Behavior.sysml` | Supporting behavior packages, publicly imported by the system |
 | `80_documents/` | Generic document definitions, prose, figures and retained template |

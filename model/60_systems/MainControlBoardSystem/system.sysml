@@ -35,7 +35,7 @@ package MainControlBoardSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
-    part def MainPcbModuleSpecification :> ElectronicsComponent, ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification, Elan8::SystemsEngineering::SystemSpecification {
+    part def MainPcbModuleSpecification :> ElectronicsComponent, Elan8::SystemsEngineering::SystemSpecification {
         port batteryPower : PowerRailPort;
         port logicPower : PowerRailPort;
         port sensorBus : ~I2cControllerPort;
@@ -82,26 +82,26 @@ package MainControlBoardSystem {
           }
     }
 
-    part def MainPcbModuleArchitecture :> MainPcbModuleSpecification, ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture, PrintedCircuitBoardAssembly, Elan8::SystemsEngineering::SystemArchitecture {
-        part mountedComponents : ComponentProfiles::PhysicalComponent::PhysicalComponentSpecification[0..*] nonunique :>> mountedComponents;
-        part bareBoard : ComponentProfiles::RobotControlBoard::RobotControlBoardSpecification :>> bareBoard;
+    part def MainPcbModuleArchitecture :> MainPcbModuleSpecification, PrintedCircuitBoardAssembly, Elan8::SystemsEngineering::SystemArchitecture {
+        part mountedComponents : Elan8::Core::PhysicalComponent[0..*] nonunique :>> mountedComponents;
+        part bareBoard : MainControlBoardSystem::RobotControlBoard :>> bareBoard;
         part mcu : ControllerSystem::RobotMainMcuSpecification :> mountedComponents;
-        part leftMotorDriver : ComponentProfiles::RobotMotorDriver::RobotMotorDriverSpecification :> mountedComponents;
-        part rightMotorDriver : ComponentProfiles::RobotMotorDriver::RobotMotorDriverSpecification :> mountedComponents;
-        part wireless : ComponentProfiles::RobotWirelessModule::RobotWirelessModuleSpecification :> mountedComponents;
-        part wirelessUart : ComponentProfiles::WirelessUartBus::WirelessUartBusSpecification;
-        part imu : ComponentProfiles::I2cInertialMeasurementUnit::I2cInertialMeasurementUnitSpecification :> mountedComponents;
+        part leftMotorDriver : MainControlBoardSystem::RobotMotorDriver :> mountedComponents;
+        part rightMotorDriver : MainControlBoardSystem::RobotMotorDriver :> mountedComponents;
+        part wireless : MainControlBoardSystem::RobotWirelessModule :> mountedComponents;
+        part wirelessUart : DomainModel::WirelessUartBus;
+        part imu : Elan8::Electronics::Sensing::I2cInertialMeasurementUnit :> mountedComponents;
     }
 
     part def MainPcbModuleIntegration :> MainPcbModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part mountedComponents : ComponentProfiles::PhysicalComponent::PhysicalComponentArchitecture[5] nonunique :>> mountedComponents = (mcu, leftMotorDriver, rightMotorDriver, wireless, imu);
-        part bareBoard : ComponentProfiles::RobotControlBoard::RobotControlBoardArchitecture :>> bareBoard;
+        part mountedComponents : Elan8::Core::PhysicalComponent[5] nonunique :>> mountedComponents = (mcu, leftMotorDriver, rightMotorDriver, wireless, imu);
+        part bareBoard : MainControlBoardSystem::RobotControlBoard :>> bareBoard;
         part mcu : ControllerSystem::RobotMainMcuIntegration :>> mcu :> mountedComponents;
-        part leftMotorDriver : ComponentProfiles::RobotMotorDriver::RobotMotorDriverArchitecture :>> leftMotorDriver :> mountedComponents;
-        part rightMotorDriver : ComponentProfiles::RobotMotorDriver::RobotMotorDriverArchitecture :>> rightMotorDriver :> mountedComponents;
-        part wireless : ComponentProfiles::RobotWirelessModule::RobotWirelessModuleArchitecture :>> wireless :> mountedComponents;
-        part wirelessUart : ComponentProfiles::WirelessUartBus::WirelessUartBusArchitecture :>> wirelessUart;
-        part imu : ComponentProfiles::I2cInertialMeasurementUnit::I2cInertialMeasurementUnitArchitecture :>> imu :> mountedComponents {
+        part leftMotorDriver : MainControlBoardSystem::RobotMotorDriver :>> leftMotorDriver :> mountedComponents;
+        part rightMotorDriver : MainControlBoardSystem::RobotMotorDriver :>> rightMotorDriver :> mountedComponents;
+        part wireless : MainControlBoardSystem::RobotWirelessModule :>> wireless :> mountedComponents;
+        part wirelessUart : DomainModel::WirelessUartBus :>> wirelessUart;
+        part imu : Elan8::Electronics::Sensing::I2cInertialMeasurementUnit :>> imu :> mountedComponents {
               @BomItem { description = "Inertial measurement unit, 6-axis"; sourcing = SourcingKind::buy; unitCostEur = 1.40; }
               attribute :>> mass = 0.03 [kg]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
               attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
@@ -168,5 +168,32 @@ package MainControlBoardSystem {
             filter not @SysML::AllocationUsage;
             expose VacuumCleanerSystem::robotSystem.physical.mainPcb;
           }
+    }
+
+    part def RobotMotorDriver :> ThreePhaseMotorDriver {
+        @BomItem { description = "Three-phase motor driver"; sourcing = SourcingKind::buy; unitCostEur = 2.30; }
+        attribute :>> mass = 0.005 [kg];
+        /* illustrative estimate */
+        attribute :>> powerDraw = 1.5 [W];
+        /* illustrative estimate */
+        dependency selectedImplementation
+            from RobotMotorDriver to DRV8316R;
+    }
+
+    part def RobotWirelessModule :> WirelessModule {
+        /* illustrative estimate */
+        port hostLink : UartPort :>> hostLink;
+        port robotService : RobotServicePort;
+        @BomItem { description = "Wi-Fi and Bluetooth LE module"; sourcing = SourcingKind::buy; unitCostEur = 1.50; }
+        attribute :>> mass = 0.005 [kg];
+        /* illustrative estimate */
+        attribute :>> powerDraw = 1 [W];
+        dependency selectedImplementation
+            from RobotWirelessModule to ESP32C3MINI1;
+    }
+
+    part def RobotControlBoard :> PrintedCircuitBoard {
+        @BomItem { description = "Main control board, bare PCB with passives and connectors"; sourcing = SourcingKind::make; unitCostEur = 3.40; }
+        attribute :>> mass = 0.155 [kg];
     }
 }

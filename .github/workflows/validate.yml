@@ -16,7 +16,7 @@ env:
   SPEC42_VERSION: "0.56.0"
   # Elan8 libraries the model is validated against, pinned to exact commits.
   DOMAIN_LIBRARIES_REF: 24f13ae144a0400609d33ec93b1e476269235c97
-  METHODOLOGY_REF: d4fa2f0dad0c6886cd96d4409677a7dc95c1974f
+  METHODOLOGY_REF: 44d63e9342db3455479de34b6b929776f7c4e6c9
 
 jobs:
   spec42:
