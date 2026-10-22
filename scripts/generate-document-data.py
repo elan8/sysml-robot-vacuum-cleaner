@@ -84,7 +84,7 @@ def export() -> dict:
     data = json.loads(completed.stdout)
     summary = data["summary"]
     # The validator checks each diagnostic, including the four documented
-    # Spec42 0.56.0 custom-view warnings. Do not accept warnings on count alone.
+    # Spec42 custom-view warnings. Do not accept warnings on count alone.
     from validate_model import check_language
     check_language(spec42, library_arguments(), ROOT / "model")
     if summary["error_count"]:

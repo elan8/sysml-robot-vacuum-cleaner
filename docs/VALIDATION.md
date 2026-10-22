@@ -1,6 +1,6 @@
 # Validation
 
-Use Spec42 **0.56.0**, its **2026-04** standard libraries and Python 3.9+.
+Use Spec42 **0.57.0**, its **2026-04** standard libraries and Python 3.9+.
 Exact domain and methodology source revisions are in `../dependencies.lock.json`.
 Check out both repositories beside this repository or under `.libraries/`.
 The validator verifies their HEAD revisions; it does not fetch or update them.
@@ -20,12 +20,12 @@ Managed `domain` and `method` archives are disabled; pinned source libraries are
 
 ## Language diagnostics
 
-The migrated baseline has 27 SysML source files, zero errors, four warnings and
-16 informational diagnostics. The information concerns document/section views
-which compose content and intentionally have no direct exposes.
+The baseline has 26 SysML source files, zero errors and four warnings. Spec42
+0.57.0 no longer reports views without direct exposes, so the document/section views
+that compose content produce no informational diagnostics.
 
-Spec42 0.56.0 incorrectly reports `view_type_non_standard` for custom view
-definitions that specialize `GeneralView`. The methodology documents the same
+Spec42 (0.56.0 and 0.57.0) incorrectly reports `view_type_non_standard` for
+custom view definitions that specialize `GeneralView`. The methodology documents the same
 defect for its starter and elevator example. The model retains the valid shared
 definitions. The validator accepts only one occurrence of each named view type:
 
@@ -83,20 +83,13 @@ The rendering script exports nine focused views, checks each diagram product is
 complete, and writes an SVG/JSON gallery under `generated/views/`. Optional
 `-ResvgExe` adds PNGs. See [VIEWS.md](VIEWS.md).
 
-Diagram export uses the separate source revision pinned as `diagramRenderer`
-in the lock file: `dc2bc2790fda6114d61b5860e4632cf96379774e`. Check out that
-revision of Spec42 and build its CLI (`cargo build -p server --bin spec42`), then pass the
-resulting executable to `render-views.ps1`. It identifies itself as 0.56.0 but
-contains post-release fixes, so the version string alone is insufficient.
-
-Released Spec42 0.56.0 cannot prepare Boolean metaclass filters and does not
-discover derived GeneralView types. Composition views deliberately exclude
-connection/allocation usages, which also conform to PartUsage. Removing those
-filters would add allocation boxes to diagrams intended to show constituents.
-The model keeps the correct filters. `-IncludeMethodologyViews` exports the four
-additional role views with the same rendering build, for thirteen in total.
-This rendering baseline is separate from the released binary used for
-pinned language/structural CI; CI does not build Spec42 or render diagrams.
+Diagram export uses the Spec42 release pinned in the lock file, the same binary
+the language and structural checks use. Composition views deliberately exclude
+connection/allocation usages, which also conform to PartUsage, with Boolean metaclass
+filters; removing those filters would add allocation boxes to diagrams intended to
+show constituents. `-IncludeMethodologyViews` also exports the four role views typed
+by GeneralView specializations, for thirteen in total.
+CI validates the model but does not render diagrams.
 Inspect relationship content and readability after a model change.
 
 `generate-document-data.py --check` checks local table freshness. CI regenerates

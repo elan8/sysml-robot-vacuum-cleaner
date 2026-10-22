@@ -13,9 +13,9 @@ permissions:
   contents: read
 
 env:
-  SPEC42_VERSION: "0.56.0"
+  SPEC42_VERSION: "0.57.0"
   # Elan8 libraries the model is validated against, pinned to exact commits.
-  DOMAIN_LIBRARIES_REF: 24f13ae144a0400609d33ec93b1e476269235c97
+  DOMAIN_LIBRARIES_REF: 1f277cacf8c8fefc8710169e9764c6812f9be57e # v0.5.0
   METHODOLOGY_REF: 0cb3ee0e7b5e64cf4f850a46da5f26acb280a4c2
 
 jobs:

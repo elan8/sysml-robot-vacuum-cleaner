@@ -1,17 +1,13 @@
 {
-  "spec42": "0.56.0",
-  "standardLibrary": "2026-04 (distributed with Spec42 0.56.0)",
-  "diagramRenderer": {
-    "repository": "https://github.com/elan8/spec42",
-    "sourceCommit": "dc2bc2790fda6114d61b5860e4632cf96379774e",
-    "reason": "Post-release inherited view discovery and Boolean metaclass filters"
-  },
+  "spec42": "0.57.0",
+  "standardLibrary": "2026-04 (distributed with Spec42 0.57.0)",
   "methodology": {
     "repository": "https://github.com/elan8/mbse-methodology",
     "commit": "0cb3ee0e7b5e64cf4f850a46da5f26acb280a4c2"
   },
   "domain": {
     "repository": "https://github.com/elan8/sysml-domain-libraries",
-    "commit": "24f13ae144a0400609d33ec93b1e476269235c97"
+    "release": "v0.5.0",
+    "commit": "1f277cacf8c8fefc8710169e9764c6812f9be57e"
   }
 }
