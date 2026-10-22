@@ -20,7 +20,8 @@ package DustBinSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -74,18 +75,25 @@ package DustBinSystem {
         attribute :>> capacity = 450 [mL];
     }
 
-    part def DustBinLid :> MechanicalComponent {
-        @BomItem { description = "Dust bin lid, moulded"; sourcing = SourcingKind::make; unitCostEur = 0.30; }
+    part def DustBinLid :> MechanicalComponent, CostedPart {
+        doc /* Dust bin lid, moulded */
+        @MakePart;
+        attribute :>> unitCost = 0.30 [EUR];
         attribute :>> mass = 0.03 [kg];
     }
 
-    part def DustFilter :> MechanicalComponent {
-        @BomItem { description = "Pleated dust filter"; sourcing = SourcingKind::buy; unitCostEur = 0.55; }
+    part def DustFilter :> MechanicalComponent, CostedPart {
+        doc /* Pleated dust filter */
+        @BuyPart;
+        attribute :>> unitCost = 0.55 [EUR];
         attribute :>> mass = 0.02 [kg];
     }
 
-    part def DustBinBody :> MechanicalComponent {
-        @BomItem { description = "Dust bin body, moulded"; sourcing = SourcingKind::make; unitCostEur = 0.70; }
+    part def DustBinBody :> MechanicalComponent, CostedPart {
+        doc /* Dust bin body, moulded */
+        @MakePart;
+        attribute :>> unitCost = 0.70 [EUR];
         attribute :>> mass = 0.15 [kg];
     }
+
 }

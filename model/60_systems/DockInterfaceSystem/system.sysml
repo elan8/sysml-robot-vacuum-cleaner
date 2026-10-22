@@ -20,7 +20,8 @@ package DockInterfaceSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -48,8 +49,7 @@ package DockInterfaceSystem {
 
     part def DockInterfaceModuleIntegration :> DockInterfaceModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
         part contacts : DockInterfaceSystem::DockContactAssembly :>> contacts;
-        part beaconReceiver : DomainModel::HomingBeaconReceiver :>> beaconReceiver {
-              @BomItem { description = "Infrared homing-beacon receiver"; sourcing = SourcingKind::buy; unitCostEur = 0.35; }
+        part beaconReceiver : DockInterfaceSystem::BeaconReceiver :>> beaconReceiver {
               attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
               attribute :>> powerDraw = 0.1 [W]; /* illustrative estimate */
             }
@@ -64,9 +64,17 @@ package DockInterfaceSystem {
         connect beaconReceiver.detection to beaconDetected;
     }
 
-    part def DockContactAssembly :> MechanicalComponent {
+    part def DockContactAssembly :> MechanicalComponent, CostedPart {
+        doc /* Charging contact assembly */
         doc /* Two sprung charging contacts in their carrier. */
-        @BomItem { description = "Charging contact assembly"; sourcing = SourcingKind::make; unitCostEur = 0.80; }
+        @MakePart;
+        attribute :>> unitCost = 0.80 [EUR];
         attribute :>> mass = 0.05 [kg];
+    }
+
+    part def BeaconReceiver :> DomainModel::HomingBeaconReceiver, CostedPart {
+        doc /* Infrared homing-beacon receiver */
+        @BuyPart;
+        attribute :>> unitCost = 0.35 [EUR];
     }
 }

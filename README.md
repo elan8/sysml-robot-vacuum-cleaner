@@ -117,6 +117,9 @@ SysML validation; that does not constitute a rendered-document check.
 The BOM and mass-budget script remains available independently of Doc42. It
 exports the physical model with Spec42, generates Markdown/CSV data, and checks
 classification, mass, derivation, satisfaction, verification and validation gaps.
+Parts use `Elan8::Procurement::CostedPart` with unit costs in `[EUR]` and
+`BuyPart`/`MakePart` classification on concrete definitions. Selected catalogue
+parts supply manufacturer identity through `selectedImplementation` dependencies.
 CI runs it as a model check:
 
 ```sh

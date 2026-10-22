@@ -20,7 +20,8 @@ package PowerSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -56,22 +57,19 @@ package PowerSystem {
     }
 
     part def PowerModuleIntegration :> PowerModuleArchitecture, Elan8::SystemsEngineering::SystemIntegration {
-        part battery : Elan8::Electronics::Power::BatteryPack :>> battery {
-              @BomItem { description = "Lithium-ion battery pack, 4S2P, 14.4 V"; sourcing = SourcingKind::buy; unitCostEur = 16.00; }
+        part battery : PowerSystem::RobotBatteryPack :>> battery {
               attribute :>> nominalCapacity = 6400 [mAh];
               attribute :>> nominalVoltage = 14.4 [V];
               attribute :>> mass = 0.50 [kg]; /* eight 18650 cells and pack hardware */
             }
         part charger : PowerSystem::RobotBatteryCharger :>> charger;
         part bms : PowerSystem::RobotBms :>> bms;
-        part logicRegulator : Elan8::Electronics::Power::VoltageRegulator :>> logicRegulator {
-              @BomItem { description = "Buck regulator, 3.3 V"; sourcing = SourcingKind::buy; unitCostEur = 0.40; }
+        part logicRegulator : PowerSystem::LogicRegulator :>> logicRegulator {
               attribute :>> outputVoltage = 3.3 [V];
               attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
               attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
             }
-        part sensorRegulator : Elan8::Electronics::Power::VoltageRegulator :>> sensorRegulator {
-              @BomItem { description = "Buck regulator, 5 V"; sourcing = SourcingKind::buy; unitCostEur = 0.40; }
+        part sensorRegulator : PowerSystem::SensorRegulator :>> sensorRegulator {
               attribute :>> outputVoltage = 5 [V];
               attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
               attribute :>> quiescentPower = 1 [W]; /* illustrative estimate */
@@ -123,8 +121,10 @@ package PowerSystem {
           }
     }
 
-    part def RobotBms :> BatteryManagementSystem {
-        @BomItem { description = "Battery gauge and protection circuit"; sourcing = SourcingKind::buy; unitCostEur = 2.90; }
+    part def RobotBms :> BatteryManagementSystem, CostedPart {
+        doc /* Battery gauge and protection circuit */
+        @BuyPart;
+        attribute :>> unitCost = 2.90 [EUR];
         attribute :>> maxChargeCurrent = 2 [A];
         attribute :>> maxCellTemperature = 328.15 [K];
         attribute :>> mass = 0.03 [kg];
@@ -135,11 +135,31 @@ package PowerSystem {
             from RobotBms to BQ40Z50R2;
     }
 
-    part def RobotBatteryCharger :> BatteryCharger {
-        @BomItem { description = "Battery charger stage, 2 A"; sourcing = SourcingKind::buy; unitCostEur = 1.20; }
+    part def RobotBatteryCharger :> BatteryCharger, CostedPart {
+        doc /* Battery charger stage, 2 A */
+        @BuyPart;
+        attribute :>> unitCost = 1.20 [EUR];
         attribute :>> maxChargeCurrent = 2 [A];
         attribute :>> quiescentPower = 0.5 [W];
         attribute :>> powerDraw = 0.5 [W];
         attribute :>> mass = 0.04 [kg];
+    }
+
+    part def RobotBatteryPack :> Elan8::Electronics::Power::BatteryPack, CostedPart {
+        doc /* Lithium-ion battery pack, 4S2P, 14.4 V */
+        @BuyPart;
+        attribute :>> unitCost = 16.00 [EUR];
+    }
+
+    part def LogicRegulator :> Elan8::Electronics::Power::VoltageRegulator, CostedPart {
+        doc /* Buck regulator, 3.3 V */
+        @BuyPart;
+        attribute :>> unitCost = 0.40 [EUR];
+    }
+
+    part def SensorRegulator :> Elan8::Electronics::Power::VoltageRegulator, CostedPart {
+        doc /* Buck regulator, 5 V */
+        @BuyPart;
+        attribute :>> unitCost = 0.40 [EUR];
     }
 }

@@ -45,13 +45,20 @@ packages in VacuumCleanerSystem/Behavior.sysml, explicitly publicly imported as
 `VacuumCleanerSystem::Behavior`. The import provides navigation, not new ownership.
 `DomainModel` owns shared protocol items, ports and logical buses. `PhysicalShared`
 and `FirmwareLibrary` own common helper definitions. `PurchasedParts` owns six
-catalog choices; `Sourcing` owns make/buy BOM metadata.
+catalog choices; `Elan8::Procurement` supplies `CostedPart`, `BuyPart` and `MakePart`.
+Concrete part definitions carry make/buy classification and `unitCost` in `[EUR]`;
+their first documentation paragraph supplies the short BOM description. Supplier
+identity comes from the selected catalogue part via `selectedImplementation`.
+Unclassified assemblies are traversed; a classified made assembly (such as a
+wiring harness) is counted once, including its internal parts.
+Costs remain illustrative estimates at 10,000 robots, rather than supplier quotes.
 
-Ordinary leaf components use the native domain types directly: BatteryPack,
-Wheel, Gearbox, BoardConnector and others. Thirty definitions with real robot
-content remain as plain specializations: brush geometry/ports, motor and sensor
-mass/power, selected catalog parts, enclosures, firmware tasks and typed queues.
-They belong to their owning systems; shared software definitions live in FirmwareLibrary.
+Ordinary leaf components use domain types directly when no project-specific data
+is needed. Concrete purchased or manufactured items specialize those types with
+`CostedPart` for their procurement estimates, without specification/architecture
+adapter pairs. These definitions belong to their owning systems. Shared software
+definitions, including task and queue types, live in FirmwareLibrary.
+
 There is no ComponentProfiles package or synthetic PhysicalComponent role hierarchy.
 The PCB mountedComponents collection uses Elan8::Core::PhysicalComponent directly.
 

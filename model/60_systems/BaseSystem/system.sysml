@@ -20,7 +20,8 @@ package BaseSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -124,11 +125,10 @@ package BaseSystem {
         part chassis : BaseSystem::Chassis :>> chassis;
         part leftDriveTrain : DriveTrainSystem::DriveTrainIntegration :>> leftDriveTrain;
         part rightDriveTrain : DriveTrainSystem::DriveTrainIntegration :>> rightDriveTrain;
-        part casterWheel : Elan8::Mechanical::Drivetrain::CasterWheel :>> casterWheel {
+        part casterWheel : BaseSystem::RearCasterWheel :>> casterWheel {
               doc /* Rear support: always aft of the main roller and suction intake in the
                    * normal forward cleaning direction. Positive longitudinal position is forward. */
               attribute longitudinalPosition : LengthValue = -140 [mm];
-              @BomItem { description = "Rear caster wheel"; sourcing = SourcingKind::buy; unitCostEur = 0.60; }
               attribute :>> mass = 0.03 [kg]; /* illustrative estimate */
             }
         part frontLeftCliff : BaseSystem::CliffSensor :>> frontLeftCliff;
@@ -217,20 +217,30 @@ package BaseSystem {
           }
     }
 
-    part def CliffSensor :> DcPoweredSensor {
+    part def CliffSensor :> DcPoweredSensor, CostedPart {
+        doc /* Cliff sensor, infrared reflective */
         /* illustrative estimate */
         port signal : GpioPort;
         attribute triggerHeight : LengthValue = 50 [mm];
-        @BomItem { description = "Cliff sensor, infrared reflective"; sourcing = SourcingKind::buy; unitCostEur = 0.45; }
+        @BuyPart;
+        attribute :>> unitCost = 0.45 [EUR];
 
         attribute :>> mass = 0.02 [kg];
         /* illustrative estimate */
         attribute :>> powerDraw = 0.25 [W];
     }
 
-    part def Chassis :> MechanicalComponent {
+    part def Chassis :> MechanicalComponent, CostedPart {
+        doc /* Chassis tub, injection moulded */
         doc /* Bare structural tub; everything else in BaseModule mounts on it. */
-        @BomItem { description = "Chassis tub, injection moulded"; sourcing = SourcingKind::make; unitCostEur = 3.50; }
+        @MakePart;
+        attribute :>> unitCost = 3.50 [EUR];
         attribute :>> mass = 0.3 [kg];
+    }
+
+    part def RearCasterWheel :> Elan8::Mechanical::Drivetrain::CasterWheel, CostedPart {
+        doc /* Rear caster wheel */
+        @BuyPart;
+        attribute :>> unitCost = 0.60 [EUR];
     }
 }

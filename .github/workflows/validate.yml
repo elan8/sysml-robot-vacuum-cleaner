@@ -60,7 +60,7 @@ jobs:
       - name: Validate model
         run: python3 scripts/validate_model.py
 
-      - name: Check diagnostic exception policy
+      - name: Check diagnostic and procurement export policies
         run: python3 -m unittest discover -s tests
 
       # The bill of materials and the mass budget are derived from the model.

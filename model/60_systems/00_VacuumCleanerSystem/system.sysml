@@ -20,7 +20,6 @@ package VacuumCleanerSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;

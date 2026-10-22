@@ -110,3 +110,9 @@ baseline as local validation. It checks guards, language diagnostics, semantic
 structure, complete child selection, traceability and mass. There is no Doc42
 installation, license step, document rendering, PDF build or artifact upload.
 Retained `Elan8::Documents` sources are ordinary model inputs only.
+
+Procurement export tests reject conflicting make/buy annotations, missing or
+negative costs and unsupported currencies. They also check make-part classification
+and supplier identity from selected catalogue parts. The procurement migration
+preserves all 62 engineering IDs and 580 behavior, connection, selection and
+traceability edges; its BOM CSV and mass budget remain byte-identical.

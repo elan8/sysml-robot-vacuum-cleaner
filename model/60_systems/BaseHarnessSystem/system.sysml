@@ -20,7 +20,8 @@ package BaseHarnessSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -81,13 +82,15 @@ package BaseHarnessSystem {
         part conductors : Elan8::Electronics::Interconnection::HarnessConductor [1..*] :>> conductors;
     }
 
-    part def BaseWiringHarnessIntegration :> BaseWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+    part def BaseWiringHarnessIntegration :> BaseWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration, CostedPart {
+        doc /* Base wiring harness with connectors */
         /* illustrative estimate */
             part pcbConnector : Elan8::Electronics::Interconnection::BoardConnector :>> pcbConnector :> connectors;
         part baseConnector : Elan8::Electronics::Interconnection::ElectronicConnector :>> baseConnector :> connectors;
         part connectors : Elan8::Electronics::Interconnection::ElectronicConnector[2] :>> connectors = (pcbConnector, baseConnector);
         part conductors : Elan8::Electronics::Interconnection::HarnessConductor[1..*] :>> conductors;
-        @BomItem { description = "Base wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.90; }
+        @MakePart;
+        attribute :>> unitCost = 1.90 [EUR];
         attribute :>> mass = 0.12 [kg];
         connect pcbBatteryPower to baseBatteryRail;
         connect pcbLogicPower to baseLogicRail;
@@ -108,5 +111,6 @@ package BaseHarnessSystem {
         connect pcbBmsAlert to baseBmsAlert;
         connect pcbDockBeaconDetected to baseDockBeaconDetected;
     }
+
 
 }

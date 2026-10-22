@@ -20,7 +20,8 @@ package ControllerSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -69,15 +70,18 @@ package ControllerSystem {
         port power : ~PowerRailPort :>> RobotMainMcuSpecification::power, Microcontroller::power;
     }
 
-    part def RobotMainMcuIntegration :> RobotMainMcuArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+    part def RobotMainMcuIntegration :> RobotMainMcuArchitecture, Elan8::SystemsEngineering::SystemIntegration, CostedPart {
+        doc /* Main microcontroller */
         part memories : Elan8::Electronics::Compute::MemoryBlock[0..*] :>> memories;
         part peripherals : Elan8::Electronics::Compute::PeripheralBlock[0..*] :>> peripherals;
-        @BomItem { description = "Main microcontroller"; sourcing = SourcingKind::buy; unitCostEur = 4.60; }
+        @BuyPart;
+        attribute :>> unitCost = 4.60 [EUR];
         attribute :>> mass = 0.01 [kg];
         /* illustrative estimate */
             attribute :>> powerDraw = 3 [W];
         dependency selectedImplementation
               from RobotMainMcuIntegration to STM32U575VGT6;
     }
+
 
 }

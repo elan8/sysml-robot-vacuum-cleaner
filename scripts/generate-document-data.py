@@ -241,11 +241,14 @@ class Bom:
             name = self.model.feature_name(usage)
             here = path + [name]
             top = module or name
-            item = self.model.annotation(usage, "Sourcing::BomItem")
-            if item is None and typed is not None:
-                item = self.model.annotation(typed, "Sourcing::BomItem")
-            if item is not None:
-                self.add_item(usage, typed, here, level, top, item)
+            buy = self.model.annotation(typed, "Procurement::BuyPart") if typed else None
+            make = self.model.annotation(typed, "Procurement::MakePart") if typed else None
+            if buy is not None or make is not None:
+                if buy is not None and make is not None:
+                    self.gaps.append(".".join(here) + " (both @BuyPart and @MakePart)")
+                    continue
+                self.add_item(usage, typed, here, level, top,
+                              "buy" if buy is not None else "make", buy or {})
                 added = True
                 continue
             if type_name.startswith(LOGICAL_PACKAGES) or (typed is not None and any(
@@ -262,28 +265,37 @@ class Bom:
                 self.gaps.append(".".join(here))
         return added
 
-    def add_item(self, usage, typed, path, level, module, item) -> None:
+    def add_item(self, usage, typed, path, level, module, sourcing, buy) -> None:
         model = self.model
         mass = kilograms(model.redefined_value(usage, "mass"))
         if mass is None and typed is not None:
             mass = kilograms(model.redefined_value(typed, "mass"))
-        manufacturer = part_number = ""
-        selected = model.selected_part(typed) if typed is not None else None
+        selected = model.selected_part(typed)
         if selected is not None:
-            buy = model.annotation(selected, "Procurement::BuyPart") or {}
-            manufacturer = buy.get("manufacturer", "")
-            part_number = buy.get("manufacturerPartNumber", "")
-        sourcing = str(item.get("sourcing", "")).rsplit("::", 1)[-1]
-        if sourcing not in ("buy", "make") or not isinstance(item.get("unitCostEur"), (int, float)):
-            self.gaps.append(".".join(path) + " (incomplete @BomItem)")
+            buy = model.annotation(selected, "Procurement::BuyPart") or buy
+        manufacturer = buy.get("manufacturer", "")
+        part_number = buy.get("manufacturerPartNumber", "")
+        cost = model.redefined_value(usage, "unitCost")
+        if cost is None:
+            cost = model.redefined_value(typed, "unitCost")
+        if (not isinstance(cost, dict) or cost.get("unit") != "EUR"
+                or not isinstance(cost.get("magnitude"), (int, float))
+                or cost["magnitude"] < 0):
+            self.gaps.append(".".join(path) + " (unitCost must be a nonnegative EUR amount)")
+            return
+        # The concrete definition's first doc is its short procurement description.
+        descriptions = [entry["text"].strip() for entry in typed["documentation"]
+                        if entry["form"] == "doc"]
+        if not descriptions:
+            self.gaps.append(".".join(path) + " (no procurement description)")
             return
         if mass is None:
             self.gaps.append(".".join(path) + " (no mass)")
             return
-        self.lines.append({"level": level, "item": item["description"], "path": ".".join(path),
+        self.lines.append({"level": level, "item": descriptions[0], "path": ".".join(path),
                            "assembly": False, "module": module, "sourcing": sourcing,
                            "manufacturer": manufacturer, "part_number": part_number,
-                           "cost": float(item["unitCostEur"]), "mass": mass})
+                           "cost": float(cost["magnitude"]), "mass": mass})
         self.modules[module] = self.modules.get(module, 0.0) + mass
 
     def grouped(self) -> list[dict]:

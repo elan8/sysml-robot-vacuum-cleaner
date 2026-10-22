@@ -20,7 +20,8 @@ package TopHarnessSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -55,13 +56,15 @@ package TopHarnessSystem {
         part conductors : Elan8::Electronics::Interconnection::HarnessConductor [1..*] :>> conductors;
     }
 
-    part def TopWiringHarnessIntegration :> TopWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration {
+    part def TopWiringHarnessIntegration :> TopWiringHarnessArchitecture, Elan8::SystemsEngineering::SystemIntegration, CostedPart {
+        doc /* Top wiring harness with connectors */
         /* illustrative estimate */
             part pcbConnector : Elan8::Electronics::Interconnection::BoardConnector :>> pcbConnector :> connectors;
         part topConnector : Elan8::Electronics::Interconnection::ElectronicConnector :>> topConnector :> connectors;
         part connectors : Elan8::Electronics::Interconnection::ElectronicConnector[2] :>> connectors = (pcbConnector, topConnector);
         part conductors : Elan8::Electronics::Interconnection::HarnessConductor[1..*] :>> conductors;
-        @BomItem { description = "Top wiring harness with connectors"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
+        @MakePart;
+        attribute :>> unitCost = 1.10 [EUR];
         attribute :>> mass = 0.06 [kg];
         connect pcbSensorBus to topSensorBus;
         connect pcbLidarSerial to topLidarSerial;
@@ -69,5 +72,6 @@ package TopHarnessSystem {
         connect pcbBumperHazard to topBumperHazard;
         connect pcbHmiControl to topHmiControl;
     }
+
 
 }

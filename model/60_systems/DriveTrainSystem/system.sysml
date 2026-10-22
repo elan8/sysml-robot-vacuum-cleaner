@@ -20,7 +20,8 @@ package DriveTrainSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -51,22 +52,18 @@ package DriveTrainSystem {
 
     part def DriveTrainIntegration :> DriveTrainArchitecture, Elan8::SystemsEngineering::SystemIntegration {
         part motor : DriveTrainSystem::DriveMotor :>> motor;
-        part gearbox : Elan8::Mechanical::Drivetrain::Gearbox :>> gearbox {
-              @BomItem { description = "Planetary gearbox, 30:1"; sourcing = SourcingKind::buy; unitCostEur = 1.60; }
+        part gearbox : DriveTrainSystem::DriveGearbox :>> gearbox {
               attribute :>> gearRatio = 30 [one]; /* illustrative estimate */
               attribute :>> mass = 0.15 [kg]; /* illustrative estimate */
             }
-        part wheel : Elan8::Mechanical::Drivetrain::Wheel :>> wheel {
-              @BomItem { description = "Drive wheel with tyre, 65 mm"; sourcing = SourcingKind::make; unitCostEur = 0.90; }
+        part wheel : DriveTrainSystem::DriveWheel :>> wheel {
               attribute :>> diameter = 65 [mm]; /* illustrative estimate */
               attribute :>> mass = 0.08 [kg]; /* illustrative estimate */
             }
-        part encoder : Elan8::Electronics::Sensing::QuadratureEncoder :>> encoder {
-              @BomItem { description = "Quadrature encoder, magnetic"; sourcing = SourcingKind::buy; unitCostEur = 0.70; }
+        part encoder : DriveTrainSystem::WheelEncoder :>> encoder {
               attribute :>> mass = 0.005 [kg]; /* illustrative estimate */
             }
-        part lift : DomainModel::LiftSwitch :>> lift {
-              @BomItem { description = "Wheel-drop switch"; sourcing = SourcingKind::buy; unitCostEur = 0.15; }
+        part lift : DriveTrainSystem::WheelDropSwitch :>> lift {
               attribute :>> mass = 0.01 [kg]; /* illustrative estimate */
             }
         attribute :>> mass =
@@ -78,9 +75,35 @@ package DriveTrainSystem {
         connect lift.signal to liftHazard;
     }
 
-    part def DriveMotor :> BldcMotor {
-        @BomItem { description = "Drive motor, brushless DC, 14 W"; sourcing = SourcingKind::buy; unitCostEur = 4.80; }
+    part def DriveMotor :> BldcMotor, CostedPart {
+        doc /* Drive motor, brushless DC, 14 W */
+        @BuyPart;
+        attribute :>> unitCost = 4.80 [EUR];
         attribute :>> ratedPower = 14 [W];
         attribute :>> mass = 0.14 [kg];
+    }
+
+    part def DriveGearbox :> Elan8::Mechanical::Drivetrain::Gearbox, CostedPart {
+        doc /* Planetary gearbox, 30:1 */
+        @BuyPart;
+        attribute :>> unitCost = 1.60 [EUR];
+    }
+
+    part def DriveWheel :> Elan8::Mechanical::Drivetrain::Wheel, CostedPart {
+        doc /* Drive wheel with tyre, 65 mm */
+        @MakePart;
+        attribute :>> unitCost = 0.90 [EUR];
+    }
+
+    part def WheelEncoder :> Elan8::Electronics::Sensing::QuadratureEncoder, CostedPart {
+        doc /* Quadrature encoder, magnetic */
+        @BuyPart;
+        attribute :>> unitCost = 0.70 [EUR];
+    }
+
+    part def WheelDropSwitch :> DomainModel::LiftSwitch, CostedPart {
+        doc /* Wheel-drop switch */
+        @BuyPart;
+        attribute :>> unitCost = 0.15 [EUR];
     }
 }

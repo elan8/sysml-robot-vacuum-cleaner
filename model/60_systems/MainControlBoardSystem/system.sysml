@@ -20,7 +20,8 @@ package MainControlBoardSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -101,8 +102,7 @@ package MainControlBoardSystem {
         part rightMotorDriver : MainControlBoardSystem::RobotMotorDriver :>> rightMotorDriver :> mountedComponents;
         part wireless : MainControlBoardSystem::RobotWirelessModule :>> wireless :> mountedComponents;
         part wirelessUart : DomainModel::WirelessUartBus :>> wirelessUart;
-        part imu : Elan8::Electronics::Sensing::I2cInertialMeasurementUnit :>> imu :> mountedComponents {
-              @BomItem { description = "Inertial measurement unit, 6-axis"; sourcing = SourcingKind::buy; unitCostEur = 1.40; }
+        part imu : MainControlBoardSystem::RobotImu :>> imu :> mountedComponents {
               attribute :>> mass = 0.03 [kg]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
               attribute :>> powerDraw = 0.2 [W]; /* illustrative estimate — unchanged from prior SensorAssembly.imu */
             }
@@ -170,8 +170,10 @@ package MainControlBoardSystem {
           }
     }
 
-    part def RobotMotorDriver :> ThreePhaseMotorDriver {
-        @BomItem { description = "Three-phase motor driver"; sourcing = SourcingKind::buy; unitCostEur = 2.30; }
+    part def RobotMotorDriver :> ThreePhaseMotorDriver, CostedPart {
+        doc /* Three-phase motor driver */
+        @BuyPart;
+        attribute :>> unitCost = 2.30 [EUR];
         attribute :>> mass = 0.005 [kg];
         /* illustrative estimate */
         attribute :>> powerDraw = 1.5 [W];
@@ -180,11 +182,13 @@ package MainControlBoardSystem {
             from RobotMotorDriver to DRV8316R;
     }
 
-    part def RobotWirelessModule :> WirelessModule {
+    part def RobotWirelessModule :> WirelessModule, CostedPart {
+        doc /* Wi-Fi and Bluetooth LE module */
         /* illustrative estimate */
         port hostLink : UartPort :>> hostLink;
         port robotService : RobotServicePort;
-        @BomItem { description = "Wi-Fi and Bluetooth LE module"; sourcing = SourcingKind::buy; unitCostEur = 1.50; }
+        @BuyPart;
+        attribute :>> unitCost = 1.50 [EUR];
         attribute :>> mass = 0.005 [kg];
         /* illustrative estimate */
         attribute :>> powerDraw = 1 [W];
@@ -192,8 +196,16 @@ package MainControlBoardSystem {
             from RobotWirelessModule to ESP32C3MINI1;
     }
 
-    part def RobotControlBoard :> PrintedCircuitBoard {
-        @BomItem { description = "Main control board, bare PCB with passives and connectors"; sourcing = SourcingKind::make; unitCostEur = 3.40; }
+    part def RobotControlBoard :> PrintedCircuitBoard, CostedPart {
+        doc /* Main control board, bare PCB with passives and connectors */
+        @MakePart;
+        attribute :>> unitCost = 3.40 [EUR];
         attribute :>> mass = 0.155 [kg];
+    }
+
+    part def RobotImu :> Elan8::Electronics::Sensing::I2cInertialMeasurementUnit, CostedPart {
+        doc /* Inertial measurement unit, 6-axis */
+        @BuyPart;
+        attribute :>> unitCost = 1.40 [EUR];
     }
 }

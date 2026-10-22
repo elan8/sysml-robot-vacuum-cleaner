@@ -20,7 +20,8 @@ package TopSystem {
     private import Elan8::Electronics::Compute::*;
     private import FirmwareArchitecture::*;
     private import PurchasedParts::*;
-    private import Sourcing::*;
+    private import Elan8::Procurement::*;
+    private import Elan8::Units::Money::*;
     private import SystemRequirements::*;
     private import Elan8::Software::*;
     private import Elan8::Electronics::Wireless::*;
@@ -83,8 +84,7 @@ package TopSystem {
         part frontTof : TopSystem::RobotTofSensor :>> frontTof;
         part leftTof : TopSystem::RobotTofSensor :>> leftTof;
         part rightTof : TopSystem::RobotTofSensor :>> rightTof;
-        part frontBumper : DomainModel::BumperSwitch :>> frontBumper {
-              @BomItem { description = "Bumper switch assembly"; sourcing = SourcingKind::buy; unitCostEur = 0.20; }
+        part frontBumper : TopSystem::BumperSwitchAssembly :>> frontBumper {
               attribute :>> mass = 0.02 [kg]; /* illustrative estimate */
             }
         part hmi : TopSystem::HumanMachineInterface :>> hmi;
@@ -135,9 +135,11 @@ package TopSystem {
           }
     }
 
-    part def RobotTofSensor :> DcPoweredSensor, I2cDataSensor {
+    part def RobotTofSensor :> DcPoweredSensor, I2cDataSensor, CostedPart {
+        doc /* Time-of-flight distance sensor module */
         attribute range : LengthValue = 1200 [mm];
-        @BomItem { description = "Time-of-flight distance sensor module"; sourcing = SourcingKind::buy; unitCostEur = 2.60; }
+        @BuyPart;
+        attribute :>> unitCost = 2.60 [EUR];
 
         attribute :>> mass = 0.03 [kg];
         /* illustrative estimate */
@@ -147,10 +149,12 @@ package TopSystem {
             from RobotTofSensor to VL53L1CX;
     }
 
-    part def RobotLidar :> DcPoweredSensor, UartDataSensor {
+    part def RobotLidar :> DcPoweredSensor, UartDataSensor, CostedPart {
+        doc /* 360° laser distance scanner */
         attribute scanRate : FrequencyValue = 10 [Hz];
         attribute range : LengthValue = 6000 [mm];
-        @BomItem { description = "360° laser distance scanner"; sourcing = SourcingKind::buy; unitCostEur = 35.00; }
+        @BuyPart;
+        attribute :>> unitCost = 35.00 [EUR];
 
         attribute :>> mass = 0.15 [kg];
         /* illustrative estimate */
@@ -160,17 +164,27 @@ package TopSystem {
             from RobotLidar to RPLIDARC1;
     }
 
-    part def HumanMachineInterface :> ElectronicsComponent {
+    part def HumanMachineInterface :> ElectronicsComponent, CostedPart {
+        doc /* Button and indicator board */
         port power : ~PowerRailPort;
         port control : ~LocalHmiControllerPort;
-        @BomItem { description = "Button and indicator board"; sourcing = SourcingKind::make; unitCostEur = 1.10; }
+        @MakePart;
+        attribute :>> unitCost = 1.10 [EUR];
         attribute :>> powerDraw = 1 [W];
         attribute :>> mass = 0.08 [kg];
     }
 
-    part def TopShell :> MechanicalComponent {
+    part def TopShell :> MechanicalComponent, CostedPart {
+        doc /* Top shell with bumper carrier, moulded */
         doc /* Outer cover with the bumper carrier and the LiDAR turret opening. */
-        @BomItem { description = "Top shell with bumper carrier, moulded"; sourcing = SourcingKind::make; unitCostEur = 2.80; }
+        @MakePart;
+        attribute :>> unitCost = 2.80 [EUR];
         attribute :>> mass = 0.2 [kg];
+    }
+
+    part def BumperSwitchAssembly :> DomainModel::BumperSwitch, CostedPart {
+        doc /* Bumper switch assembly */
+        @BuyPart;
+        attribute :>> unitCost = 0.20 [EUR];
     }
 }
