@@ -31,5 +31,5 @@ The single selected product usage is
 it is an environment model, not a second selected product assembly.
 
 `50_library/Navigation.sysml` preserves prior access paths through native aliases
-and public imports. It owns no duplicate engineering definitions. See
-`docs/METHODOLOGY_MIGRATION.md` for canonical owners and preserved engineering IDs.
+and public imports. It owns no duplicate engineering definitions; each alias names
+its canonical owner.

@@ -2,7 +2,7 @@
 
 Load all of `model/`, with the pinned domain library. `Root.sysml` is navigation.
 The [methodology tour](ELAN8_METHOD_TOUR.md) explains contracts, decomposition
-and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
+and selection.
 
 ## Reading path
 

@@ -4,7 +4,6 @@
 internal_docs/*
 target/*
 # Reproducible document intermediates and rendered PDFs.
-/documents/generated/
 /out/
 /generated/
 /.libraries/
