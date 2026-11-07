@@ -106,13 +106,12 @@ using the generic `Elan8::Documents` vocabulary:
 | System Design Specification | RVC-SDS-001 | How is the robot built to do it? | Architecture, allocation of requirements to modules with budgets, firmware, bill of materials, analyses, requirement satisfaction |
 | Verification and Validation Plan | RVC-VVP-001 | How will we know that it does? | Methods, test articles and facilities, 12 verification cases with pass criteria, the requirements verification matrix, 5 validation cases and the validation matrix |
 
-**PDF generation is disabled** until a suitable Doc42 release and working
-license are available. CI does not install or run Doc42, check document
-rendering, build PDFs or upload engineering-document artifacts.
-
-The authored document views, prose, figures and house template remain as
-sources for a future renderer. These definitions are included in ordinary
-SysML validation; that does not constitute a rendered-document check.
+[Doc42](https://github.com/elan8/doc42-release) renders the four documents as PDF
+with the house template in `model/80_documents/template/`. CI checks them on every
+run and builds them, except for pull requests from forks, which cannot read the
+license secret. The PDFs are the `documents` artifact of each run; see
+[`model/80_documents/README.md`](model/80_documents/README.md) to build them
+locally.
 
 The BOM and mass-budget script remains available independently of Doc42. It
 exports the physical model with Spec42, generates Markdown/CSV data, and checks
@@ -127,8 +126,9 @@ python scripts/generate-document-data.py
 python scripts/generate-document-data.py --check  # optional local freshness check
 ```
 
-Its outputs go into ignored `generated/`, which is absent from a clean checkout.
-No PDFs are generated. Authored sources remain tracked under `model/80_documents/`.
+Its outputs go into ignored `generated/`, which is absent from a clean checkout,
+as are the PDFs in `generated/documents/`. Authored sources are tracked under
+`model/80_documents/`.
 
 ## Validation
 
@@ -148,7 +148,7 @@ complete child selection. All errors and unexpected warnings fail. Four known
 Spec42 custom-view warnings are documented in [VALIDATION.md](docs/VALIDATION.md),
 along with the structural checker's coverage limits. Diagram export requires the
 separately pinned rendering source revision in the lock file for inherited views
-and Boolean filters. PDF generation stays disabled.
+and Boolean filters.
 
 ## Status and limitations
 

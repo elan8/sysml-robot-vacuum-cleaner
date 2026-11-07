@@ -44,7 +44,7 @@ verification case and the household safety validation in `VacuumCleanerSystem`.
 Views live with the systems they review. The context and three system role views
 use `Elan8::SystemsEngineering`; nine focused views retain detailed engineering
 questions. `80_documents` selects the same authoritative graph for publication.
-PDF generation stays disabled. Shared document vocabulary is `Elan8::Documents`.
+Doc42 renders the documents as PDF in CI. Shared document vocabulary is `Elan8::Documents`.
 
 See [MODEL_GUIDE.md](MODEL_GUIDE.md), [VIEWS.md](VIEWS.md) and
 [migration mapping](METHODOLOGY_MIGRATION.md).

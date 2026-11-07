@@ -73,8 +73,8 @@ The 53 artificial contract/design pairs are deliberately no longer present.
 
 Customer requirements remain in StakeholderNeeds. The retained RobotDocuments
 package now lives in `model/80_documents`, alongside its prose, figures and
-inactive template. Generated data moves from `documents/generated/` to root
-`generated/`, which is ignored. No Doc42 pipeline is enabled.
+template. Generated data moves from `documents/generated/` to root
+`generated/`, which is ignored. Doc42 builds the documents in CI.
 
 ## Preserved baseline and coverage
 

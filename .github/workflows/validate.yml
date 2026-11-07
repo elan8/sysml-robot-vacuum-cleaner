@@ -69,3 +69,30 @@ jobs:
         env:
           SYSML_DOMAIN_LIBRARIES_ROOT: .libraries/sysml-domain-libraries
         run: python3 scripts/generate-document-data.py
+
+      # The four engineering documents, built from the model and the tables above.
+      - name: Install Doc42
+        uses: elan8/doc42-release@v0.5.0
+
+      - name: Check documents
+        run: doc42 check model --workspace-root . --library-path .libraries/sysml-domain-libraries/model
+
+      # The license secret is not available to pull requests from forks.
+      - name: Build documents
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          ELAN8_LICENSE: ${{ secrets.ELAN8_LICENSE }}
+        run: |
+          for document in crs srs sds vvp; do
+            doc42 build model --workspace-root . \
+              --library-path .libraries/sysml-domain-libraries/model \
+              --doc "RobotDocuments::$document" --out generated/documents
+          done
+
+      - name: Upload documents
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: documents
+          path: generated/documents/*.pdf
+          if-no-files-found: error
