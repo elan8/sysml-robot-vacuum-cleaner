@@ -132,7 +132,7 @@ as are the PDFs in `generated/documents/`. Authored sources are tracked under
 
 ## Validation
 
-Requires [Spec42](https://github.com/elan8/spec42) **0.56.0**, Python 3.9+,
+Requires [Spec42](https://github.com/elan8/spec42) **0.59.2**, Python 3.9+,
 and the exact domain-library and methodology commits in
 [`dependencies.lock.json`](dependencies.lock.json). Put dependency checkouts
 beside this repository or under `.libraries/`.

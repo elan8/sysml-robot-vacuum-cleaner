@@ -43,7 +43,7 @@ trace tables cover derivation, satisfaction and verification.
 
 ## Rendering
 
-With the rendering build pinned in `dependencies.lock.json`, run:
+With the Spec42 release pinned in `dependencies.lock.json`, run:
 
 ```powershell
 ./scripts/render-views.ps1 -Spec42Exe <path-to-spec42>
@@ -56,10 +56,9 @@ or an incomplete diagram projection. Depth controls presentation only; the JSON
 products retain the selected content and relationships.
 
 The sibling library defaults match `validate.ps1`; override them with
-`-DomainLibrariesRoot` when necessary. Validate before exporting. Released
-Spec42 0.56.0 lacks Boolean filter preparation and derived-view discovery;
-use the exact rendering source revision recorded in VALIDATION.md and the lock
-file. Pass `-IncludeMethodologyViews` to export all thirteen.
+`-DomainLibrariesRoot` when necessary. Validate before exporting with the
+Spec42 release pinned in the lock file. Pass `-IncludeMethodologyViews` to export
+all thirteen.
 
 ## Authored product illustrations
 
