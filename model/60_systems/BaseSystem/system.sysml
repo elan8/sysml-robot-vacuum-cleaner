@@ -37,25 +37,9 @@ package BaseSystem {
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
     part def BaseModuleSpecification :> MechanicalComponent, Elan8::SystemsEngineering::SystemSpecification {
-        port leftPhases : ThreePhaseDrivePort;
-        port rightPhases : ThreePhaseDrivePort;
-        port leftOdometry : QuadratureEncoderPort;
-        port rightOdometry : QuadratureEncoderPort;
-        port brushCommand : PwmPort;
-        port vacuumCommand : PwmPort;
-        port leftLiftHazard : GpioPort;
-        port rightLiftHazard : GpioPort;
-        port frontLeftCliffHazard : GpioPort;
-        port frontRightCliffHazard : GpioPort;
-        port rearLeftCliffHazard : GpioPort;
-        port rearRightCliffHazard : GpioPort;
-        port cleaningFault : GpioPort;
-        port bmsAlert : GpioPort;
-        port dockBeaconDetected : GpioPort;
-        port batteryRail : PowerRailPort;
-        port logicRail : PowerRailPort;
+        // The base wiring harness from the main board, as a bus carrying the signals as nested ports.
+        port mainPcbHarness : BaseHarnessSystem::BaseHarnessModuleBus;
         port sensorRail : PowerRailPort;
-        port bmsBus : I2cControllerPort;
         port dockPowerInput : PowerRailPort;
         port beaconInput : HomingBeaconPort;
         attribute cliffSensingLatency : DurationValue;
@@ -169,14 +153,14 @@ package BaseSystem {
               cleaningHead.leftSideBrush.longitudinalPosition > cleaningHead.mainBrushLongitudinalPosition
                 and cleaningHead.rightSideBrush.longitudinalPosition > cleaningHead.mainBrushLongitudinalPosition
             }
-        connect leftDriveTrain.phases to leftPhases;
-        connect rightDriveTrain.phases to rightPhases;
-        connect leftDriveTrain.odometry to leftOdometry;
-        connect rightDriveTrain.odometry to rightOdometry;
-        connect powerModule.batteryRail to batteryRail;
-        connect powerModule.logicRail to logicRail;
+        connect leftDriveTrain.phases to mainPcbHarness.leftPhases;
+        connect rightDriveTrain.phases to mainPcbHarness.rightPhases;
+        connect leftDriveTrain.odometry to mainPcbHarness.leftOdometry;
+        connect rightDriveTrain.odometry to mainPcbHarness.rightOdometry;
+        connect powerModule.batteryRail to mainPcbHarness.batteryRail;
+        connect powerModule.logicRail to mainPcbHarness.logicRail;
         connect powerModule.sensorRail to sensorRail;
-        connect powerModule.bmsBus to bmsBus;
+        connect powerModule.bmsBus to mainPcbHarness.bmsBus;
         connect powerModule.batteryRail to cleaningHead.power;
         connect powerModule.sensorRail to leftDriveTrain.encoder.power;
         connect powerModule.sensorRail to rightDriveTrain.encoder.power;
@@ -185,20 +169,20 @@ package BaseSystem {
         connect powerModule.sensorRail to rearLeftCliff.power;
         connect powerModule.sensorRail to rearRightCliff.power;
         connect powerModule.sensorRail to dockInterface.beaconReceiver.power;
-        connect brushCommand to cleaningHead.brushCommand;
-        connect vacuumCommand to cleaningHead.vacuumCommand;
+        connect mainPcbHarness.brushCommand to cleaningHead.brushCommand;
+        connect mainPcbHarness.vacuumCommand to cleaningHead.vacuumCommand;
         connect dockPowerInput to dockInterface.dockPowerInput;
         connect dockInterface.chargePowerOutput to powerModule.charger.supplyInput;
         connect beaconInput to dockInterface.beaconReceiver.beacon;
-        connect leftDriveTrain.liftHazard to leftLiftHazard;
-        connect rightDriveTrain.liftHazard to rightLiftHazard;
-        connect frontLeftCliff.signal to frontLeftCliffHazard;
-        connect frontRightCliff.signal to frontRightCliffHazard;
-        connect rearLeftCliff.signal to rearLeftCliffHazard;
-        connect rearRightCliff.signal to rearRightCliffHazard;
-        connect powerModule.bmsAlert to bmsAlert;
-        connect dockInterface.beaconDetected to dockBeaconDetected;
-        connect cleaningHead.fault to cleaningFault;
+        connect leftDriveTrain.liftHazard to mainPcbHarness.leftLiftHazard;
+        connect rightDriveTrain.liftHazard to mainPcbHarness.rightLiftHazard;
+        connect frontLeftCliff.signal to mainPcbHarness.frontLeftCliffHazard;
+        connect frontRightCliff.signal to mainPcbHarness.frontRightCliffHazard;
+        connect rearLeftCliff.signal to mainPcbHarness.rearLeftCliffHazard;
+        connect rearRightCliff.signal to mainPcbHarness.rearRightCliffHazard;
+        connect powerModule.bmsAlert to mainPcbHarness.bmsAlert;
+        connect dockInterface.beaconDetected to mainPcbHarness.dockBeaconDetected;
+        connect cleaningHead.fault to mainPcbHarness.cleaningFault;
         attribute :>> batteryCapacity = powerModule.battery.nominalCapacity;
         attribute :>> chargeCurrent = powerModule.charger.maxChargeCurrent;
     }

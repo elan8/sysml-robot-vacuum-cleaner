@@ -6,7 +6,7 @@ The robot consists of six line-replaceable units:
 - the **dust bin**, with its lid and filter ({{PhysicalArchitecture::DustBin}});
 - the **base wiring harness** and the **top wiring harness**, which connect the main control board to the two modules ({{PhysicalArchitecture::BaseWiringHarness}}, {{PhysicalArchitecture::TopWiringHarness}}).
 
-Modules are connected only through typed ports. Power, signal and material paths are modelled explicitly, including dock charging, the protected battery rail and the debris path from the cleaning head to the dust bin. The diagrams in this chapter are drawn from those connections.
+Modules are connected only through typed ports. Power, signal and material paths are modelled explicitly, including dock charging, the protected battery rail and the debris path from the cleaning head to the dust bin. Each wiring harness is a bus: one port at each end that carries its signals as nested ports. The module interconnection therefore shows one connection per harness end, and each module diagram shows where the signals leave the bus for the parts inside. The diagrams in this chapter are drawn from those connections.
 
 The cleaning direction defines the front of the robot. Two forward side brushes sweep
 inward towards the main roller and suction intake. A belt-and-gear transmission drives
