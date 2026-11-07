@@ -9,7 +9,9 @@ validation plan.
 Doc42 renders the documents as PDF with the house template in `template/`. CI
 checks them on every run and builds them, except for pull requests from forks,
 which cannot read the license secret; the PDFs are the `documents` artifact of
-the run. To build one locally, with an Elan8 license in `ELAN8_LICENSE`:
+the run. On `main`, CI also publishes them with an index page at
+<https://elan8.github.io/sysml-robot-vacuum-cleaner/>, written by
+`scripts/build-documents-index.py` from the metadata each document declares. To build one locally, with an Elan8 license in `ELAN8_LICENSE`:
 
 ```sh
 doc42 build model --workspace-root . --library-path ../sysml-domain-libraries/model \

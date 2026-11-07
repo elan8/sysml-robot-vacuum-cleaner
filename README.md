@@ -109,7 +109,9 @@ using the generic `Elan8::Documents` vocabulary:
 [Doc42](https://github.com/elan8/doc42-release) renders the four documents as PDF
 with the house template in `model/80_documents/template/`. CI checks them on every
 run and builds them, except for pull requests from forks, which cannot read the
-license secret. The PDFs are the `documents` artifact of each run; see
+license secret. **The current documents are published at
+<https://elan8.github.io/sysml-robot-vacuum-cleaner/>**, rebuilt on every push to
+`main`; each run also keeps them as its `documents` artifact. See
 [`model/80_documents/README.md`](model/80_documents/README.md) to build them
 locally.
 
