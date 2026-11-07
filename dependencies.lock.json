@@ -12,6 +12,6 @@
   },
   "domain": {
     "repository": "https://github.com/elan8/sysml-domain-libraries",
-    "commit": "24f13ae144a0400609d33ec93b1e476269235c97"
+    "commit": "146fe5ca70e76d8692e96f4a666e974592c40abc"
   }
 }
