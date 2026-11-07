@@ -3,10 +3,11 @@
 This project follows MBSE methodology 0.5.0 at commit
 `0cb3ee0e7b5e64cf4f850a46da5f26acb280a4c2`. Exact dependencies are in
 `dependencies.lock.json`; validation verifies both dependency checkout revisions.
-Use Spec42 0.56.0 with its 2026-04 standard libraries. The domain source pin also
-includes `Elan8::Documents`; it is intentionally newer than the methodology's
-frozen candidate archive. Disable managed `domain` and `method` archives when
-using these sources. No Doc42 dependency or PDF generation is enabled.
+Use Spec42 0.59.2 with its 2026-04 standard libraries. The domain source pin is newer
+than the domain libraries v0.5.0 release: it adds the `Diagram` metadata to
+`Elan8::Documents`, and is intentionally newer than the methodology's frozen candidate
+archive. Disable managed `domain` and `method` archives when using these sources.
+Doc42 0.5.0 builds the documents in CI.
 
 Diagram rendering has a separate Spec42 source revision in the lock file because
 inherited view discovery and Boolean metaclass filters need post-release fixes.
