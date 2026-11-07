@@ -131,7 +131,7 @@ $requiredPhysicalConnections = @(
     "connect motor.mechanicalOutput to gearbox.rotationalInput;",
     "connect gearbox.rotationalOutput to wheel.axle;",
     "connect base.cleaningHead.debrisOut to dustBin.debrisIn;",
-    "connect hmi.control to hmiControl;"
+    "connect hmi.control to mainPcbHarness.hmiControl;"
 )
 foreach ($connection in $requiredPhysicalConnections) {
     if ($physicalText -notmatch [regex]::Escape($connection)) {
