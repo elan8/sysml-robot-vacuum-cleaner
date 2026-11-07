@@ -705,7 +705,7 @@ package RobotPlatformSystem {
             verify robotSystemSpecification.'Cleaning area per charge';
             verify robotSystemSpecification.'Floor coverage';
           }
-          ref energyAnalysis = MissionEnergyAnalysis;
+          ref analysis energyAnalysis : MissionEnergyAnalysis;
           then action runCoverageMission : RunPhysicalTest;
           then action recordEnergyResult : RecordAnalysisResult;
         }
@@ -739,7 +739,7 @@ package RobotPlatformSystem {
             verify robotSystemSpecification.'Localization accuracy';
             verify robotSystemSpecification.'Coverage map maintenance';
           }
-          ref performanceAnalysis = LocalizationPerformanceAnalysis;
+          ref analysis performanceAnalysis : LocalizationPerformanceAnalysis;
           then action runNavigationChecks : RunSoftwareVerification;
           then action recordLocalizationResult : RecordAnalysisResult;
         }
@@ -763,7 +763,7 @@ package RobotPlatformSystem {
             verify mainPcbSpecification.'Drive disable latency';
             verify robotSystemSpecification.'Safe stop held until cleared';
           }
-          ref reactionAnalysis = SafetyReactionAnalysis;
+          ref analysis reactionAnalysis : SafetyReactionAnalysis;
           then action executeScenario : RunPhysicalTest;
           then action recordReactionResult : RecordAnalysisResult;
         }
@@ -787,7 +787,7 @@ package RobotPlatformSystem {
             verify dustBinSpecification.'Dust bin mass';
             verify harnessSpecification.'Wiring harness mass';
           }
-          ref massAnalysis = MassBudgetAnalysis;
+          ref analysis massAnalysis : MassBudgetAnalysis;
           then action measureRobot : InspectAndMeasure;
           then action recordMassResult : RecordAnalysisResult;
         }

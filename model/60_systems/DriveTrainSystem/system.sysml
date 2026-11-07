@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: MIT */
 package DriveTrainSystem {
     private import NumericalFunctions::*;
+    private import MeasurementReferences::one;
     // sum(...) in the rolled-up mass/power attributes
     private import BehaviorStates::*;
     private import DomainModel::*;

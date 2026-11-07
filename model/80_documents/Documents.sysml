@@ -291,6 +291,7 @@ package RobotDocuments {
       @Prose { file = "prose/sds-physical.md"; }
       view interconnection : InterconnectionView {
         @Section { title = "Module interconnection"; }
+        @Diagram { depth = 0; }
         doc /* The six line-replaceable units and the electrical, signal and material
              * connections between them. */
         expose VacuumCleanerSystem::robotSystem.physical.base;
@@ -302,23 +303,27 @@ package RobotDocuments {
       }
       view baseModule : InterconnectionView {
         @Section { title = "Base module"; }
+        @Diagram { depth = 1; }
         doc /* Chassis, both drive trains, the cleaning head, the four cliff sensors, the power
              * module and the dock interface. */
         expose VacuumCleanerSystem::robotSystem.physical.base;
       }
       view powerModule : InterconnectionView {
         @Section { title = "Power module"; }
+        @Diagram { depth = 1; }
         doc /* Battery, battery management, charger and the two regulated rails. All loads are
              * fed through the protected output of the battery management system. */
         expose VacuumCleanerSystem::robotSystem.physical.base.powerModule;
       }
       view mainPcb : InterconnectionView {
         @Section { title = "Main control board"; }
+        @Diagram { depth = 1; }
         doc /* Microcontroller, motor drivers, inertial measurement unit and wireless module. */
         expose VacuumCleanerSystem::robotSystem.physical.mainPcb;
       }
       view topModule : InterconnectionView {
         @Section { title = "Top module"; }
+        @Diagram { depth = 1; }
         doc /* LiDAR, the three time-of-flight sensors, the bumper and the human-machine
              * interface. */
         expose VacuumCleanerSystem::robotSystem.physical.top;
