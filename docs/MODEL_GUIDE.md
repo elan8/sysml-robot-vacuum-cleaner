@@ -2,7 +2,7 @@
 
 Load all of `model/`, with the pinned domain library. `Root.sysml` is navigation.
 The [methodology tour](ELAN8_METHOD_TOUR.md) explains contracts, decomposition
-and selection. The [migration map](METHODOLOGY_MIGRATION.md) records new owners.
+and selection.
 
 ## Reading path
 
@@ -94,6 +94,6 @@ EUR 121.10. These are teaching estimates, not released production data.
 Limits are defined once in RobotPlatformSystem::Limits; module
 budgets are in RobotPlatformSystem::Budgets. Document placeholders can retain old
 navigation aliases, but resolve to those authoritative values. Document views,
-prose, figures and the inactive house template live in `80_documents`.
-The BOM and mass-budget script operates independently of document rendering.
-PDF generation remains disabled; see [VALIDATION.md](VALIDATION.md).
+prose, figures and the house template live in `80_documents`, which Doc42 renders
+as PDF in CI. The BOM and mass-budget script supplies the documents' tables and
+also runs on its own; see [VALIDATION.md](VALIDATION.md).
