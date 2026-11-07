@@ -36,43 +36,58 @@ package BaseHarnessSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
+    port def BaseHarnessBus {
+        doc /* The signals the base wiring harness carries between the main board and the base
+             * module, as nested ports typed as the main board sees them. The base module uses
+             * BaseHarnessModuleBus. */
+        port batteryRail : PowerRailPort;
+        port logicRail : PowerRailPort;
+        port leftPhases : ThreePhaseDrivePort;
+        port rightPhases : ThreePhaseDrivePort;
+        port leftOdometry : QuadratureEncoderPort;
+        port rightOdometry : QuadratureEncoderPort;
+        port brushCommand : PwmPort;
+        port vacuumCommand : PwmPort;
+        port bmsBus : ~I2cControllerPort;
+        port leftLiftHazard : GpioPort;
+        port rightLiftHazard : GpioPort;
+        port frontLeftCliffHazard : GpioPort;
+        port frontRightCliffHazard : GpioPort;
+        port rearLeftCliffHazard : GpioPort;
+        port rearRightCliffHazard : GpioPort;
+        port cleaningFault : GpioPort;
+        port bmsAlert : GpioPort;
+        port dockBeaconDetected : GpioPort;
+    }
+
+    port def BaseHarnessModuleBus {
+        doc /* The signals of the base wiring harness as the module sees them: the mate of the bus the main
+             * board uses. Conjugating a bus reverses only its directed features, not its nested
+             * ports (SysML v2 7.12), so the module end has a definition of its own. */
+        port batteryRail : PowerRailPort;
+        port logicRail : PowerRailPort;
+        port leftPhases : ThreePhaseDrivePort;
+        port rightPhases : ThreePhaseDrivePort;
+        port leftOdometry : QuadratureEncoderPort;
+        port rightOdometry : QuadratureEncoderPort;
+        port brushCommand : PwmPort;
+        port vacuumCommand : PwmPort;
+        port bmsBus : I2cControllerPort;
+        port leftLiftHazard : GpioPort;
+        port rightLiftHazard : GpioPort;
+        port frontLeftCliffHazard : GpioPort;
+        port frontRightCliffHazard : GpioPort;
+        port rearLeftCliffHazard : GpioPort;
+        port rearRightCliffHazard : GpioPort;
+        port cleaningFault : GpioPort;
+        port bmsAlert : GpioPort;
+        port dockBeaconDetected : GpioPort;
+    }
+
     part def BaseWiringHarnessSpecification :> Elan8::Core::PhysicalComponent, Elan8::SystemsEngineering::SystemSpecification {
-        port pcbBatteryPower : PowerRailPort;
-        port baseBatteryRail : PowerRailPort;
-        port pcbLogicPower : PowerRailPort;
-        port baseLogicRail : PowerRailPort;
-        port pcbLeftPhases : ThreePhaseDrivePort;
-        port baseLeftPhases : ThreePhaseDrivePort;
-        port pcbRightPhases : ThreePhaseDrivePort;
-        port baseRightPhases : ThreePhaseDrivePort;
-        port pcbLeftOdometry : QuadratureEncoderPort;
-        port baseLeftOdometry : QuadratureEncoderPort;
-        port pcbRightOdometry : QuadratureEncoderPort;
-        port baseRightOdometry : QuadratureEncoderPort;
-        port pcbBrushCommand : PwmPort;
-        port baseBrushCommand : PwmPort;
-        port pcbVacuumCommand : PwmPort;
-        port baseVacuumCommand : PwmPort;
-        port pcbBmsBus : I2cControllerPort;
-        port baseBmsBus : I2cControllerPort;
-        port pcbLeftLiftHazard : GpioPort;
-        port baseLeftLiftHazard : GpioPort;
-        port pcbRightLiftHazard : GpioPort;
-        port baseRightLiftHazard : GpioPort;
-        port pcbFrontLeftCliffHazard : GpioPort;
-        port baseFrontLeftCliffHazard : GpioPort;
-        port pcbFrontRightCliffHazard : GpioPort;
-        port baseFrontRightCliffHazard : GpioPort;
-        port pcbRearLeftCliffHazard : GpioPort;
-        port baseRearLeftCliffHazard : GpioPort;
-        port pcbRearRightCliffHazard : GpioPort;
-        port baseRearRightCliffHazard : GpioPort;
-        port pcbCleaningFault : GpioPort;
-        port baseCleaningFault : GpioPort;
-        port pcbBmsAlert : GpioPort;
-        port baseBmsAlert : GpioPort;
-        port pcbDockBeaconDetected : GpioPort;
-        port baseDockBeaconDetected : GpioPort;
+        // Each end mates with the module it plugs into.
+        port mainPcbEnd : BaseHarnessModuleBus;
+        port baseEnd : BaseHarnessBus;
     }
 
     part def BaseWiringHarnessArchitecture :> BaseWiringHarnessSpecification, WiringHarness, Elan8::SystemsEngineering::SystemArchitecture {
@@ -92,24 +107,24 @@ package BaseHarnessSystem {
         @MakePart;
         attribute :>> unitCost = 1.90 [EUR];
         attribute :>> mass = 0.12 [kg];
-        connect pcbBatteryPower to baseBatteryRail;
-        connect pcbLogicPower to baseLogicRail;
-        connect pcbLeftPhases to baseLeftPhases;
-        connect pcbRightPhases to baseRightPhases;
-        connect pcbLeftOdometry to baseLeftOdometry;
-        connect pcbRightOdometry to baseRightOdometry;
-        connect pcbBrushCommand to baseBrushCommand;
-        connect pcbVacuumCommand to baseVacuumCommand;
-        connect pcbBmsBus to baseBmsBus;
-        connect pcbLeftLiftHazard to baseLeftLiftHazard;
-        connect pcbRightLiftHazard to baseRightLiftHazard;
-        connect pcbFrontLeftCliffHazard to baseFrontLeftCliffHazard;
-        connect pcbFrontRightCliffHazard to baseFrontRightCliffHazard;
-        connect pcbRearLeftCliffHazard to baseRearLeftCliffHazard;
-        connect pcbRearRightCliffHazard to baseRearRightCliffHazard;
-        connect pcbCleaningFault to baseCleaningFault;
-        connect pcbBmsAlert to baseBmsAlert;
-        connect pcbDockBeaconDetected to baseDockBeaconDetected;
+        connect mainPcbEnd.batteryRail to baseEnd.batteryRail;
+        connect mainPcbEnd.logicRail to baseEnd.logicRail;
+        connect mainPcbEnd.leftPhases to baseEnd.leftPhases;
+        connect mainPcbEnd.rightPhases to baseEnd.rightPhases;
+        connect mainPcbEnd.leftOdometry to baseEnd.leftOdometry;
+        connect mainPcbEnd.rightOdometry to baseEnd.rightOdometry;
+        connect mainPcbEnd.brushCommand to baseEnd.brushCommand;
+        connect mainPcbEnd.vacuumCommand to baseEnd.vacuumCommand;
+        connect mainPcbEnd.bmsBus to baseEnd.bmsBus;
+        connect mainPcbEnd.leftLiftHazard to baseEnd.leftLiftHazard;
+        connect mainPcbEnd.rightLiftHazard to baseEnd.rightLiftHazard;
+        connect mainPcbEnd.frontLeftCliffHazard to baseEnd.frontLeftCliffHazard;
+        connect mainPcbEnd.frontRightCliffHazard to baseEnd.frontRightCliffHazard;
+        connect mainPcbEnd.rearLeftCliffHazard to baseEnd.rearLeftCliffHazard;
+        connect mainPcbEnd.rearRightCliffHazard to baseEnd.rearRightCliffHazard;
+        connect mainPcbEnd.cleaningFault to baseEnd.cleaningFault;
+        connect mainPcbEnd.bmsAlert to baseEnd.bmsAlert;
+        connect mainPcbEnd.dockBeaconDetected to baseEnd.dockBeaconDetected;
     }
 
 

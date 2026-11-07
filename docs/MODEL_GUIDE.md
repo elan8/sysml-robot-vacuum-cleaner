@@ -84,7 +84,9 @@ There are 11 customer, 21 system and 13 module requirements, four analyses,
 12 verification cases and five validation cases.
 
 The physical baseline retains a dock/charger/BMS/battery path, separate safety
-signals, two module harnesses, mechanically connected drivetrains, a powered
+signals, two module harnesses modelled as buses (`BaseHarnessBus` and `TopHarnessBus`, with a
+module-side mate each, because conjugation does not reverse nested ports), mechanically
+connected drivetrains, a powered
 beacon receiver, debris transfer to the removable bin, and the top-module HMI.
 Two forward side brushes share the brush transmission. The main roller and
 suction intake are ahead of the rear caster. Nominal body diameter is 340 mm;

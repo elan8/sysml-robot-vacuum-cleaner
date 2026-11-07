@@ -37,29 +37,11 @@ package MainControlBoardSystem {
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
     part def MainPcbModuleSpecification :> ElectronicsComponent, Elan8::SystemsEngineering::SystemSpecification {
-        port batteryPower : PowerRailPort;
-        port logicPower : PowerRailPort;
-        port sensorBus : ~I2cControllerPort;
-        port lidarSerial : ~UartPort;
-        port bmsBus : ~I2cControllerPort;
+        // The wiring harnesses to the base and top modules, as buses: one port each, carrying the
+        // signals as nested ports, which the board connects to its parts.
+        port baseHarness : BaseHarnessSystem::BaseHarnessBus;
+        port topHarness : TopHarnessSystem::TopHarnessBus;
         port appService : ~RobotServicePort;
-        port leftPhases : ThreePhaseDrivePort;
-        port rightPhases : ThreePhaseDrivePort;
-        port leftOdometry : QuadratureEncoderPort;
-        port rightOdometry : QuadratureEncoderPort;
-        port brushCommand : PwmPort;
-        port vacuumCommand : PwmPort;
-        port leftLiftHazard : GpioPort;
-        port rightLiftHazard : GpioPort;
-        port frontLeftCliffHazard : GpioPort;
-        port frontRightCliffHazard : GpioPort;
-        port rearLeftCliffHazard : GpioPort;
-        port rearRightCliffHazard : GpioPort;
-        port cleaningFault : GpioPort;
-        port bmsAlert : GpioPort;
-        port dockBeaconDetected : GpioPort;
-        port topBumperHazard : GpioPort;
-        port localHmi : ~LocalHmiControllerPort;
         attribute driveDisableLatency : DurationValue;
         satisfy Requirements::mainPcbSpecification;
     }
@@ -120,39 +102,39 @@ package MainControlBoardSystem {
               into one module — Base and Top now form the real enclosure, so a separate
               PCB-housing level is no longer needed.
             */
-        connect batteryPower to leftMotorDriver.supply;
-        connect batteryPower to rightMotorDriver.supply;
-        connect logicPower to mcu.power;
-        connect logicPower to wireless.power;
-        connect logicPower to imu.power;
-        connect sensorBus to mcu.sensorI2c;
+        connect baseHarness.batteryRail to leftMotorDriver.supply;
+        connect baseHarness.batteryRail to rightMotorDriver.supply;
+        connect baseHarness.logicRail to mcu.power;
+        connect baseHarness.logicRail to wireless.power;
+        connect baseHarness.logicRail to imu.power;
+        connect topHarness.sensorBus to mcu.sensorI2c;
         interface imuLink : I2cLink
               connect controllerPort ::> mcu.sensorI2c
               to targetPort ::> imu.data;
-        connect lidarSerial to mcu.lidarUart;
-        connect bmsBus to mcu.bmsSmbus;
-        connect leftOdometry to mcu.leftOdometry;
-        connect rightOdometry to mcu.rightOdometry;
+        connect topHarness.lidarSerial to mcu.lidarUart;
+        connect baseHarness.bmsBus to mcu.bmsSmbus;
+        connect baseHarness.leftOdometry to mcu.leftOdometry;
+        connect baseHarness.rightOdometry to mcu.rightOdometry;
         connect mcu.leftMotorPwm to leftMotorDriver.command;
         connect mcu.rightMotorPwm to rightMotorDriver.command;
-        connect leftMotorDriver.driveOutput to leftPhases;
-        connect rightMotorDriver.driveOutput to rightPhases;
-        connect mcu.brushPwm to brushCommand;
-        connect mcu.vacuumPwm to vacuumCommand;
+        connect leftMotorDriver.driveOutput to baseHarness.leftPhases;
+        connect rightMotorDriver.driveOutput to baseHarness.rightPhases;
+        connect mcu.brushPwm to baseHarness.brushCommand;
+        connect mcu.vacuumPwm to baseHarness.vacuumCommand;
         connect mcu.wirelessUart to wirelessUart.host;
         connect wireless.hostLink to wirelessUart.wireless;
         connect appService to wireless.robotService;
-        connect leftLiftHazard to mcu.leftLiftHazard;
-        connect rightLiftHazard to mcu.rightLiftHazard;
-        connect frontLeftCliffHazard to mcu.frontLeftCliffHazard;
-        connect frontRightCliffHazard to mcu.frontRightCliffHazard;
-        connect rearLeftCliffHazard to mcu.rearLeftCliffHazard;
-        connect rearRightCliffHazard to mcu.rearRightCliffHazard;
-        connect cleaningFault to mcu.cleaningFault;
-        connect bmsAlert to mcu.bmsAlert;
-        connect dockBeaconDetected to mcu.dockBeaconDetected;
-        connect topBumperHazard to mcu.topBumperHazard;
-        connect localHmi to mcu.localHmi;
+        connect baseHarness.leftLiftHazard to mcu.leftLiftHazard;
+        connect baseHarness.rightLiftHazard to mcu.rightLiftHazard;
+        connect baseHarness.frontLeftCliffHazard to mcu.frontLeftCliffHazard;
+        connect baseHarness.frontRightCliffHazard to mcu.frontRightCliffHazard;
+        connect baseHarness.rearLeftCliffHazard to mcu.rearLeftCliffHazard;
+        connect baseHarness.rearRightCliffHazard to mcu.rearRightCliffHazard;
+        connect baseHarness.cleaningFault to mcu.cleaningFault;
+        connect baseHarness.bmsAlert to mcu.bmsAlert;
+        connect baseHarness.dockBeaconDetected to mcu.dockBeaconDetected;
+        connect topHarness.bumperHazard to mcu.topBumperHazard;
+        connect topHarness.hmiControl to mcu.localHmi;
         connect leftMotorDriver.fault to mcu.leftMotorFault;
         connect rightMotorDriver.fault to mcu.rightMotorFault;
     }

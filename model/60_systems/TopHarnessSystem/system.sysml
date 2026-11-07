@@ -36,17 +36,33 @@ package TopHarnessSystem {
     private import PhysicalShared::*;
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
+    port def TopHarnessBus {
+        doc /* The signals the top wiring harness carries between the main board and the top
+             * module, as nested ports typed as the main board sees them. The top module uses
+             * TopHarnessModuleBus. Sensor power, which comes from the base module, is a port of
+             * its own. */
+        port sensorBus : ~I2cControllerPort;
+        port lidarSerial : ~UartPort;
+        port bumperHazard : GpioPort;
+        port hmiControl : ~LocalHmiControllerPort;
+    }
+
+    port def TopHarnessModuleBus {
+        doc /* The signals of the top wiring harness as the module sees them: the mate of the bus the main
+             * board uses. Conjugating a bus reverses only its directed features, not its nested
+             * ports (SysML v2 7.12), so the module end has a definition of its own. */
+        port sensorBus : I2cControllerPort;
+        port lidarSerial : UartPort;
+        port bumperHazard : GpioPort;
+        port hmiControl : LocalHmiControllerPort;
+    }
+
     part def TopWiringHarnessSpecification :> Elan8::Core::PhysicalComponent, Elan8::SystemsEngineering::SystemSpecification {
-        port pcbSensorBus : I2cControllerPort;
-        port topSensorBus : I2cControllerPort;
-        port pcbLidarSerial : UartPort;
-        port topLidarSerial : ~UartPort;
+        // Each end mates with the module it plugs into.
+        port mainPcbEnd : TopHarnessModuleBus;
+        port topEnd : TopHarnessBus;
         port baseSensorPower : PowerRailPort;
         port topSensorPower : PowerRailPort;
-        port pcbBumperHazard : GpioPort;
-        port topBumperHazard : GpioPort;
-        port pcbHmiControl : LocalHmiControllerPort;
-        port topHmiControl : ~LocalHmiControllerPort;
     }
 
     part def TopWiringHarnessArchitecture :> TopWiringHarnessSpecification, WiringHarness, Elan8::SystemsEngineering::SystemArchitecture {
@@ -66,11 +82,11 @@ package TopHarnessSystem {
         @MakePart;
         attribute :>> unitCost = 1.10 [EUR];
         attribute :>> mass = 0.06 [kg];
-        connect pcbSensorBus to topSensorBus;
-        connect pcbLidarSerial to topLidarSerial;
+        connect mainPcbEnd.sensorBus to topEnd.sensorBus;
+        connect mainPcbEnd.lidarSerial to topEnd.lidarSerial;
+        connect mainPcbEnd.bumperHazard to topEnd.bumperHazard;
+        connect mainPcbEnd.hmiControl to topEnd.hmiControl;
         connect baseSensorPower to topSensorPower;
-        connect pcbBumperHazard to topBumperHazard;
-        connect pcbHmiControl to topHmiControl;
     }
 
 

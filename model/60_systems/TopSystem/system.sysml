@@ -37,11 +37,9 @@ package TopSystem {
     private import StandardViewDefinitions::*;
     private import ReviewConcerns::*;
     part def TopModuleSpecification :> MechanicalComponent, Elan8::SystemsEngineering::SystemSpecification {
-        port sensorBus : I2cControllerPort;
-        port lidarSerial : UartPort;
+        // The top wiring harness from the main board, as a bus carrying the signals as nested ports.
+        port mainPcbHarness : TopHarnessSystem::TopHarnessModuleBus;
         port power : PowerRailPort;
-        port bumperHazard : GpioPort;
-        port hmiControl : LocalHmiControllerPort;
         attribute height : LengthValue;
         attribute topElectronicsPowerDraw : PowerValue;
         satisfy Requirements::topModuleSpecification;
@@ -107,19 +105,19 @@ package TopSystem {
               draw is left unset (negligible), matching the ElectronicsComponent "no
               default, not mandatory" convention already used for BatteryPack.
             */
-        connect sensorBus to i2c.host;
+        connect mainPcbHarness.sensorBus to i2c.host;
         connect frontTof.data to i2c.frontTof;
         connect leftTof.data to i2c.leftTof;
         connect rightTof.data to i2c.rightTof;
-        connect lidarSerial to uart.host;
+        connect mainPcbHarness.lidarSerial to uart.host;
         connect lidar.data to uart.lidar;
         connect lidar.power to power;
         connect frontTof.power to power;
         connect leftTof.power to power;
         connect rightTof.power to power;
         connect hmi.power to power;
-        connect hmi.control to hmiControl;
-        connect frontBumper.signal to bumperHazard;
+        connect hmi.control to mainPcbHarness.hmiControl;
+        connect frontBumper.signal to mainPcbHarness.bumperHazard;
     }
 
     package Views {
