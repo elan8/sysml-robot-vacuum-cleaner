@@ -2,5 +2,6 @@
   "spec42.libraryPaths": [
     "../sysml-domain-libraries/model"
   ],
+  "spec42.doc42.libraryPaths": [],
   "spec42.disabledLibraries": ["domain", "method"]
 }
